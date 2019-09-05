@@ -125,7 +125,9 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
+#ifdef _DEBUG
 		InitConsole();
+#endif
 		LoadOriginalDll();
 		LoadLibrary(TEXT("RS_ASIO.dll"));
 		
