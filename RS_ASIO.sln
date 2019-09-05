@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.329
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "avrt", "avrt\avrt.vcxproj", "{397924BB-35EE-4CE8-BCDD-A79E12C1E180}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RS_ASIO", "RS_ASIO\RS_ASIO.vcxproj", "{4339185F-E3EA-4FE0-BBD7-67D4FE3FBF3E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{397924BB-35EE-4CE8-BCDD-A79E12C1E180}.Debug|x86.ActiveCfg = Debug|Win32
+		{397924BB-35EE-4CE8-BCDD-A79E12C1E180}.Debug|x86.Build.0 = Debug|Win32
+		{397924BB-35EE-4CE8-BCDD-A79E12C1E180}.Release|x86.ActiveCfg = Release|Win32
+		{397924BB-35EE-4CE8-BCDD-A79E12C1E180}.Release|x86.Build.0 = Release|Win32
+		{4339185F-E3EA-4FE0-BBD7-67D4FE3FBF3E}.Debug|x86.ActiveCfg = Debug|Win32
+		{4339185F-E3EA-4FE0-BBD7-67D4FE3FBF3E}.Debug|x86.Build.0 = Debug|Win32
+		{4339185F-E3EA-4FE0-BBD7-67D4FE3FBF3E}.Release|x86.ActiveCfg = Release|Win32
+		{4339185F-E3EA-4FE0-BBD7-67D4FE3FBF3E}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {51FD37F8-4C73-4548-99B2-78BE01CBBF32}
+	EndGlobalSection
+EndGlobal
