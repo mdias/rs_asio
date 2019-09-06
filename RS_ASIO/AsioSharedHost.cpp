@@ -198,6 +198,9 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 			return ASE_HWMalfunction;
 		}
 
+		m_NumBufferFrames = (UINT32)bufferDurationFrames;
+		m_CurrentWaveFormat = format;
+
 		if (m_Driver->start() != ASE_OK)
 		{
 			DisplayCurrentError();
@@ -210,9 +213,6 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 
 			return ASE_HWMalfunction;
 		}
-
-		m_NumBufferFrames = (UINT32)bufferDurationFrames;
-		m_CurrentWaveFormat = format;
 	}
 
 	++m_StartCount;
