@@ -5,6 +5,21 @@
 #include "RSAggregatorDeviceEnum.h"
 #include "Configurator.h"
 
+FILE *fStreamOut = nullptr;
+FILE *fStreamErr = nullptr;
+
+static void InitConsole()
+{
+	freopen_s(&fStreamOut, "RS_ASIO.txt", "w", stdout);
+	// freopen_s(&fStreamErr, "RS_ASIO_err.txt", "w", stderr);
+}
+
+static void CleanupConsole()
+{
+	// if (fStreamErr)	fclose(fStreamErr);
+	if (fStreamOut)	fclose(fStreamOut);
+}
+
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -13,12 +28,18 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
+#ifdef _DEBUG
+		InitConsole();
+#endif
 		DisableThreadLibraryCalls(hModule);
 		std::cout << "Wrapper DLL loaded\n";
 		PatchOriginalCode();
 		break;
 	case DLL_PROCESS_DETACH:
 		std::cout << "Wrapper DLL unloaded\n";
+#ifdef _DEBUG
+		CleanupConsole();
+#endif
 		break;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
