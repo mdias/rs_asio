@@ -171,9 +171,9 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 		std::cout << "  actual buffer duration: " << RefTimeToMilisecs(bufferDuration) << "ms (" << std::dec << bufferDurationFrames << " frames)\n";
 
 		// create the buffers
-		m_AsioBuffers.resize(m_AsioInChannelInfo.size() + m_AsioOutChannelInfo.size());
-		for (size_t i = 0; i < m_AsioBuffers.size(); ++i)
+		m_AsioBuffers.resize(m_AsioOutChannelInfo.size() + m_AsioInChannelInfo.size());
 		{
+			size_t i = 0;
 			for (unsigned outC = 0; outC < m_AsioOutChannelInfo.size(); ++outC, ++i)
 			{
 				ASIOBufferInfo& asioBuffer = m_AsioBuffers[i];
