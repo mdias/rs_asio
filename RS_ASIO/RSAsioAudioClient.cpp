@@ -222,14 +222,12 @@ HRESULT RSAsioAudioClient::GetDevicePeriod(REFERENCE_TIME *phnsDefaultDevicePeri
 
 	if (phnsDefaultDevicePeriod)
 	{
-		*phnsDefaultDevicePeriod = /*MilisecsToRefTime(3)*/100000;;
+		*phnsDefaultDevicePeriod = MilisecsToRefTime(3);;
 	}
 	if (phnsMinimumDevicePeriod)
 	{
-		*phnsMinimumDevicePeriod = /*MilisecsToRefTime(3)*/30000;
+		*phnsMinimumDevicePeriod = MilisecsToRefTime(3);
 	}
-
-	std::cout << "  OK\n";
 
 	return S_OK;
 }
