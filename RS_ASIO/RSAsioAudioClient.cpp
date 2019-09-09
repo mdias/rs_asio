@@ -40,6 +40,8 @@ HRESULT RSAsioAudioClient::QueryInterface(REFIID riid, void **ppvObject)
 
 HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamFlags, REFERENCE_TIME hnsBufferDuration, REFERENCE_TIME hnsPeriodicity, const WAVEFORMATEX *pFormat, LPCGUID AudioSessionGuid)
 {
+	std::lock_guard<std::mutex> g(m_bufferMutex);
+
 	if (!pFormat)
 		return E_POINTER;
 
@@ -79,18 +81,15 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	{
 		m_CaptureClient = new RSAsioAudioCaptureClient(*this);
 	}
-	m_AsioSharedHost.AddBufferSwitchListener(this);
-
+	
 	m_IsInitialized = true;
 	m_UsingEventHandle = useEventCallback;
 
 	UINT32 numFrames = m_AsioSharedHost.GetBufferNumFrames();
+	m_bufferNumFrames = numFrames;
+	m_buffer.resize(pFormat->nBlockAlign * numFrames);
 
-	{
-		std::lock_guard<std::mutex> g(m_bufferMutex);
-		m_bufferNumFrames = numFrames;
-		m_buffer.resize(pFormat->nBlockAlign * numFrames);
-	}
+	m_AsioSharedHost.AddBufferSwitchListener(this);
 
 	return S_OK;
 }
@@ -230,6 +229,8 @@ HRESULT RSAsioAudioClient::GetDevicePeriod(REFERENCE_TIME *phnsDefaultDevicePeri
 
 HRESULT RSAsioAudioClient::Start()
 {
+	std::lock_guard<std::mutex> g(m_bufferMutex);
+
 	if (!m_IsInitialized)
 		return AUDCLNT_E_NOT_INITIALIZED;
 
@@ -252,6 +253,8 @@ HRESULT RSAsioAudioClient::Start()
 
 HRESULT RSAsioAudioClient::Stop()
 {
+	std::lock_guard<std::mutex> g(m_bufferMutex);
+
 	if (!m_IsInitialized)
 		return AUDCLNT_E_NOT_INITIALIZED;
 
@@ -262,6 +265,8 @@ HRESULT RSAsioAudioClient::Stop()
 
 HRESULT RSAsioAudioClient::Reset()
 {
+	std::lock_guard<std::mutex> g(m_bufferMutex);
+
 	if (!m_IsInitialized)
 		return AUDCLNT_E_NOT_INITIALIZED;
 	if (m_IsStarted)
@@ -284,11 +289,8 @@ HRESULT RSAsioAudioClient::Reset()
 	m_EventHandle = NULL;
 	memset(&m_WaveFormat, 0, sizeof(m_WaveFormat));
 
-	{
-		std::lock_guard<std::mutex> g(m_bufferMutex);
-		m_bufferNumFrames = 0;
-		m_buffer.clear();
-	}
+	m_bufferNumFrames = 0;
+	m_buffer.clear();
 
 	return S_OK;
 }
@@ -411,26 +413,27 @@ static void CopyInterleaveChannel(BYTE* inDeinterleaved, BYTE* outInterleaved, W
 
 void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 {
-#ifdef _DEBUG
-	if (m_numBufferSwitches < 3)
-	{
-		++m_numBufferSwitches;
-		std::cout << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << std::endl;
-	}
-	else if (m_numBufferSwitches == 3)
-	{
-		++m_numBufferSwitches;
-		std::cout << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << " (not logging upcoming switches)" << std::endl;
-	}
-	
-#endif
-
 	std::lock_guard<std::mutex> g(m_bufferMutex);
+
+#ifdef _DEBUG
+	if (m_IsStarted)
+	{
+		if (m_numBufferSwitches < 3)
+		{
+			++m_numBufferSwitches;
+			std::cout << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << std::endl;
+		}
+		else if (m_numBufferSwitches == 3)
+		{
+			++m_numBufferSwitches;
+			std::cout << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << " (not logging upcoming switches)" << std::endl;
+		}
+	}
+#endif
 
 	if (!m_IsStarted)
 	{
 		memset(m_buffer.data(), 0, m_buffer.size());
-		return;
 	}
 
 	// sanity check
