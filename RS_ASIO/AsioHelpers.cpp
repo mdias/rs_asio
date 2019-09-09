@@ -162,7 +162,7 @@ static bool GetRegistryDriverInfo(AsioHelpers::DriverInfo& outInfo, HKEY hKey, c
 
 std::vector<AsioHelpers::DriverInfo> AsioHelpers::FindDrivers()
 {
-	std::cout << "\n" __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 
 	std::vector<AsioHelpers::DriverInfo> result;
 
@@ -178,7 +178,7 @@ std::vector<AsioHelpers::DriverInfo> AsioHelpers::FindDrivers()
 			AsioHelpers::DriverInfo info;
 			if (GetRegistryDriverInfo(info, hkEnum, keyName))
 			{
-				std::cout << "  " << info.Name.c_str() << "\n";
+				std::cout << "  " << info.Name.c_str() << std::endl;
 				result.push_back(std::move(info));
 			}
 		}

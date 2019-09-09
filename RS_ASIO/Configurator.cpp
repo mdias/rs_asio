@@ -197,7 +197,7 @@ static void LoadConfigIni(RSConfig& out)
 	file.open(cfgPath, std::ifstream::in);
 	if (!file.is_open())
 	{
-		std::cout << "failed to open config file\n";
+		std::cout << "failed to open config file" << std::endl;
 		return;
 	}
 
@@ -225,7 +225,7 @@ static void LoadConfigIni(RSConfig& out)
 			size_t pos = currentLine.find(']');
 			if (pos != (currentLine.length()-1))
 			{
-				std::cerr << __FUNCTION__ << " - malformed ini section found at line " << line << "\n";
+				std::cerr << __FUNCTION__ << " - malformed ini section found at line " << line << std::endl;
 			}
 			else
 			{
@@ -286,7 +286,7 @@ static void LoadConfigIni(RSConfig& out)
 						}
 						else
 						{
-							std::cerr << __FUNCTION__ << " - invalid value for channel, value should be an integer starting at zero. line: " << line << "\n";
+							std::cerr << __FUNCTION__ << " - invalid value for channel, value should be an integer starting at zero. line: " << line << std::endl;
 						}
 					}
 				}

@@ -180,20 +180,20 @@ std::ostream & operator<<(std::ostream & os, const std::wstring wStr)
 std::ostream & operator<<(std::ostream & os, const WAVEFORMATEX& fmt)
 {
 	os << "WAVEFORMATEX\n";
-	os << "  wFormatTag: " << std::hex << fmt.wFormatTag << "\n";
-	os << "  nChannels: " << std::dec << fmt.nChannels << "\n";
-	os << "  nSamplesPerSec: " << std::dec << fmt.nSamplesPerSec << "\n";
-	os << "  nAvgBytesPerSec: " << std::dec << fmt.nAvgBytesPerSec << "\n";
-	os << "  nBlockAlign: " << std::dec << fmt.nBlockAlign << "\n";
-	os << "  wBitsPerSample: " << std::dec << fmt.wBitsPerSample << "\n";
-	os << "  cbSize: " << std::dec << fmt.cbSize << "\n";
+	os << "  wFormatTag: " << std::hex << fmt.wFormatTag << std::endl;
+	os << "  nChannels: " << std::dec << fmt.nChannels << std::endl;
+	os << "  nSamplesPerSec: " << std::dec << fmt.nSamplesPerSec << std::endl;
+	os << "  nAvgBytesPerSec: " << std::dec << fmt.nAvgBytesPerSec << std::endl;
+	os << "  nBlockAlign: " << std::dec << fmt.nBlockAlign << std::endl;
+	os << "  wBitsPerSample: " << std::dec << fmt.wBitsPerSample << std::endl;
+	os << "  cbSize: " << std::dec << fmt.cbSize << std::endl;
 
 	if (fmt.wFormatTag == WAVE_FORMAT_EXTENSIBLE)
 	{
 		const WAVEFORMATEXTENSIBLE& ext = (WAVEFORMATEXTENSIBLE&)fmt;
-		os << "  ext.SubFormat: " << std::hex << ext.SubFormat << "\n";
-		os << "  ext.Samples: " << std::dec << ext.Samples.wSamplesPerBlock << "\n";
-		os << "  ext.dwChannelMask: " << std::hex << ext.dwChannelMask << "\n";
+		os << "  ext.SubFormat: " << std::hex << ext.SubFormat << std::endl;
+		os << "  ext.Samples: " << std::dec << ext.Samples.wSamplesPerBlock << std::endl;
+		os << "  ext.dwChannelMask: " << std::hex << ext.dwChannelMask << std::endl;
 	}
 
 	return os;

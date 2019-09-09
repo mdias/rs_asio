@@ -52,7 +52,7 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 	
 	if (!m_Config.output.asioDriverName.empty())
 	{
-		std::cout << __FUNCTION__ " - " << "output requesting ASIO driver: " << m_Config.output.asioDriverName << "\n";
+		std::cout << __FUNCTION__ " - " << "output requesting ASIO driver: " << m_Config.output.asioDriverName << std::endl;
 
 		AsioSharedHost* host = fnFindOrCreateAsioHost(m_Config.output.asioDriverName);
 		if (host)
@@ -62,12 +62,12 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 			device->Release();
 			device = nullptr;
 
-			std::cout << __FUNCTION__ " - OK\n";
+			std::cout << __FUNCTION__ " - OK" << std::endl;
 			host->Release();
 		}
 		else
 		{
-			std::cerr << __FUNCTION__ " - " << "failed.\n";
+			std::cerr << __FUNCTION__ " - " << "failed." << std::endl;
 		}
 	}
 
@@ -76,7 +76,7 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 	{
 		if (!inputCfg.asioDriverName.empty())
 		{
-			std::cout << __FUNCTION__ " - " << "input[" << inputIdx << "] requesting ASIO driver: " << inputCfg.asioDriverName << "\n";
+			std::cout << __FUNCTION__ " - " << "input[" << inputIdx << "] requesting ASIO driver: " << inputCfg.asioDriverName << std::endl;
 
 			AsioSharedHost* host = fnFindOrCreateAsioHost(inputCfg.asioDriverName);
 			if (host)
@@ -89,12 +89,12 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 				device->Release();
 				device = nullptr;
 
-				std::cout << __FUNCTION__ " - OK\n";
+				std::cout << __FUNCTION__ " - OK" << std::endl;
 				host->Release();
 			}
 			else
 			{
-				std::cerr << __FUNCTION__ " - " << "failed.\n";
+				std::cerr << __FUNCTION__ " - " << "failed." << std::endl;
 			}
 		}
 

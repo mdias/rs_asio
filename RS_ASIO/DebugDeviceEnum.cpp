@@ -7,8 +7,6 @@
 DebugDeviceEnum::DebugDeviceEnum(IMMDeviceEnumerator* enumerator)
 	: m_RealEnumerator(enumerator)
 {
-	std::cout << "\n\n NEW DEVICE ENUM\n\n";
-
 	if (m_RealEnumerator)
 	{
 		m_RealEnumerator->AddRef();
@@ -27,20 +25,20 @@ DebugDeviceEnum::~DebugDeviceEnum()
 
 HRESULT STDMETHODCALLTYPE DebugDeviceEnum::QueryInterface(REFIID riid, void **ppvObject)
 {
-	std::cout << __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 
 	return m_RealEnumerator->QueryInterface(riid, ppvObject);
 }
 
 HRESULT STDMETHODCALLTYPE DebugDeviceEnum::EnumAudioEndpoints(EDataFlow dataFlow, DWORD dwStateMask, IMMDeviceCollection **ppDevices)
 {
-	std::cout << __FUNCTION__ " - dataFlow: " << Dataflow2String(dataFlow) << " - dwStateMask: " << dwStateMask << "\n";
+	std::cout << __FUNCTION__ " - dataFlow: " << Dataflow2String(dataFlow) << " - dwStateMask: " << dwStateMask << std::endl;
 	
 	HRESULT hr = RSBaseDeviceEnum::EnumAudioEndpoints(dataFlow, dwStateMask, ppDevices);
-	std::cout << "  hr: " << std::hex << hr << "\n";
+	std::cout << "  hr: " << std::hex << hr << std::endl;
 	if (ppDevices)
 	{
-		std::cout << "  *ppDevices: " << *ppDevices << "\n";
+		std::cout << "  *ppDevices: " << *ppDevices << std::endl;
 	}
 
 	return hr;
@@ -48,13 +46,13 @@ HRESULT STDMETHODCALLTYPE DebugDeviceEnum::EnumAudioEndpoints(EDataFlow dataFlow
 
 HRESULT STDMETHODCALLTYPE DebugDeviceEnum::GetDefaultAudioEndpoint(EDataFlow dataFlow, ERole role, IMMDevice **ppEndpoint)
 {
-	std::cout << __FUNCTION__ " - dataFlow: " << Dataflow2String(dataFlow) << " - role: " << Role2String(role) << "\n";
+	std::cout << __FUNCTION__ " - dataFlow: " << Dataflow2String(dataFlow) << " - role: " << Role2String(role) << std::endl;
 
 	HRESULT hr = RSBaseDeviceEnum::GetDefaultAudioEndpoint(dataFlow, role, ppEndpoint);
-	std::cout << "  hr: " << std::hex << hr << "\n";
+	std::cout << "  hr: " << std::hex << hr << std::endl;
 	if (ppEndpoint)
 	{
-		std::cout << "  *ppEndpoint: " << *ppEndpoint << "\n";
+		std::cout << "  *ppEndpoint: " << *ppEndpoint << std::endl;
 	}
 
 	return hr;
@@ -63,10 +61,10 @@ HRESULT STDMETHODCALLTYPE DebugDeviceEnum::GetDefaultAudioEndpoint(EDataFlow dat
 HRESULT STDMETHODCALLTYPE DebugDeviceEnum::GetDevice(LPCWSTR pwstrId, IMMDevice **ppDevice)
 {
 	HRESULT hr = RSBaseDeviceEnum::GetDevice(pwstrId, ppDevice);
-	std::cout << "  hr: " << std::hex << hr << "\n";
+	std::cout << "  hr: " << std::hex << hr << std::endl;
 	if (ppDevice)
 	{
-		std::cout << "  *ppEndpoint: " << *ppDevice << "\n";
+		std::cout << "  *ppEndpoint: " << *ppDevice << std::endl;
 	}
 
 	return hr;
@@ -74,14 +72,14 @@ HRESULT STDMETHODCALLTYPE DebugDeviceEnum::GetDevice(LPCWSTR pwstrId, IMMDevice 
 
 HRESULT STDMETHODCALLTYPE DebugDeviceEnum::RegisterEndpointNotificationCallback(IMMNotificationClient *pClient)
 {
-	std::cout << __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 
 	return m_RealEnumerator->RegisterEndpointNotificationCallback(pClient);
 }
 
 HRESULT STDMETHODCALLTYPE DebugDeviceEnum::UnregisterEndpointNotificationCallback(IMMNotificationClient *pClient)
 {
-	std::cout << __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 
 	return m_RealEnumerator->UnregisterEndpointNotificationCallback(pClient);
 }
@@ -156,7 +154,7 @@ void DebugDeviceEnum::UpdateAvailableDevices()
 	m_RenderDevices.UpdateDevicesFromCollection(aggregatedRenderCollection, true);
 	m_CaptureDevices.UpdateDevicesFromCollection(aggregatedCaptureCollection, true);
 
-	std::cout << __FUNCTION__ << " - " << m_RenderDevices.size() << " render devices, " << m_CaptureDevices.size() << " capture devices\n";
+	std::cout << __FUNCTION__ << " - " << m_RenderDevices.size() << " render devices, " << m_CaptureDevices.size() << " capture devices" << std::endl;
 
 	m_DeviceListNeedsUpdate = false;
 }

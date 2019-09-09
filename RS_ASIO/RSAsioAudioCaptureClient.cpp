@@ -70,7 +70,7 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::ReleaseBuffer(UINT32 NumFram
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetNextPacketSize(UINT32 *pNumFramesInNextPacket)
 {
-	std::cout << __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 
 	if (!pNumFramesInNextPacket)
 		return E_POINTER;

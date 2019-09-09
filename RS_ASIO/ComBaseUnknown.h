@@ -19,7 +19,7 @@ public:
 			return S_OK;
 		}
 
-		std::cerr << __FUNCTION__ << " - interface not found; riid: " << riid << "\n";
+		std::cerr << __FUNCTION__ << " - interface not found; riid: " << riid << std::endl;
 
 		return E_NOINTERFACE;
 	}

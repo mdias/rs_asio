@@ -28,7 +28,7 @@ static std::vector<void*> FindBytesOffsets(const BYTE* bytes, size_t numBytes)
 	MODULEINFO baseModuleInfo;
 	if (!GetModuleInformation(GetCurrentProcess(), baseModuleHandle, &baseModuleInfo, sizeof(baseModuleInfo)))
 	{
-		std::cerr << "Could not get base module info\n";
+		std::cerr << "Could not get base module info" << std::endl;
 		return result;
 	}
 
@@ -59,21 +59,21 @@ static std::vector<void*> FindBytesOffsets(const BYTE* bytes, size_t numBytes)
 template<void* NewFn>
 static void Patch_CallAbsoluteAddress(const std::vector<void*>& offsets)
 {
-	std::cout << __FUNCTION__ " - num locations: " << offsets.size() << "\n";
+	std::cout << __FUNCTION__ " - num locations: " << offsets.size() << std::endl;
 
 	static void* fnAddress = NewFn;
 	static void* fnAddressIndirect = &fnAddress;
 
 	for (void* offset : offsets)
 	{
-		std::cout << "Patching call at " << offset << "\n";
+		std::cout << "Patching call at " << offset << std::endl;
 
 		BYTE* bytes = (BYTE*)offset;
 
 		DWORD oldProtectFlags = 0;
 		if (!VirtualProtect(offset, 6, PAGE_WRITECOPY, &oldProtectFlags))
 		{
-			std::cerr << "Failed to change memory protection\n";
+			std::cerr << "Failed to change memory protection" << std::endl;
 		}
 		else
 		{
@@ -82,7 +82,7 @@ static void Patch_CallAbsoluteAddress(const std::vector<void*>& offsets)
 
 			if (!VirtualProtect(offset, 6, oldProtectFlags, &oldProtectFlags))
 			{
-				std::cerr << "Failed to restore memory protection\n";
+				std::cerr << "Failed to restore memory protection" << std::endl;
 			}
 		}
 	}
@@ -91,14 +91,14 @@ static void Patch_CallAbsoluteAddress(const std::vector<void*>& offsets)
 template<void* NewFn>
 static void Patch_CallRelativeAddress(const std::vector<void*>& offsets)
 {
-	std::cout << __FUNCTION__ " - num locations: " << offsets.size() << "\n";
+	std::cout << __FUNCTION__ " - num locations: " << offsets.size() << std::endl;
 
 	static void* fnAddress = NewFn;
 	static void* fnAddressIndirect = &fnAddress;
 
 	for (void* offset : offsets)
 	{
-		std::cout << "Patching call at " << offset << "\n";
+		std::cout << "Patching call at " << offset << std::endl;
 
 		BYTE* bytes = (BYTE*)offset;
 
@@ -108,7 +108,7 @@ static void Patch_CallRelativeAddress(const std::vector<void*>& offsets)
 		DWORD oldProtectFlags = 0;
 		if (!VirtualProtect(offset, 6, PAGE_WRITECOPY, &oldProtectFlags))
 		{
-			std::cerr << "Failed to change memory protection\n";
+			std::cerr << "Failed to change memory protection" << std::endl;
 		}
 		else
 		{
@@ -120,7 +120,7 @@ static void Patch_CallRelativeAddress(const std::vector<void*>& offsets)
 
 			if (!VirtualProtect(offset, 6, oldProtectFlags, &oldProtectFlags))
 			{
-				std::cerr << "Failed to restore memory protection\n";
+				std::cerr << "Failed to restore memory protection" << std::endl;
 			}
 		}
 	}
@@ -129,11 +129,11 @@ static void Patch_CallRelativeAddress(const std::vector<void*>& offsets)
 
 void PatchOriginalCode()
 {
-	std::cout << __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 	
 	// patch CoCreateInstance calls
 	{
-		std::cout << "Patching CoCreateInstance\n";
+		std::cout << "Patching CoCreateInstance" << std::endl;
 
 		std::vector<void*> offsets = FindBytesOffsets(originalBytes_call_CoCreateInstance, sizeof(originalBytes_call_CoCreateInstance));
 		Patch_CallAbsoluteAddress<(void*)&Patched_CoCreateInstance>(offsets);
@@ -141,14 +141,14 @@ void PatchOriginalCode()
 
 	// patch PortAudio MarshalStreamComPointers
 	{
-		std::cout << "Patching PortAudio MarshalStreamComPointers\n";
+		std::cout << "Patching PortAudio MarshalStreamComPointers" << std::endl;
 		std::vector<void*> offsets = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));
 		Patch_CallRelativeAddress<(void*)&Patched_PortAudio_MarshalStreamComPointers>(offsets);
 	}
 
 	// patch PortAudio UnmarshalStreamComPointers
 	{
-		std::cout << "Patching PortAudio UnmarshalStreamComPointers\n";
+		std::cout << "Patching PortAudio UnmarshalStreamComPointers" << std::endl;
 		std::vector<void*> offsets = FindBytesOffsets(originalBytes_call_UnmarshalStreamComPointers, sizeof(originalBytes_call_UnmarshalStreamComPointers));
 		Patch_CallRelativeAddress<(void*)&Patched_PortAudio_UnmarshalStreamComPointers>(offsets);
 	}

@@ -62,15 +62,15 @@ static void LoadOriginalDll()
 	char originalPath[MAX_PATH] = {};
 	snprintf(originalPath, sizeof(originalPath), "%s\\avrt.dll", sysDir);
 
-	std::cout << "Attempting to load original DLL from: " << originalPath << "\n";
+	std::cout << "Attempting to load original DLL from: " << originalPath << std::endl;
 	hModuleReal = LoadLibraryA(originalPath);
 	if (!hModuleReal)
 	{
-		std::cerr << "Load failed\n";
+		std::cerr << "Load failed" << std::endl;
 	}
 	else
 	{
-		std::cout << "Load OK; fetching procedure addresses...\n";
+		std::cout << "Load OK; fetching procedure addresses..." << std::endl;
 
 		FILLREALPROCADDRESS(AvCreateTaskIndex);
 		FILLREALPROCADDRESS(AvQuerySystemResponsiveness);
@@ -99,7 +99,7 @@ static void UnloadOriginalDll()
 {
 	if (hModuleReal)
 	{
-		std::cout << "Unloading original DLL\n";
+		std::cout << "Unloading original DLL" << std::endl;
 
 		FreeLibrary(hModuleReal);
 		hModuleReal = NULL;

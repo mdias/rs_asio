@@ -168,7 +168,7 @@ HRESULT RSAsioAudioClient::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const 
 	// check channels
 	if (pFormat->nChannels > m_AsioDevice.GetNumWasapiChannels())
 	{
-		//std::cerr << "  unsupported number of channels: " << pFormat->nChannels << "\n";
+		//std::cerr << "  unsupported number of channels: " << pFormat->nChannels << std::endl;
 		return E_FAIL;
 	}
 	if (m_AsioDevice.GetNumChannels() == 0)
@@ -187,7 +187,7 @@ HRESULT RSAsioAudioClient::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const 
 
 HRESULT RSAsioAudioClient::GetMixFormat(WAVEFORMATEX **ppDeviceFormat)
 {
-	std::cout << __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 
 	if (!ppDeviceFormat)
 		return E_POINTER;
@@ -212,7 +212,7 @@ HRESULT RSAsioAudioClient::GetMixFormat(WAVEFORMATEX **ppDeviceFormat)
 
 HRESULT RSAsioAudioClient::GetDevicePeriod(REFERENCE_TIME *phnsDefaultDevicePeriod, REFERENCE_TIME *phnsMinimumDevicePeriod)
 {
-	std::cout << __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 
 	if (!phnsDefaultDevicePeriod && !phnsMinimumDevicePeriod)
 		return E_POINTER;
@@ -316,7 +316,7 @@ HRESULT RSAsioAudioClient::GetService(REFIID riid, void **ppv)
 	{
 		if (m_RenderClient)
 		{
-			std::cout << "  returning render client\n";
+			std::cout << "  returning render client" << std::endl;
 			m_RenderClient->AddRef();
 			*ppv = m_RenderClient;
 			return S_OK;
@@ -326,7 +326,7 @@ HRESULT RSAsioAudioClient::GetService(REFIID riid, void **ppv)
 	{
 		if (m_CaptureClient)
 		{
-			std::cout << "  returning capture client\n";
+			std::cout << "  returning capture client" << std::endl;
 			m_CaptureClient->AddRef();
 			*ppv = m_CaptureClient;
 			return S_OK;

@@ -11,7 +11,7 @@ DEFINE_PROPERTYKEY(PKEY_Device_DeviceIdHiddenKey1, 0xb3f8fa53, 0x0004, 0x438e, 0
 DEFINE_PROPERTYKEY(PKEY_Device_DeviceIdHiddenKey2, 0x83DA6326, 0x97A6, 0x4088, 0x94, 0x53, 0xA1, 0x92, 0x3F, 0x57, 0x3B, 0x29, 3);
 
 
-#define DEBUG_PRINT_HR(hr) if(FAILED(hr)) std::cout << "  hr: " << HResultToStr(hr) << "\n"
+#define DEBUG_PRINT_HR(hr) if(FAILED(hr)) std::cout << "  hr: " << HResultToStr(hr) << std::endl
 
 DebugWrapperDevicePropertyStore::DebugWrapperDevicePropertyStore(IPropertyStore& realPropertyStore, const std::wstring& deviceId)
 	: m_RealPropertyStore(realPropertyStore)
@@ -27,24 +27,14 @@ DebugWrapperDevicePropertyStore::~DebugWrapperDevicePropertyStore()
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetCount(DWORD *cProps)
 {
-	std::cout << m_DeviceId << " " __FUNCTION__ "\n";
+	std::cout << m_DeviceId << " " __FUNCTION__ << std::endl;
 
-#if 1
 	HRESULT hr = m_RealPropertyStore.GetCount(cProps);
-#else
-	std::cout << "  override hack\n";
-
-	HRESULT hr = S_OK;
-	if (!cProps)
-		hr = E_POINTER;
-	else
-		*cProps = 0;
-#endif
 
 	DEBUG_PRINT_HR(hr);
 	if (SUCCEEDED(hr) && cProps)
 	{
-		std::cout << "  *cProps: " << std::dec << *cProps << "\n";
+		std::cout << "  *cProps: " << std::dec << *cProps << std::endl;
 	}
 
 	return hr;
@@ -52,7 +42,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetCount(DWORD *cProp
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetAt(DWORD iProp, PROPERTYKEY *pkey)
 {
-	//std::cout << m_DeviceId << " " __FUNCTION__ " - iProp: " << std::dec << iProp << "\n";
+	//std::cout << m_DeviceId << " " __FUNCTION__ " - iProp: " << std::dec << iProp << std::endl;
 
 	HRESULT hr = m_RealPropertyStore.GetAt(iProp, pkey);
 	//DEBUG_PRINT_HR(hr);
@@ -73,7 +63,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetValue(REFPROPERTYK
 	}
 #endif
 
-	std::cout << m_DeviceId << " " __FUNCTION__ " - key: " << key << "\n";
+	std::cout << m_DeviceId << " " __FUNCTION__ " - key: " << key << std::endl;
 
 	HRESULT hr = m_RealPropertyStore.GetValue(key, pv);
 	DEBUG_PRINT_HR(hr);
@@ -81,7 +71,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetValue(REFPROPERTYK
 	{
 		if (pv->vt == VT_EMPTY)
 		{
-			std::cout << "  unhandled key\n";
+			std::cout << "  unhandled key" << std::endl;
 		}
 		else if (key == PKEY_AudioEngine_DeviceFormat && pv->vt == VT_BLOB)
 		{	
@@ -89,7 +79,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetValue(REFPROPERTYK
 		}
 		else if (key == PKEY_AudioEndpoint_FormFactor && pv->vt == VT_UI4)
 		{
-			std::cout << "  form factor: " << pv->uintVal << "\n";
+			std::cout << "  form factor: " << pv->uintVal << std::endl;
 		}
 	}
 
@@ -98,7 +88,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetValue(REFPROPERTYK
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::SetValue(REFPROPERTYKEY key, REFPROPVARIANT propvar)
 {
-	std::cout << m_DeviceId << " " __FUNCTION__ " - key: " << key << "\n";
+	std::cout << m_DeviceId << " " __FUNCTION__ " - key: " << key << std::endl;
 
 	HRESULT hr = m_RealPropertyStore.SetValue(key, propvar);
 	DEBUG_PRINT_HR(hr);
@@ -108,7 +98,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::SetValue(REFPROPERTYK
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::Commit()
 {
-	std::cout << m_DeviceId << " " __FUNCTION__ "\n";
+	std::cout << m_DeviceId << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealPropertyStore.Commit();
 	DEBUG_PRINT_HR(hr);

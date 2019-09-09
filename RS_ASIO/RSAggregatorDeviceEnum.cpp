@@ -30,7 +30,7 @@ void RSAggregatorDeviceEnum::AddDeviceEnumerator(IMMDeviceEnumerator* enumerator
 
 void RSAggregatorDeviceEnum::UpdateAvailableDevices()
 {
-	std::cout << __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 
 	RSDeviceCollection aggregatedRenderCollection;
 	RSDeviceCollection aggregatedCaptureCollection;

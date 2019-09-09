@@ -30,11 +30,11 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     case DLL_PROCESS_ATTACH:
 		InitConsole();
 		DisableThreadLibraryCalls(hModule);
-		std::cout << "Wrapper DLL loaded\n";
+		std::cout << "Wrapper DLL loaded" << std::endl;
 		PatchOriginalCode();
 		break;
 	case DLL_PROCESS_DETACH:
-		std::cout << "Wrapper DLL unloaded\n";
+		std::cout << "Wrapper DLL unloaded" << std::endl;
 		CleanupConsole();
 		break;
     case DLL_THREAD_ATTACH:
@@ -46,7 +46,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 HRESULT STDAPICALLTYPE Patched_CoCreateInstance(REFCLSID rclsid, IUnknown *pUnkOuter, DWORD dwClsContext, REFIID riid, void **ppOut)
 {
-	std::cout << "Patched_CoCreateInstance called: " << riid << "\n";
+	std::cout << "Patched_CoCreateInstance called: " << riid << std::endl;
 
 	if (!ppOut)
 		return E_POINTER;
@@ -94,7 +94,7 @@ HRESULT Patched_PortAudio_MarshalStreamComPointers(void* stream)
 	void** out_ClientParent = (void**)&(streamBytes[offsetPortAudio_out_ClientParent]);
 	void** out_ClientStream = (void**)&(streamBytes[offsetPortAudio_out_ClientStream]);
 
-	std::cout << __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 	*captureClientStream = nullptr;
 	*in_ClientStream = nullptr;
 	*renderClientStream = nullptr;
@@ -102,7 +102,7 @@ HRESULT Patched_PortAudio_MarshalStreamComPointers(void* stream)
 	
 	if ((*in_ClientParent) != nullptr)
 	{
-		std::cout << "  marshalling input device\n";
+		std::cout << "  marshalling input device" << std::endl;
 
 		// (IID_IAudioClient) marshal stream->in->clientParent into stream->in->clientStream
 		*in_ClientStream = *in_ClientParent;
@@ -113,7 +113,7 @@ HRESULT Patched_PortAudio_MarshalStreamComPointers(void* stream)
 
 	if ((*out_ClientParent) != nullptr)
 	{
-		std::cout << "  marshalling output device\n";
+		std::cout << "  marshalling output device" << std::endl;
 
 		// (IID_IAudioClient) marshal stream->out->clientParent into stream->out->clientStream
 		*out_ClientStream = *out_ClientParent;
@@ -145,11 +145,11 @@ HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* stream)
 	*in_ClientProc = nullptr;
 	*out_ClientProc = nullptr;
 
-	std::cout << __FUNCTION__ "\n";
+	std::cout << __FUNCTION__ << std::endl;
 
 	if ((*in_ClientParent) != nullptr)
 	{
-		std::cout << "  unmarshalling input device\n";
+		std::cout << "  unmarshalling input device" << std::endl;
 
 		// (IID_IAudioClient) unmarshal from stream->in->clientStream into stream->in->clientProc
 		*in_ClientProc = *in_ClientStream;
@@ -162,7 +162,7 @@ HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* stream)
 
 	if ((*out_ClientParent) != nullptr)
 	{
-		std::cout << "  unmarshalling output device\n";
+		std::cout << "  unmarshalling output device" << std::endl;
 
 		// (IID_IAudioClient) unmarshal from stream->out->clientStream into stream->out->clientProc
 		*out_ClientProc = *out_ClientStream;
