@@ -35,7 +35,8 @@ public:
 	ASIOBufferInfo* GetInputBuffer(unsigned channel);
 	unsigned GetNumInputChannels() const { return m_AsioInChannelInfo.size(); }
 	unsigned GetNumOutputChannels() const { return m_AsioOutChannelInfo.size(); }
-public:
+
+private:
 	void DisplayCurrentError();
 
 	void __cdecl AsioCalback_bufferSwitch(long doubleBufferIndex, ASIOBool directProcess);
