@@ -8,7 +8,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Copy the DLL files to the game folder.
 - Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
 - Make sure your ASIO interface is set to 24-bit mode.
-- If you use the debug version, you probably will want to run the game in windowed mode.
+- Extra: An RS_ASIO-log.txt file is generated inside the game directory which may help discover your ASIO driver name diagnose issues.
 
 ### How to remove/uninstall
 
