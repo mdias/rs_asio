@@ -71,4 +71,8 @@ private:
 	std::mutex m_bufferMutex;
 	DWORD m_bufferNumFrames;
 	std::vector<int> m_ChannelMap;
+
+#ifdef _DEBUG
+	unsigned m_numBufferSwitches;
+#endif
 };

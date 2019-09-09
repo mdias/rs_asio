@@ -187,8 +187,6 @@ HRESULT RSAsioAudioClient::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const 
 
 HRESULT RSAsioAudioClient::GetMixFormat(WAVEFORMATEX **ppDeviceFormat)
 {
-	std::cout << __FUNCTION__ << std::endl;
-
 	if (!ppDeviceFormat)
 		return E_POINTER;
 
@@ -212,8 +210,6 @@ HRESULT RSAsioAudioClient::GetMixFormat(WAVEFORMATEX **ppDeviceFormat)
 
 HRESULT RSAsioAudioClient::GetDevicePeriod(REFERENCE_TIME *phnsDefaultDevicePeriod, REFERENCE_TIME *phnsMinimumDevicePeriod)
 {
-	std::cout << __FUNCTION__ << std::endl;
-
 	if (!phnsDefaultDevicePeriod && !phnsMinimumDevicePeriod)
 		return E_POINTER;
 
@@ -247,6 +243,9 @@ HRESULT RSAsioAudioClient::Start()
 		return AUDCLNT_E_NOT_STOPPED;
 
 	m_IsStarted = true;
+#ifdef _DEBUG
+	m_numBufferSwitches = 0;
+#endif
 
 	return S_OK;
 }
@@ -412,6 +411,20 @@ static void CopyInterleaveChannel(BYTE* inDeinterleaved, BYTE* outInterleaved, W
 
 void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 {
+#ifdef _DEBUG
+	if (m_numBufferSwitches < 3)
+	{
+		++m_numBufferSwitches;
+		std::cout << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << std::endl;
+	}
+	else if (m_numBufferSwitches == 3)
+	{
+		++m_numBufferSwitches;
+		std::cout << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << " (not logging upcoming switches)" << std::endl;
+	}
+	
+#endif
+
 	std::lock_guard<std::mutex> g(m_bufferMutex);
 
 	if (!m_IsStarted)
