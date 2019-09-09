@@ -96,7 +96,7 @@ bool RSDeviceCollection::UpdateDevicesFromCollection(IMMDeviceCollection& collec
 	}
 	devices.clear();
 
-	//std::cout << "Added " << numAdded << " to collection; total now is " << m_Devices.size() << std::endl;
+	//rslog::info_ts() << "Added " << numAdded << " to collection; total now is " << m_Devices.size() << std::endl;
 
 	return true;
 }

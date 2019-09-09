@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <functional>
 #include <mutex>
-#include "TrampolineToMethod.h"
 #include "asio.h"
 #include "Utils.h"
+#include "Log.h"
+#include "TrampolineToMethod.h"

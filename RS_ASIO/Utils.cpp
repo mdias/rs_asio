@@ -3,6 +3,48 @@
 DEFINE_PROPERTYKEY(PKEY_Device_DeviceIdHiddenKey1, 0xb3f8fa53, 0x0004, 0x438e, 0x90, 0x03, 0x51, 0xa4, 0x6e, 0x13, 0x9b, 0xfc, 2);
 DEFINE_PROPERTYKEY(PKEY_Device_DeviceIdHiddenKey2, 0x83DA6326, 0x97A6, 0x4088, 0x94, 0x53, 0xA1, 0x92, 0x3F, 0x57, 0x3B, 0x29, 3);
 
+LONGLONG TimeStamp::GetMilisecs() const
+{
+	LONGLONG freq = GetPerformanceFreq();
+	if (!freq)
+		return 0;
+
+	return (perfCount*1000) / freq;
+}
+
+LONGLONG TimeStamp::GetMicrosecs() const
+{
+	LONGLONG freq = GetPerformanceFreq();
+	if (!freq)
+		return 0;
+
+	return (perfCount * 1000) / (freq/1000);
+}
+
+double TimeStamp::GetSeconds() const
+{
+	LONGLONG microsecs = GetMicrosecs();
+	LONGLONG secs = microsecs / 1000000;
+	microsecs -= (secs * 1000000);
+
+	return (double)secs + (((double)microsecs) / 1000000.0);
+}
+
+TimeStamp TimeStamp::operator - (const TimeStamp& other)
+{
+	return TimeStamp(perfCount - other.perfCount);
+}
+
+LONGLONG TimeStamp::GetPerformanceFreq() const
+{
+	static LARGE_INTEGER freq{};
+	if (freq.QuadPart == 0)
+	{
+		QueryPerformanceFrequency(&freq);
+	}
+	return freq.QuadPart;
+}
+
 std::string ConvertWStrToStr(const std::wstring& wstr)
 {
 	typedef std::codecvt<wchar_t, char, std::mbstate_t> converter_type;
@@ -292,6 +334,11 @@ std::ostream & operator<<(std::ostream & os, ASIOSampleType sampleType)
 #undef CASE_TO_STR
 
 	return os;
+}
+
+std::ostream & operator<<(std::ostream & os, const TimeStamp& time)
+{
+	return os << time.GetSeconds();
 }
 
 REFERENCE_TIME MilisecsToRefTime(LONGLONG ms)

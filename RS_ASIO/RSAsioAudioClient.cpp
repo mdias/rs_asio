@@ -167,7 +167,7 @@ HRESULT RSAsioAudioClient::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const 
 	// check channels
 	if (pFormat->nChannels > m_AsioDevice.GetNumWasapiChannels())
 	{
-		//std::cerr << "  unsupported number of channels: " << pFormat->nChannels << std::endl;
+		//rslog::error_ts() << "  unsupported number of channels: " << pFormat->nChannels << std::endl;
 		return E_FAIL;
 	}
 	if (m_AsioDevice.GetNumChannels() == 0)
@@ -317,7 +317,7 @@ HRESULT RSAsioAudioClient::GetService(REFIID riid, void **ppv)
 	{
 		if (m_RenderClient)
 		{
-			std::cout << "  returning render client" << std::endl;
+			rslog::info_ts() << "  returning render client" << std::endl;
 			m_RenderClient->AddRef();
 			*ppv = m_RenderClient;
 			return S_OK;
@@ -327,7 +327,7 @@ HRESULT RSAsioAudioClient::GetService(REFIID riid, void **ppv)
 	{
 		if (m_CaptureClient)
 		{
-			std::cout << "  returning capture client" << std::endl;
+			rslog::info_ts() << "  returning capture client" << std::endl;
 			m_CaptureClient->AddRef();
 			*ppv = m_CaptureClient;
 			return S_OK;
@@ -418,15 +418,15 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 #ifdef _DEBUG
 	if (m_IsStarted)
 	{
-		if (m_numBufferSwitches < 3)
+		if (m_numBufferSwitches < 2)
 		{
 			++m_numBufferSwitches;
-			std::cout << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << std::endl;
+			rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << std::endl;
 		}
-		else if (m_numBufferSwitches == 3)
+		else if (m_numBufferSwitches == 2)
 		{
 			++m_numBufferSwitches;
-			std::cout << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << " (not logging upcoming switches)" << std::endl;
+			rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << " (not logging upcoming switches)" << std::endl;
 		}
 	}
 #endif

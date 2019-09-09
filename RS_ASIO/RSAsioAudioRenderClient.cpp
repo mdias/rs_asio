@@ -16,7 +16,7 @@ RSAsioAudioRenderClient::~RSAsioAudioRenderClient()
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::GetBuffer(UINT32 NumFramesRequested, BYTE **ppData)
 {
-	//std::cout << ".";
+	//rslog::info_ts() << ".";
 
 	if (!ppData)
 		return E_POINTER;

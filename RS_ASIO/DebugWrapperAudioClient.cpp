@@ -2,7 +2,7 @@
 #include "DebugWrapperAudioClient.h"
 
 
-#define DEBUG_PRINT_HR(hr) if(FAILED(hr)) std::cout << "  hr: " << HResultToStr(hr) << std::endl
+#define DEBUG_PRINT_HR(hr) if(FAILED(hr)) rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl
 
 template<typename TBase>
 DebugWrapperAudioClient<TBase>::DebugWrapperAudioClient(TBase& realAudioClient, const std::wstring deviceId)
@@ -21,7 +21,7 @@ DebugWrapperAudioClient<TBase>::~DebugWrapperAudioClient()
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::QueryInterface(REFIID riid, void **ppvObject)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << " riid: " << riid << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << " riid: " << riid << std::endl;
 
 	HRESULT hr = E_POINTER;
 
@@ -46,7 +46,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::QueryInterface(REFIID 
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamFlags, REFERENCE_TIME hnsBufferDuration, REFERENCE_TIME hnsPeriodicity, const WAVEFORMATEX *pFormat, LPCGUID AudioSessionGuid)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ " - ShareMode: " << ShareMode << " Flags: " << std::hex << StreamFlags << " bufferDuration: " << std::dec << RefTimeToMilisecs(hnsBufferDuration) << "ms periodicity: " << RefTimeToMilisecs(hnsPeriodicity) << "ms" << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ " - ShareMode: " << ShareMode << " Flags: " << std::hex << StreamFlags << " bufferDuration: " << std::dec << RefTimeToMilisecs(hnsBufferDuration) << "ms periodicity: " << RefTimeToMilisecs(hnsPeriodicity) << "ms" << std::endl;
 
 	HRESULT hr = m_RealAudioClient.Initialize(ShareMode, StreamFlags, hnsBufferDuration, hnsPeriodicity, pFormat, AudioSessionGuid);
 	DEBUG_PRINT_HR(hr);
@@ -57,14 +57,14 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::Initialize(AUDCLNT_SHA
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetBufferSize(UINT32 *pNumBufferFrames)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 	
 	HRESULT hr = m_RealAudioClient.GetBufferSize(pNumBufferFrames);
 	DEBUG_PRINT_HR(hr);
 
 	if (SUCCEEDED(hr))
 	{
-		std::cout << "  *pNumBufferFrames: " << *pNumBufferFrames << std::endl;
+		rslog::info_ts() << "  *pNumBufferFrames: " << *pNumBufferFrames << std::endl;
 	}
 
 	return hr;
@@ -73,14 +73,14 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetBufferSize(UINT32 *
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetStreamLatency(REFERENCE_TIME *phnsLatency)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealAudioClient.GetStreamLatency(phnsLatency);
 	DEBUG_PRINT_HR(hr);
 
 	if (SUCCEEDED(hr))
 	{
-		std::cout << "  latency: " << RefTimeToMilisecs(*phnsLatency) << "ms" << std::endl;
+		rslog::info_ts() << "  latency: " << RefTimeToMilisecs(*phnsLatency) << "ms" << std::endl;
 	}
 
 	return hr;
@@ -89,10 +89,10 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetStreamLatency(REFER
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetCurrentPadding(UINT32 *pNumPaddingFrames)
 {
-	//std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	//rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealAudioClient.GetCurrentPadding(pNumPaddingFrames);
-	//std::cout << "  hr: " << HResultToStr(hr) << std::endl;
+	//rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl;
 
 	return hr;
 }
@@ -100,7 +100,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetCurrentPadding(UINT
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const WAVEFORMATEX *pFormat, WAVEFORMATEX **ppClosestMatch)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	if (!pFormat)
 		return E_POINTER;
@@ -111,7 +111,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::IsFormatSupported(AUDC
 	/*
 	if (FAILED(hr))
 	{
-		std::cout << (*pFormat);
+		rslog::info_ts() << (*pFormat);
 	}
 	*/
 
@@ -121,7 +121,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::IsFormatSupported(AUDC
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetMixFormat(WAVEFORMATEX **ppDeviceFormat)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 	
 	HRESULT hr = m_RealAudioClient.GetMixFormat(ppDeviceFormat);
 	DEBUG_PRINT_HR(hr);
@@ -132,7 +132,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetMixFormat(WAVEFORMA
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetDevicePeriod(REFERENCE_TIME *phnsDefaultDevicePeriod, REFERENCE_TIME *phnsMinimumDevicePeriod)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealAudioClient.GetDevicePeriod(phnsDefaultDevicePeriod, phnsMinimumDevicePeriod);
 	DEBUG_PRINT_HR(hr);
@@ -143,7 +143,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetDevicePeriod(REFERE
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::Start()
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealAudioClient.Start();
 	DEBUG_PRINT_HR(hr);
@@ -154,7 +154,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::Start()
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::Stop()
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealAudioClient.Stop();
 	DEBUG_PRINT_HR(hr);
@@ -165,7 +165,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::Stop()
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::Reset()
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealAudioClient.Reset();
 	DEBUG_PRINT_HR(hr);
@@ -176,7 +176,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::Reset()
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::SetEventHandle(HANDLE eventHandle)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealAudioClient.SetEventHandle(eventHandle);
 	DEBUG_PRINT_HR(hr);
@@ -187,7 +187,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::SetEventHandle(HANDLE 
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetService(REFIID riid, void **ppv)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << " - riid: " << riid << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << " - riid: " << riid << std::endl;
 
 	HRESULT hr = m_RealAudioClient.GetService(riid, ppv);
 	DEBUG_PRINT_HR(hr);
@@ -223,7 +223,7 @@ DebugWrapperAudioClient2<TBase>::~DebugWrapperAudioClient2()
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient2<TBase>::QueryInterface(REFIID riid, void **ppvObject)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << " riid: " << riid << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << " riid: " << riid << std::endl;
 
 	if (!ppvObject)
 	{
@@ -246,7 +246,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient2<TBase>::QueryInterface(REFIID
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient2<TBase>::IsOffloadCapable(AUDIO_STREAM_CATEGORY Category, BOOL *pbOffloadCapable)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = this->m_RealAudioClient.IsOffloadCapable(Category, pbOffloadCapable);
 	DEBUG_PRINT_HR(hr);
@@ -257,7 +257,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient2<TBase>::IsOffloadCapable(AUDI
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient2<TBase>::SetClientProperties(const AudioClientProperties *pProperties)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = this->m_RealAudioClient.SetClientProperties(pProperties);
 	DEBUG_PRINT_HR(hr);
@@ -268,7 +268,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient2<TBase>::SetClientProperties(c
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient2<TBase>::GetBufferSizeLimits(const WAVEFORMATEX *pFormat, BOOL bEventDriven, REFERENCE_TIME *phnsMinBufferDuration, REFERENCE_TIME *phnsMaxBufferDuration)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = this->m_RealAudioClient.GetBufferSizeLimits(pFormat, bEventDriven, phnsMinBufferDuration, phnsMaxBufferDuration);
 	DEBUG_PRINT_HR(hr);
@@ -294,7 +294,7 @@ DebugWrapperAudioClient3::~DebugWrapperAudioClient3()
 
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient3::QueryInterface(REFIID riid, void **ppvObject)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << " riid: " << riid << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << " riid: " << riid << std::endl;
 
 	if (!ppvObject)
 	{
@@ -316,7 +316,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient3::QueryInterface(REFIID riid, 
 
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient3::GetSharedModeEnginePeriod(const WAVEFORMATEX *pFormat, UINT32 *pDefaultPeriodInFrames, UINT32 *pFundamentalPeriodInFrames, UINT32 *pMinPeriodInFrames, UINT32 *pMaxPeriodInFrames)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealAudioClient.GetSharedModeEnginePeriod(pFormat, pDefaultPeriodInFrames, pFundamentalPeriodInFrames, pMinPeriodInFrames, pMaxPeriodInFrames);
 	DEBUG_PRINT_HR(hr);
@@ -326,7 +326,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient3::GetSharedModeEnginePeriod(co
 
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient3::GetCurrentSharedModeEnginePeriod(WAVEFORMATEX **ppFormat, UINT32 *pCurrentPeriodInFrames)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealAudioClient.GetCurrentSharedModeEnginePeriod(ppFormat, pCurrentPeriodInFrames);
 	DEBUG_PRINT_HR(hr);
@@ -336,7 +336,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient3::GetCurrentSharedModeEnginePe
 
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient3::InitializeSharedAudioStream(DWORD StreamFlags, UINT32 PeriodInFrames, const WAVEFORMATEX *pFormat, LPCGUID AudioSessionGuid)
 {
-	std::cout << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealAudioClient.InitializeSharedAudioStream(StreamFlags, PeriodInFrames, pFormat, AudioSessionGuid);
 	DEBUG_PRINT_HR(hr);

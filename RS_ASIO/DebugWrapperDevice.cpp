@@ -5,7 +5,7 @@
 #include "DebugWrapperEndpoint.h"
 #include "DebugWrapperAudioEndpointVolume.h"
 
-#define DEBUG_PRINT_HR(hr) if(FAILED(hr)) std::cout << "  hr: " << HResultToStr(hr) << std::endl;
+#define DEBUG_PRINT_HR(hr) if(FAILED(hr)) rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl;
 
 DebugWrapperDevice::DebugWrapperDevice(IMMDevice& realDevice)
 	: m_RealDevice(realDevice)
@@ -25,7 +25,7 @@ DebugWrapperDevice::~DebugWrapperDevice()
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevice::QueryInterface(REFIID riid, void **ppvObject)
 {
-	std::cout << m_Id << " " __FUNCTION__" - riid: " << riid << std::endl;
+	rslog::info_ts() << m_Id << " " __FUNCTION__" - riid: " << riid << std::endl;
 
 	HRESULT hr = m_RealDevice.QueryInterface(riid, ppvObject);
 	DEBUG_PRINT_HR(hr);
@@ -43,7 +43,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevice::QueryInterface(REFIID riid, void *
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevice::Activate(REFIID iid, DWORD dwClsCtx, PROPVARIANT *pActivationParams, void **ppInterface)
 {
-	std::cout << m_Id << " " __FUNCTION__ " - Activate iid: " << iid << " dwClsCtx: " << std::hex << dwClsCtx << std::endl;
+	rslog::info_ts() << m_Id << " " __FUNCTION__ " - Activate iid: " << iid << " dwClsCtx: " << std::hex << dwClsCtx << std::endl;
 
 	HRESULT hr = E_NOINTERFACE;
 
@@ -113,7 +113,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevice::Activate(REFIID iid, DWORD dwClsCt
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevice::OpenPropertyStore(DWORD stgmAccess, IPropertyStore **ppProperties)
 {
-	std::cout << m_Id << " " __FUNCTION__ " - stgmAccess: " << std::hex << stgmAccess << std::endl;
+	rslog::info_ts() << m_Id << " " __FUNCTION__ " - stgmAccess: " << std::hex << stgmAccess << std::endl;
 
 	IPropertyStore* realPropStore = nullptr;
 	HRESULT hr = m_RealDevice.OpenPropertyStore(stgmAccess, &realPropStore);

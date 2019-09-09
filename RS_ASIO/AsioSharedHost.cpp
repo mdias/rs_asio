@@ -111,7 +111,7 @@ bool AsioSharedHost::IsValid() const
 
 ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME& suggestedBufferDuration)
 {
-	std::cout << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
+	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
 	if (!IsValid())
 		return ASE_NotPresent;
 
@@ -126,7 +126,7 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 		}
 		if (std::lround(asioSampleRate) != format.nSamplesPerSec)
 		{
-			std::cout << std::dec << "  Switching sample rate from " << std::lround(asioSampleRate) << " to " << format.nSamplesPerSec << "..." << std::endl;
+			rslog::info_ts() << std::dec << "  Switching sample rate from " << std::lround(asioSampleRate) << " to " << format.nSamplesPerSec << "..." << std::endl;
 			if (m_Driver->setSampleRate((ASIOSampleRate)format.nSamplesPerSec) != ASE_OK)
 			{
 				DisplayCurrentError();
@@ -145,7 +145,7 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 			return ASE_HWMalfunction;
 		}
 
-		std::cout << std::dec << "  ASIOBufferSize - min: " << minBufferFrames << " max: " << maxBufferFrames << " preferred: " << preferredBufferFrames << " granularity: " << bufferGranularity << std::endl;
+		rslog::info_ts() << std::dec << "  ASIOBufferSize - min: " << minBufferFrames << " max: " << maxBufferFrames << " preferred: " << preferredBufferFrames << " granularity: " << bufferGranularity << std::endl;
 
 		const REFERENCE_TIME minDuration = 1 * 10000;
 		const REFERENCE_TIME maxDuration = 100 * 10000;
@@ -167,8 +167,8 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 		}
 		bufferDuration = AudioFramesToDuration(bufferDurationFrames, format.nSamplesPerSec);
 
-		std::cout << "  suggested buffer duration: " << RefTimeToMilisecs(suggestedBufferDuration) << "ms (" << std::dec << suggestedBufferDurationFrames << " frames)" << std::endl;
-		std::cout << "  actual buffer duration: " << RefTimeToMilisecs(bufferDuration) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
+		rslog::info_ts() << "  suggested buffer duration: " << RefTimeToMilisecs(suggestedBufferDuration) << "ms (" << std::dec << suggestedBufferDurationFrames << " frames)" << std::endl;
+		rslog::info_ts() << "  actual buffer duration: " << RefTimeToMilisecs(bufferDuration) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
 
 		// create the buffers
 		m_AsioBuffers.resize(m_AsioOutChannelInfo.size() + m_AsioInChannelInfo.size());
@@ -224,7 +224,7 @@ void AsioSharedHost::Stop()
 {
 	if (m_StartCount == 0)
 	{
-		std::cerr << __FUNCTION__ " - too many stop calls!" << std::endl;
+		rslog::error_ts() << __FUNCTION__ " - too many stop calls!" << std::endl;
 		return;
 	}
 
@@ -276,7 +276,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 	// basic format checks
 	if (format.wFormatTag != WAVE_FORMAT_PCM && format.wFormatTag != WAVE_FORMAT_EXTENSIBLE)
 	{
-		std::cerr << "  unknown wFormatTag: " << format.wFormatTag << std::endl;
+		rslog::error_ts() << "  unknown wFormatTag: " << format.wFormatTag << std::endl;
 		return false;
 	}
 
@@ -284,21 +284,21 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 	const long maxChannels = output ? numOutputChannels : numInputChannels;
 	if (format.nChannels > maxChannels)
 	{
-		std::cerr << "  unsupported number of channels: " << format.nChannels << std::endl;
+		rslog::error_ts() << "  unsupported number of channels: " << format.nChannels << std::endl;
 		return false;
 	}
 
 	// check sample rate
 	if (m_Driver->canSampleRate((ASIOSampleRate)format.nSamplesPerSec) != ASE_OK)
 	{
-		std::cerr << "  unsupported sample rate: " << format.nSamplesPerSec << std::endl;
+		rslog::error_ts() << "  unsupported sample rate: " << format.nSamplesPerSec << std::endl;
 		return false;
 	}
 
 	// check bit depth
 	if ((format.wBitsPerSample % 8) != 0)
 	{
-		std::cerr << "  bad wBitsPerSample: " << format.wBitsPerSample << std::endl;
+		rslog::error_ts() << "  bad wBitsPerSample: " << format.wBitsPerSample << std::endl;
 		return false;
 	}
 	const std::vector<ASIOChannelInfo>& channelInfo = output ? m_AsioOutChannelInfo : m_AsioInChannelInfo;
@@ -307,7 +307,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 	ASIOSampleType sampleType;
 	if (!CheckSampleTypeAcrossChannels(sampleType, output, firstAsioChannel, numAsioChannels))
 	{
-		std::cerr << "  requested channels use multiple different sample types" << std::endl;
+		rslog::error_ts() << "  requested channels use multiple different sample types" << std::endl;
 		return false;
 	}
 
@@ -330,7 +330,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 			case ASIOSTInt32LSB24:
 				break;
 			default:
-				std::cerr << "  requested wBitsPerSample is " << format.wBitsPerSample << " but ASIO channels format is " << sampleType << std::endl;
+				rslog::error_ts() << "  requested wBitsPerSample is " << format.wBitsPerSample << " but ASIO channels format is " << sampleType << std::endl;
 				return false;
 		}
 	}
@@ -342,7 +342,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 			case ASIOSTInt24LSB:
 				break;
 			default:
-				std::cerr << "  requested wBitsPerSample is " << format.wBitsPerSample << " but ASIO channels format is " << sampleType << std::endl;
+				rslog::error_ts() << "  requested wBitsPerSample is " << format.wBitsPerSample << " but ASIO channels format is " << sampleType << std::endl;
 				return false;
 		}
 	}
@@ -354,13 +354,13 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		case ASIOSTInt16LSB:
 			break;
 		default:
-			std::cerr << "  requested wBitsPerSample is " << format.wBitsPerSample << " but ASIO channels format is " << sampleType << std::endl;
+			rslog::error_ts() << "  requested wBitsPerSample is " << format.wBitsPerSample << " but ASIO channels format is " << sampleType << std::endl;
 			return false;
 		}
 	}
 	else
 	{
-		std::cerr << "  requested wBitsPerSample is not supported" << std::endl;
+		rslog::error_ts() << "  requested wBitsPerSample is not supported" << std::endl;
 		return false;
 	}
 
@@ -368,7 +368,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 	const WORD expectedBlockAlign = (format.wBitsPerSample / 8) * format.nChannels;
 	if (format.nBlockAlign != expectedBlockAlign)
 	{
-		std::cerr << "  unexpected nBlockAlign: " << format.nBlockAlign << " | expected: " << expectedBlockAlign << std::endl;
+		rslog::error_ts() << "  unexpected nBlockAlign: " << format.nBlockAlign << " | expected: " << expectedBlockAlign << std::endl;
 		return false;
 	}
 
@@ -376,7 +376,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 	const DWORD expectedBytesPerSec = format.nBlockAlign * format.nSamplesPerSec;
 	if (format.nAvgBytesPerSec != expectedBytesPerSec)
 	{
-		std::cerr << "  unexpected nAvgBytesPerSec: " << format.nAvgBytesPerSec << " | expected: " << expectedBytesPerSec << std::endl;
+		rslog::error_ts() << "  unexpected nAvgBytesPerSec: " << format.nAvgBytesPerSec << " | expected: " << expectedBytesPerSec << std::endl;
 		return false;
 	}
 
@@ -388,21 +388,21 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		// format check
 		if (wfe.SubFormat != KSDATAFORMAT_SUBTYPE_PCM && wfe.SubFormat != KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
 		{
-			std::cerr << "  compressed formats are not supported" << std::endl;
+			rslog::error_ts() << "  compressed formats are not supported" << std::endl;
 			return false;
 		}
 
 		// we currently don't support IEEE float...
 		if (wfe.SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
 		{
-			std::cerr << "  IEEE Float format is not supported" << std::endl;
+			rslog::error_ts() << "  IEEE Float format is not supported" << std::endl;
 			return false;
 		}
 
 		// check bit depth
 		if (wfe.Format.wBitsPerSample < wfe.Samples.wValidBitsPerSample)
 		{
-			std::cerr << "  wBitsPerSample: " << wfe.Format.wBitsPerSample << " is smaller than wValidBitsPerSample: " << wfe.Samples.wValidBitsPerSample << std::endl;
+			rslog::error_ts() << "  wBitsPerSample: " << wfe.Format.wBitsPerSample << " is smaller than wValidBitsPerSample: " << wfe.Samples.wValidBitsPerSample << std::endl;
 			return false;
 		}
 		bitsPerSample = wfe.Samples.wValidBitsPerSample;
@@ -411,12 +411,12 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 	// check bit depth
 	if (bitsPerSample != 24)
 	{
-		std::cerr << "  bitsPerSample unsupported: " << bitsPerSample << std::endl;
+		rslog::error_ts() << "  bitsPerSample unsupported: " << bitsPerSample << std::endl;
 		return false;
 	}
 	if (sampleType != ASIOSTInt32LSB)
 	{
-		std::cerr << "  ASIO sample type " << sampleType << " is not currently supported" << std::endl;
+		rslog::error_ts() << "  ASIO sample type " << sampleType << " is not currently supported" << std::endl;
 		return false;
 	}
 
@@ -501,7 +501,7 @@ void AsioSharedHost::DisplayCurrentError()
 	char err[128];
 	m_Driver->getErrorMessage(err);
 
-	std::cerr << "ASIO Error: " << err << std::endl;
+	rslog::error_ts() << "ASIO Error: " << err << std::endl;
 }
 
 void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, ASIOBool directProcess)
@@ -529,19 +529,19 @@ void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, AS
 
 void __cdecl AsioSharedHost::AsioCalback_sampleRateDidChange(ASIOSampleRate sRate)
 {
-	std::cout << __FUNCTION__ << std::endl;
+	rslog::info_ts() << __FUNCTION__ << std::endl;
 }
 
 long __cdecl AsioSharedHost::AsioCalback_asioMessage(long selector, long value, void* message, double* opt)
 {
-	std::cout << __FUNCTION__ << std::endl;
+	rslog::info_ts() << __FUNCTION__ << std::endl;
 
 	return 0;
 }
 
 ASIOTime* __cdecl AsioSharedHost::AsioCalback_bufferSwitchTimeInfo(ASIOTime* params, long doubleBufferIndex, ASIOBool directProcess)
 {
-	std::cout << __FUNCTION__ << std::endl;
+	rslog::info_ts() << __FUNCTION__ << std::endl;
 
 	return nullptr;
 }

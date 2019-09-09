@@ -9,6 +9,26 @@ struct HResultToStr
 	HRESULT hr;
 };
 
+struct TimeStamp
+{
+	TimeStamp()
+	{
+		QueryPerformanceCounter((LARGE_INTEGER*)&perfCount);
+	}
+	TimeStamp(LONGLONG pc) : perfCount(pc) {}
+
+	LONGLONG GetMilisecs() const;
+	LONGLONG GetMicrosecs() const;
+	double GetSeconds() const;
+
+	TimeStamp operator - (const TimeStamp& other);
+
+	LONGLONG perfCount = 0;
+
+private:
+	LONGLONG GetPerformanceFreq() const;
+};
+
 std::string ConvertWStrToStr(const std::wstring& wstr);
 std::string IID2String(REFIID iid);
 const char* Dataflow2String(EDataFlow dataFlow);
@@ -22,6 +42,7 @@ std::ostream & operator<<(std::ostream & os, const WAVEFORMATEX& fmt);
 std::ostream & operator<<(std::ostream & os, const AUDCLNT_SHAREMODE& mode);
 std::ostream & operator<<(std::ostream & os, const HResultToStr& hresult);
 std::ostream & operator<<(std::ostream & os, ASIOSampleType sampleType);
+std::ostream & operator<<(std::ostream & os, const TimeStamp& time);
 
 REFERENCE_TIME MilisecsToRefTime(LONGLONG ms);
 LONGLONG RefTimeToMilisecs(const REFERENCE_TIME& time);

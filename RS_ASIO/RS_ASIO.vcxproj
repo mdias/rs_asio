@@ -164,6 +164,7 @@
     <ClInclude Include="DebugWrapperEndpoint.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="function_traits.h" />
+    <ClInclude Include="Log.h" />
     <ClInclude Include="Patcher.h" />
     <ClInclude Include="RSAsioAudioCaptureClient.h" />
     <ClInclude Include="RSAsioAudioClient.h" />
@@ -192,6 +193,7 @@
     <ClCompile Include="DebugWrapperDevicePropertyStore.cpp" />
     <ClCompile Include="DebugWrapperEndpoint.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Log.cpp" />
     <ClCompile Include="Patcher.cpp" />
     <ClCompile Include="RSAsioAudioCaptureClient.cpp" />
     <ClCompile Include="RSAsioAudioClient.cpp" />

@@ -52,7 +52,7 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetAt(DWORD iProp, PROPERTY
 
 HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetValue(REFPROPERTYKEY key, PROPVARIANT *pv)
 {
-	//std::cout << __FUNCTION__ " - key: " << key << std::endl;
+	//rslog::info_ts() << __FUNCTION__ " - key: " << key << std::endl;
 
 	if (!pv)
 		return E_POINTER;
@@ -134,14 +134,14 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetValue(REFPROPERTYKEY key
 
 HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::SetValue(REFPROPERTYKEY key, REFPROPVARIANT propvar)
 {
-	std::cout << __FUNCTION__ << std::endl;
+	rslog::info_ts() << __FUNCTION__ << std::endl;
 
 	return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::Commit(void)
 {
-	std::cout << __FUNCTION__ << std::endl;
+	rslog::info_ts() << __FUNCTION__ << std::endl;
 
 	return STG_E_ACCESSDENIED;
 }
