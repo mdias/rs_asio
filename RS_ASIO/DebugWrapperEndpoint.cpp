@@ -34,7 +34,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperEndpoint::GetDataFlow(EDataFlow *pDataFlow
 
 	if (SUCCEEDED(hr))
 	{
-		rslog::info_ts() << "  *pDataFlow: " << *pDataFlow << std::endl;
+		rslog::info_ts() << "  *pDataFlow: " << Dataflow2String(*pDataFlow) << std::endl;
 	}
 
 	return hr;
