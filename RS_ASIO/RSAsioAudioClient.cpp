@@ -56,7 +56,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 		return AUDCLNT_E_DEVICE_INVALIDATED;
 
 	if (FAILED(IsFormatSupported(ShareMode, pFormat, nullptr)))
-		return E_FAIL;
+		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 
 	if (m_AsioSharedHost.Start(*pFormat, hnsBufferDuration) != ASE_OK)
 		return E_FAIL;
@@ -168,17 +168,17 @@ HRESULT RSAsioAudioClient::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const 
 	if (pFormat->nChannels > m_AsioDevice.GetNumWasapiChannels())
 	{
 		//rslog::error_ts() << "  unsupported number of channels: " << pFormat->nChannels << std::endl;
-		return E_FAIL;
+		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 	}
 	if (m_AsioDevice.GetNumChannels() == 0)
 	{
-		return E_FAIL;
+		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 	}
 
 	// check compatibility with asio host
 	if (!m_AsioSharedHost.IsWaveFormatSupported(*pFormat, m_AsioDevice.IsOutput(), m_AsioDevice.GetBaseChannelNumber(), m_AsioDevice.GetNumChannels()))
 	{
-		return E_FAIL;
+		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 	}
 
 	return S_OK;

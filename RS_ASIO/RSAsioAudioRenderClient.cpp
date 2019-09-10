@@ -42,8 +42,18 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::GetBuffer(UINT32 NumFramesReq
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::ReleaseBuffer(UINT32 NumFramesWritten, DWORD dwFlags)
 {
+	if (!m_AsioAudioClient.GetAsioDevice().GetAsioHost().IsValid())
+		return AUDCLNT_E_DEVICE_INVALIDATED;
+
 	if (!m_WaitingForBufferRelease)
 		return AUDCLNT_E_OUT_OF_ORDER;
+
+	const DWORD expectedNumFrames = m_AsioAudioClient.GetBufferNumFrames();
+
+	if (NumFramesWritten > expectedNumFrames)
+		return AUDCLNT_E_INVALID_SIZE;
+	if (NumFramesWritten != expectedNumFrames)
+		return AUDCLNT_E_BUFFER_SIZE_ERROR;
 
 	m_WaitingForBufferRelease = false;
 	m_NewBufferWaiting = false;
