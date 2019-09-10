@@ -244,9 +244,7 @@ HRESULT RSAsioAudioClient::Start()
 		return AUDCLNT_E_NOT_STOPPED;
 
 	m_IsStarted = true;
-#ifdef _DEBUG
 	m_numBufferSwitches = 0;
-#endif
 
 	return S_OK;
 }
@@ -415,7 +413,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 {
 	std::lock_guard<std::mutex> g(m_bufferMutex);
 
-#ifdef _DEBUG
+	// disable this later when driver is more mature, for now this logging is important
 	if (m_IsStarted)
 	{
 		if (m_numBufferSwitches < 2)
@@ -429,7 +427,6 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 			rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << " (not logging upcoming switches)" << std::endl;
 		}
 	}
-#endif
 
 	if (!m_IsStarted)
 	{

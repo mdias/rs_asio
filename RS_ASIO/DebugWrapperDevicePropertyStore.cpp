@@ -79,7 +79,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetValue(REFPROPERTYK
 		}
 		else if (key == PKEY_AudioEndpoint_FormFactor && pv->vt == VT_UI4)
 		{
-			rslog::info_ts() << "  form factor: " << pv->uintVal << std::endl;
+			rslog::info_ts() << "  form factor: " << std::dec << pv->uintVal << std::endl;
 		}
 	}
 

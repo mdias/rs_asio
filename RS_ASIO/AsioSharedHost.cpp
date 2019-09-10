@@ -167,8 +167,8 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 		}
 		bufferDuration = AudioFramesToDuration(bufferDurationFrames, format.nSamplesPerSec);
 
-		rslog::info_ts() << "  suggested buffer duration: " << RefTimeToMilisecs(suggestedBufferDuration) << "ms (" << std::dec << suggestedBufferDurationFrames << " frames)" << std::endl;
-		rslog::info_ts() << "  actual buffer duration: " << RefTimeToMilisecs(bufferDuration) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
+		rslog::info_ts() << std::dec << "  suggested buffer duration: " << RefTimeToMilisecs(suggestedBufferDuration) << "ms (" << std::dec << suggestedBufferDurationFrames << " frames)" << std::endl;
+		rslog::info_ts() << std::dec << "  actual buffer duration: " << RefTimeToMilisecs(bufferDuration) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
 
 		// create the buffers
 		m_AsioBuffers.resize(m_AsioOutChannelInfo.size() + m_AsioInChannelInfo.size());

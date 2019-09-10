@@ -64,7 +64,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetBufferSize(UINT32 *
 
 	if (SUCCEEDED(hr))
 	{
-		rslog::info_ts() << "  *pNumBufferFrames: " << *pNumBufferFrames << std::endl;
+		rslog::info_ts() << "  *pNumBufferFrames: " << std::dec << *pNumBufferFrames << std::endl;
 	}
 
 	return hr;
@@ -80,7 +80,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetStreamLatency(REFER
 
 	if (SUCCEEDED(hr))
 	{
-		rslog::info_ts() << "  latency: " << RefTimeToMilisecs(*phnsLatency) << "ms" << std::endl;
+		rslog::info_ts() << "  latency: " << std::dec << RefTimeToMilisecs(*phnsLatency) << "ms" << std::endl;
 	}
 
 	return hr;
