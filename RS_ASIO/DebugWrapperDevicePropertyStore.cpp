@@ -81,6 +81,13 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetValue(REFPROPERTYK
 		{
 			rslog::info_ts() << "  form factor: " << std::dec << pv->uintVal << std::endl;
 		}
+		else if (key == PKEY_Device_FriendlyName)
+		{
+			if (pv->vt == VT_LPWSTR)
+				rslog::info_ts() << "  friendly name: " << std::dec << pv->pwszVal << std::endl;
+			else if (pv->vt == VT_LPSTR)
+				rslog::info_ts() << "  friendly name: " << std::dec << pv->pszVal << std::endl;
+		}
 	}
 
 	return hr;
