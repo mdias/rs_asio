@@ -20,17 +20,17 @@ namespace rslog
 	std::ostream& info_ts()
 	{
 		char tmp[16];
-		snprintf(tmp, sizeof(tmp), "%0.3lf  ", (TimeStamp() - initTimeStamp).GetSeconds());
+		snprintf(tmp, sizeof(tmp), "%0.3lf", (TimeStamp() - initTimeStamp).GetSeconds());
 
-		return info << tmp;
+		return info << tmp << " [INFO]  ";
 	}
 
 	std::ostream& error_ts()
 	{
 		char tmp[16];
-		snprintf(tmp, sizeof(tmp), "%0.3lf  ", (TimeStamp() - initTimeStamp).GetSeconds());
+		snprintf(tmp, sizeof(tmp), "%0.3lf", (TimeStamp() - initTimeStamp).GetSeconds());
 
-		return error << tmp;
+		return error << tmp << " [ERROR]  ";
 	}
 
 	void InitLog()
