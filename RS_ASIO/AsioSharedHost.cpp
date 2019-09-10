@@ -571,7 +571,7 @@ void __cdecl AsioSharedHost::AsioCalback_sampleRateDidChange(ASIOSampleRate sRat
 
 long __cdecl AsioSharedHost::AsioCalback_asioMessage(long selector, long value, void* message, double* opt)
 {
-	rslog::info_ts() << __FUNCTION__ << std::endl;
+	rslog::info_ts() << __FUNCTION__ " - selector: " << selector << " value: " << value << std::endl;
 
 	return 0;
 }
