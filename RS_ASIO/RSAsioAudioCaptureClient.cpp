@@ -25,7 +25,7 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UIN
 	if (m_WaitingForBufferRelease)
 		return AUDCLNT_E_OUT_OF_ORDER;
 
-	std::vector<BYTE>& buffer = m_AsioAudioClient.GetBuffer();
+	std::vector<BYTE>& buffer = m_AsioAudioClient.GetBackBuffer();
 
 	*ppData = buffer.data();
 	*pNumFramesToRead = m_NewBufferWaiting ? m_AsioAudioClient.GetBufferNumFrames() : 0;
@@ -62,8 +62,7 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::ReleaseBuffer(UINT32 NumFram
 		return AUDCLNT_E_OUT_OF_ORDER;
 
 	m_WaitingForBufferRelease = false;
-
-	//rslog::info_ts() << ".";
+	m_AsioAudioClient.SwapBuffers();
 
 	return S_OK;
 }

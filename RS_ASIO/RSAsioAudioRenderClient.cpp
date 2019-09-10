@@ -30,7 +30,7 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::GetBuffer(UINT32 NumFramesReq
 	if (m_NewBufferWaiting && NumFramesRequested > 0)
 		return AUDCLNT_E_BUFFER_TOO_LARGE;
 
-	std::vector<BYTE>& buffer = m_AsioAudioClient.GetBuffer();
+	std::vector<BYTE>& buffer = m_AsioAudioClient.GetBackBuffer();
 	if (NumFramesRequested != m_AsioAudioClient.GetBufferNumFrames())
 		return AUDCLNT_E_BUFFER_SIZE_ERROR;
 
@@ -57,6 +57,19 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::ReleaseBuffer(UINT32 NumFrame
 
 	m_WaitingForBufferRelease = false;
 	m_NewBufferWaiting = false;
+
+	static std::ofstream outFile;
+	if (!outFile.is_open())
+	{
+		outFile.open("D:\\rs_asio_audio.raw", std::ios::binary | std::ios::trunc);
+	}
+	else
+	{
+		std::vector<BYTE>& buffer = m_AsioAudioClient.GetBackBuffer();
+		outFile.write((char*)buffer.data(), 4*2* NumFramesWritten);
+	}
+
+	m_AsioAudioClient.SwapBuffers();
 
 	return S_OK;
 }

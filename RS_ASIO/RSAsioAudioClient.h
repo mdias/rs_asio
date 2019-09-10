@@ -44,9 +44,9 @@ public:
 
 	RSAsioDevice& GetAsioDevice() { return m_AsioDevice; }
 
-	std::vector<BYTE>& GetBuffer() { return m_buffer; }
+	std::vector<BYTE>& GetBackBuffer() { return m_frontBuffer; }
 	DWORD GetBufferNumFrames() const { return m_bufferNumFrames; }
-	std::mutex& GetBufferMutex() { return m_bufferMutex; }
+	void SwapBuffers();
 
 protected:
 	virtual void OnAsioBufferSwitch(unsigned buffIdx) override;
@@ -67,7 +67,9 @@ private:
 	RSAsioAudioRenderClient* m_RenderClient = nullptr;
 	RSAsioAudioCaptureClient* m_CaptureClient = nullptr;
 
-	std::vector<BYTE> m_buffer;
+	std::vector<BYTE> m_frontBuffer;
+	std::vector<BYTE> m_backBuffer;
+
 	std::mutex m_bufferMutex;
 	DWORD m_bufferNumFrames;
 	std::vector<int> m_ChannelMap;
