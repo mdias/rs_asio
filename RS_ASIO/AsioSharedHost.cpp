@@ -109,7 +109,7 @@ bool AsioSharedHost::IsValid() const
 	return m_Driver != nullptr;
 }
 
-ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME& suggestedBufferDuration)
+ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME& suggestedBufferDuration, BufferSizeMode bufferSizeMode, bool allowSmallerBuffer)
 {
 	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
 	if (!IsValid())
@@ -135,40 +135,77 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 		}
 
 		// get buffer info
-		long minBufferFrames = 0;
-		long maxBufferFrames = 0;
-		long preferredBufferFrames = 0;
-		long bufferGranularity = 0;
-		if (m_Driver->getBufferSize(&minBufferFrames, &maxBufferFrames, &preferredBufferFrames, &bufferGranularity) != ASE_OK)
+		long minAsioBufferFrames = 0;
+		long maxAsioBufferFrames = 0;
+		long preferredAsioBufferFrames = 0;
+		long asioBufferGranularity = 0;
+		if (m_Driver->getBufferSize(&minAsioBufferFrames, &maxAsioBufferFrames, &preferredAsioBufferFrames, &asioBufferGranularity) != ASE_OK)
 		{
 			DisplayCurrentError();
 			return ASE_HWMalfunction;
 		}
 
-		rslog::info_ts() << std::dec << "  ASIOBufferSize - min: " << minBufferFrames << " max: " << maxBufferFrames << " preferred: " << preferredBufferFrames << " granularity: " << bufferGranularity << std::endl;
+		rslog::info_ts() << std::dec << "  ASIOBufferSize - min: " << minAsioBufferFrames << " max: " << maxAsioBufferFrames << " preferred: " << preferredAsioBufferFrames << " granularity: " << asioBufferGranularity << std::endl;
 
-		const REFERENCE_TIME minDuration = 1 * 10000;
-		const REFERENCE_TIME maxDuration = 100 * 10000;
-		const LONGLONG suggestedBufferDurationFrames = DurationToAudioFrames(suggestedBufferDuration, format.nSamplesPerSec);
+		const DWORD suggestedBufferDurationFrames = (DWORD)DurationToAudioFrames(suggestedBufferDuration, format.nSamplesPerSec);
+		DWORD bufferDurationFrames = (bufferSizeMode == BufferSizeMode_AlwaysPreferred) ? preferredAsioBufferFrames : suggestedBufferDurationFrames;
 
-		// clamp buffer duration
-		REFERENCE_TIME bufferDuration = std::max<REFERENCE_TIME>(std::min<REFERENCE_TIME>(suggestedBufferDuration, maxDuration), minDuration);
-		LONGLONG bufferDurationFrames = DurationToAudioFrames(bufferDuration, format.nSamplesPerSec);
-
-		// make sure buffer is within parameters from ASIO info
-		if (bufferDurationFrames < minBufferFrames)
-			bufferDurationFrames = minBufferFrames;
-		else if (bufferDurationFrames > maxBufferFrames)
-			bufferDurationFrames = maxBufferFrames;
-		else
+		// decide buffer size
+		if (bufferSizeMode == BufferSizeMode_Default)
 		{
-			// TODO: maybe handle this better in the future try trying to approximate the buffer size...
-			bufferDurationFrames = preferredBufferFrames;
-		}
-		bufferDuration = AudioFramesToDuration(bufferDurationFrames, format.nSamplesPerSec);
+			if (bufferDurationFrames < (DWORD)minAsioBufferFrames)
+				bufferDurationFrames = (DWORD)minAsioBufferFrames;
+			else if (bufferDurationFrames > (DWORD)maxAsioBufferFrames)
+				bufferDurationFrames = (DWORD)minAsioBufferFrames;
 
-		rslog::info_ts() << std::dec << "  suggested buffer duration: " << RefTimeToMilisecs(suggestedBufferDuration) << "ms (" << std::dec << suggestedBufferDurationFrames << " frames)" << std::endl;
+			if (asioBufferGranularity > 1)
+			{
+				const DWORD mod = bufferDurationFrames % asioBufferGranularity;
+				if (mod != 0)
+				{
+					bufferDurationFrames += asioBufferGranularity - mod;
+				}
+			}
+			else if (asioBufferGranularity == -1)
+			{
+				DWORD pow2size = 1;
+				while (pow2size < bufferDurationFrames && pow2size < (DWORD)maxAsioBufferFrames)
+				{
+					pow2size *= 2;
+				}
+				bufferDurationFrames = pow2size;
+			}
+		}
+
+		// log requested and actual buffer durations
+		const REFERENCE_TIME bufferDuration = AudioFramesToDuration(bufferDurationFrames, format.nSamplesPerSec);
+		rslog::info_ts() << std::dec << "  requested buffer duration: " << RefTimeToMilisecs(suggestedBufferDuration) << "ms (" << std::dec << suggestedBufferDurationFrames << " frames)" << std::endl;
 		rslog::info_ts() << std::dec << "  actual buffer duration: " << RefTimeToMilisecs(bufferDuration) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
+
+		// 
+		if (bufferDurationFrames < suggestedBufferDurationFrames)
+		{
+			if (!allowSmallerBuffer)
+			{
+				rslog::error_ts() << std::dec << "  buffer size (" << bufferDurationFrames << ") is smaller than minimum wanted size (" << suggestedBufferDurationFrames << ")" << std::endl;
+				return ASE_InvalidParameter;
+			}
+			else
+			{
+				rslog::info_ts() << std::dec << "  buffer size (" << bufferDurationFrames << ") is smaller than minimum wanted size (" << suggestedBufferDurationFrames << ")" << std::endl;
+			}
+		}
+
+		if (bufferDurationFrames < (DWORD)minAsioBufferFrames)
+		{
+			rslog::error_ts() << std::dec << "  buffer size (" << bufferDurationFrames << ") is smaller than minimum ASIO allowed buffer size (" << minAsioBufferFrames << ")" << std::endl;
+			return ASE_InvalidParameter;
+		}
+		else if (bufferDurationFrames > (DWORD)maxAsioBufferFrames)
+		{
+			rslog::error_ts() << std::dec << "  buffer size (" << bufferDurationFrames << ") is bigger than maximum ASIO allowed buffer size (" << maxAsioBufferFrames << ")" << std::endl;
+			return ASE_InvalidParameter;
+		}
 
 		// create the buffers
 		m_AsioBuffers.resize(m_AsioOutChannelInfo.size() + m_AsioInChannelInfo.size());
