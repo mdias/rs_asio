@@ -165,6 +165,12 @@ HRESULT RSAsioAudioClient::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const 
 	if (!m_AsioSharedHost.IsValid())
 		return AUDCLNT_E_DEVICE_INVALIDATED;
 
+	// we only support exclusive mode
+	if (ShareMode != AUDCLNT_SHAREMODE_EXCLUSIVE)
+	{
+		return AUDCLNT_E_UNSUPPORTED_FORMAT;
+	}
+
 	// check channels
 	if (pFormat->nChannels > m_AsioDevice.GetNumWasapiChannels())
 	{
