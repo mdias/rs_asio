@@ -598,7 +598,7 @@ void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, AS
 	}
 
 	// zero output
-	const unsigned numBufferBytes = m_NumBufferFrames * m_CurrentWaveFormat.Format.nBlockAlign;
+	const unsigned numBufferBytes = m_NumBufferFrames * sizeof(std::int32_t);
 	const size_t numOuts = m_AsioOutChannelInfo.size();
 	for (size_t i = 0; i < numOuts; ++i)
 	{
