@@ -342,6 +342,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 	long numOutputChannels = 0;
 	if (m_Driver->getChannels(&numInputChannels, &numOutputChannels) != ASE_OK)
 	{
+		rslog::error_ts() << "  ASIO: failed to obtain number of channels" << std::endl;
 		return false;
 	}
 

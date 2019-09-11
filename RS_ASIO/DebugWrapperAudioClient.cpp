@@ -100,7 +100,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetCurrentPadding(UINT
 template<typename TBase>
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const WAVEFORMATEX *pFormat, WAVEFORMATEX **ppClosestMatch)
 {
-	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ " - ShareMode: " << ShareMode << std::endl;
 
 	if (!pFormat)
 		return E_POINTER;
@@ -108,12 +108,10 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::IsFormatSupported(AUDC
 	HRESULT hr = m_RealAudioClient.IsFormatSupported(ShareMode, pFormat, ppClosestMatch);
 	DEBUG_PRINT_HR(hr);
 
-	/*
 	if (FAILED(hr))
 	{
 		rslog::info_ts() << (*pFormat);
 	}
-	*/
 
 	return hr;
 }
