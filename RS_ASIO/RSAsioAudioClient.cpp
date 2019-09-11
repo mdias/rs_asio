@@ -251,7 +251,6 @@ HRESULT RSAsioAudioClient::Start()
 		return AUDCLNT_E_NOT_STOPPED;
 
 	m_IsStarted = true;
-	m_numBufferSwitches = 0;
 
 	return S_OK;
 }
@@ -426,21 +425,6 @@ static void CopyInterleaveChannel(BYTE* inDeinterleaved, BYTE* outInterleaved, W
 void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 {
 	std::lock_guard<std::mutex> g(m_bufferMutex);
-
-	// disable this later when driver is more mature, for now this logging is important
-	if (m_IsStarted)
-	{
-		if (m_numBufferSwitches < 2)
-		{
-			++m_numBufferSwitches;
-			rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << std::endl;
-		}
-		else if (m_numBufferSwitches == 2)
-		{
-			++m_numBufferSwitches;
-			rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer switch " << m_numBufferSwitches << " (not logging upcoming switches)" << std::endl;
-		}
-	}
 
 	if (!m_IsStarted)
 	{

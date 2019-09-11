@@ -14,6 +14,8 @@ AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPat
 	m_AsioCallbacks.asioMessage = m_Trampoline_asioMessage.GetFuncPtr();
 	m_AsioCallbacks.bufferSwitchTimeInfo = m_Trampoline_bufferSwitchTimeInfo.GetFuncPtr();
 
+	memset(&m_CurrentWaveFormat, 0, sizeof(m_CurrentWaveFormat));
+
 	m_Module = LoadLibraryA(asioDllPath.c_str());
 	if (m_Module)
 	{
@@ -62,7 +64,10 @@ AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPat
 				ci.channel = (long)i;
 				ci.isInput = ASIOTrue;
 				if (m_Driver->getChannelInfo(&ci) != ASE_OK)
+				{
 					err = true;
+					DisplayCurrentError();
+				}
 			}
 			for (size_t i = 0; i < m_AsioOutChannelInfo.size() && !err; ++i)
 			{
@@ -70,10 +75,16 @@ AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPat
 				ci.channel = (long)i;
 				ci.isInput = ASIOFalse;
 				if (m_Driver->getChannelInfo(&ci) != ASE_OK)
+				{
 					err = true;
+					DisplayCurrentError();
+				}
 			}
 
-			
+			char tmpName[128];
+			m_Driver->getDriverName(tmpName);
+
+			m_DriverName = tmpName;
 		}
 
 		if (err)
@@ -117,6 +128,24 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 
 	if (m_StartCount == 0)
 	{
+		// make sure all channels are using a supported format for now
+		if (m_AsioInChannelInfo.size())
+		{
+			if (!IsWaveFormatSupported(format, false, 0, m_AsioInChannelInfo.size()))
+			{
+				rslog::error_ts() << "  wave format not supported on inputs." << std::endl;
+				return ASE_HWMalfunction;
+			}
+		}
+		if (m_AsioOutChannelInfo.size())
+		{
+			if (!IsWaveFormatSupported(format, true, 0, m_AsioOutChannelInfo.size()))
+			{
+				rslog::error_ts() << "  wave format not supported on outputs." << std::endl;
+				return ASE_HWMalfunction;
+			}
+		}
+
 		// Switch ASIO sample rate if needed
 		ASIOSampleRate asioSampleRate;
 		if (m_Driver->getSampleRate(&asioSampleRate) != ASE_OK)
@@ -235,8 +264,12 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 			return ASE_HWMalfunction;
 		}
 
+		m_dbgNumBufferSwitches = 0;
 		m_NumBufferFrames = (UINT32)bufferDurationFrames;
-		m_CurrentWaveFormat = format;
+		if (format.wFormatTag == WAVE_FORMAT_EXTENSIBLE)
+			m_CurrentWaveFormat = (WAVEFORMATEXTENSIBLE&)format;
+		else
+			m_CurrentWaveFormat.Format = format;
 
 		if (m_Driver->start() != ASE_OK)
 		{
@@ -281,6 +314,8 @@ void AsioSharedHost::Stop()
 		m_AsioBuffers.clear();
 		m_AsioInChannelInfo.clear();
 		m_AsioOutChannelInfo.clear();
+
+		memset(&m_CurrentWaveFormat, 0, sizeof(m_CurrentWaveFormat));
 	}
 }
 
@@ -446,6 +481,11 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 	}
 
 	// check bit depth
+	if (format.nBlockAlign != (4 * format.nChannels))
+	{
+		rslog::error_ts() << "  nBlockAlign unsupported: " << format.nBlockAlign << std::endl;
+		return false;
+	}
 	if (bitsPerSample != 24)
 	{
 		rslog::error_ts() << "  bitsPerSample unsupported: " << bitsPerSample << std::endl;
@@ -502,8 +542,8 @@ bool AsioSharedHost::GetLatencyTime(REFERENCE_TIME& in, REFERENCE_TIME& out)
 	if (m_Driver->getLatencies(&inputLatency, &outputLatency) != ASE_OK)
 		return false;
 
-	in = AudioFramesToDuration(inputLatency, m_CurrentWaveFormat.nSamplesPerSec);
-	out = AudioFramesToDuration(outputLatency, m_CurrentWaveFormat.nSamplesPerSec);
+	in = AudioFramesToDuration(inputLatency, m_CurrentWaveFormat.Format.nSamplesPerSec);
+	out = AudioFramesToDuration(outputLatency, m_CurrentWaveFormat.Format.nSamplesPerSec);
 
 	return true;
 }
@@ -545,8 +585,20 @@ void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, AS
 {
 	std::lock_guard<std::mutex> guard(m_AsioMutex);
 
+	// disable this later when driver is more mature, for now this logging is important
+	if (m_dbgNumBufferSwitches < 2)
+	{
+		++m_dbgNumBufferSwitches;
+		rslog::info_ts() << m_DriverName << " - " __FUNCTION__ " - buffer switch " << m_dbgNumBufferSwitches << std::endl;
+	}
+	else if (m_dbgNumBufferSwitches == 2)
+	{
+		++m_dbgNumBufferSwitches;
+		rslog::info_ts() << m_DriverName << " - " __FUNCTION__ " - buffer switch " << m_dbgNumBufferSwitches << " (not logging upcoming switches)" << std::endl;
+	}
+
 	// zero output
-	const unsigned numBufferBytes = m_NumBufferFrames * m_CurrentWaveFormat.nBlockAlign;
+	const unsigned numBufferBytes = m_NumBufferFrames * m_CurrentWaveFormat.Format.nBlockAlign;
 	const size_t numOuts = m_AsioOutChannelInfo.size();
 	for (size_t i = 0; i < numOuts; ++i)
 	{

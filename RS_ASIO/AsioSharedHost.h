@@ -54,7 +54,7 @@ private:
 	HMODULE m_Module = nullptr;
 	IAsioDriver* m_Driver = nullptr;
 	ULONG m_StartCount = 0;
-	WAVEFORMATEX m_CurrentWaveFormat;
+	WAVEFORMATEXTENSIBLE m_CurrentWaveFormat;
 
 	TrampolineToMethod<decltype(ASIOCallbacks::bufferSwitch)> m_Trampoline_bufferSwitch;
 	TrampolineToMethod<decltype(ASIOCallbacks::sampleRateDidChange)> m_Trampoline_sampleRateDidChange;
@@ -70,4 +70,7 @@ private:
 	std::mutex m_AsioMutex;
 
 	std::unique_ptr<std::thread> m_AsioEventsThread;
+
+	unsigned m_dbgNumBufferSwitches;
+	std::string m_DriverName;
 };
