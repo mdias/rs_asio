@@ -13,8 +13,8 @@ class AsioSharedHost : public ComBaseUnknown<IUnknown>
 public:
 	enum BufferSizeMode
 	{
-		BufferSizeMode_Default,
-		BufferSizeMode_AlwaysPreferred,
+		BufferSizeMode_Host,
+		BufferSizeMode_Driver,
 	};
 
 public:

@@ -206,6 +206,7 @@ static void LoadConfigIni(RSConfig& out)
 	{
 		SectionNone,
 		SectionConfig,
+		SectionAsio,
 		SectionAsioOut,
 		SectionAsioIn0,
 		SectionAsioIn1,
@@ -233,6 +234,8 @@ static void LoadConfigIni(RSConfig& out)
 				std::string sectionName = toLowerString(currentLine.substr(1, currentLine.length() - 2));
 				if (sectionName == "config")
 					currentSection = SectionConfig;
+				else if (sectionName == "asio")
+					currentSection = SectionAsio;
 				else if (sectionName == "asio.output")
 					currentSection = SectionAsioOut;
 				else if (sectionName == "asio.input.0")
@@ -255,10 +258,10 @@ static void LoadConfigIni(RSConfig& out)
 			if (posEqual != std::string::npos)
 			{
 				key = toLowerString(currentLine.substr(0, posEqual));
-				val = currentLine.substr(posEqual + 1);
+				val = trimString(currentLine.substr(posEqual + 1));
 			}
 
-			if (!key.empty())
+			if (!key.empty() && !val.empty())
 			{
 				if (currentSection == SectionConfig)
 				{
@@ -266,6 +269,25 @@ static void LoadConfigIni(RSConfig& out)
 						parseBoolString(val, out.enableWasapi);
 					else if (key == "enableasio")
 						parseBoolString(val, out.enableAsio);
+				}
+				else if (currentSection == SectionAsio)
+				{
+					if (key == "buffersizemode")
+					{
+						const std::string valLower = toLowerString(val);
+						if (valLower == "driver")
+						{
+							out.asioConfig.bufferMode = AsioSharedHost::BufferSizeMode_Driver;
+						}
+						else if (valLower == "host")
+						{
+							out.asioConfig.bufferMode = AsioSharedHost::BufferSizeMode_Host;
+						}
+						else
+						{
+							rslog::error_ts() << __FUNCTION__ << " - invalid value for buffer size mode. valid values are \"driver\", \"host\". line: " << line << std::endl;
+						}
+					}
 				}
 				else if (currentSection == SectionAsioOut)
 				{

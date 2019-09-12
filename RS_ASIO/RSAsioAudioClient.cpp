@@ -58,7 +58,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	if (FAILED(IsFormatSupported(ShareMode, pFormat, nullptr)))
 		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 
-	if (m_AsioSharedHost.Start(*pFormat, hnsBufferDuration, AsioSharedHost::BufferSizeMode_AlwaysPreferred, true) != ASE_OK)
+	if (m_AsioSharedHost.Start(*pFormat, hnsBufferDuration, m_AsioDevice.GetConfig().bufferSizeMode, true) != ASE_OK)
 		return E_FAIL;
 
 	memset(&m_WaveFormat, 0, sizeof(m_WaveFormat));

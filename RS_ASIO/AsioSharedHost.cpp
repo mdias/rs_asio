@@ -122,7 +122,21 @@ bool AsioSharedHost::IsValid() const
 
 ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME& suggestedBufferDuration, BufferSizeMode bufferSizeMode, bool allowSmallerBuffer)
 {
-	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
+	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << " bufferSizeMode: ";
+
+	switch (bufferSizeMode)
+	{
+		case BufferSizeMode_Host:
+			rslog::info << "Host" << std::endl;
+			break;
+		case BufferSizeMode_Driver:
+			rslog::info << "Driver" << std::endl;
+			break;
+		default:
+			rslog::info << "N/A" << std::endl;
+			break;
+	}
+
 	if (!IsValid())
 		return ASE_NotPresent;
 
@@ -177,10 +191,10 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 		rslog::info_ts() << std::dec << "  ASIOBufferSize - min: " << minAsioBufferFrames << " max: " << maxAsioBufferFrames << " preferred: " << preferredAsioBufferFrames << " granularity: " << asioBufferGranularity << std::endl;
 
 		const DWORD suggestedBufferDurationFrames = (DWORD)DurationToAudioFrames(suggestedBufferDuration, format.nSamplesPerSec);
-		DWORD bufferDurationFrames = (bufferSizeMode == BufferSizeMode_AlwaysPreferred) ? preferredAsioBufferFrames : suggestedBufferDurationFrames;
+		DWORD bufferDurationFrames = (bufferSizeMode == BufferSizeMode_Driver) ? preferredAsioBufferFrames : suggestedBufferDurationFrames;
 
 		// decide buffer size
-		if (bufferSizeMode == BufferSizeMode_Default)
+		if (bufferSizeMode == BufferSizeMode_Host)
 		{
 			if (bufferDurationFrames < (DWORD)minAsioBufferFrames)
 				bufferDurationFrames = (DWORD)minAsioBufferFrames;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RSBaseDeviceEnum.h"
+#include "AsioSharedHost.h"
 
 struct RSAsioOutputConfig
 {
@@ -18,6 +19,7 @@ struct RSAsioConfig
 {
 	RSAsioOutputConfig output;
 	std::array<RSAsioInputConfig, 2> inputs;
+	AsioSharedHost::BufferSizeMode bufferMode = AsioSharedHost::BufferSizeMode_Driver;
 };
 
 struct RSConfig

@@ -1,8 +1,7 @@
 #pragma once
 
 #include "ComBaseUnknown.h"
-
-class AsioSharedHost;
+#include "AsioSharedHost.h"
 
 class RSAsioDevice : public ComBaseUnknown<IMMDevice>
 {
@@ -12,6 +11,7 @@ public:
 		bool isOutput;
 		unsigned baseAsioChannelNumber = 0;
 		unsigned numAsioChannels = 1;
+		AsioSharedHost::BufferSizeMode bufferSizeMode = AsioSharedHost::BufferSizeMode_Driver;
 	};
 
 public:

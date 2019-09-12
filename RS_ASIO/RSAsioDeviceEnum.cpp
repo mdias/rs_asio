@@ -61,6 +61,7 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 			config.isOutput = true;
 			config.baseAsioChannelNumber = 0;
 			config.numAsioChannels = m_Config.output.numChannels;
+			config.bufferSizeMode = m_Config.bufferMode;
 
 			auto device = new RSAsioDevice(*host, L"{ASIO Out}", config);
 			m_RenderDevices.AddDevice(device);
@@ -93,6 +94,7 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 				config.isOutput = false;
 				config.baseAsioChannelNumber = inputCfg.useChannel;
 				config.numAsioChannels = 1;
+				config.bufferSizeMode = m_Config.bufferMode;
 
 				auto device = new RSAsioDevice(*host, id, config);
 				m_CaptureDevices.AddDevice(device);
