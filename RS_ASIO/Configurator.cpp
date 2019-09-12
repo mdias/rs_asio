@@ -98,12 +98,13 @@ static std::string trimString(const std::string& s)
 	size_t start = 0;
 	size_t end = s.length() - 1;
 
+	// find left position to trim
 	for (; start < end; ++start)
 	{
 		bool skip = false;
 		for (int i = 0; i < sizeof(p); ++i)
 		{
-			if (s[i] == p[i])
+			if (s[start] == p[i])
 			{
 				skip = true;
 				break;
@@ -113,12 +114,13 @@ static std::string trimString(const std::string& s)
 			break;
 	}
 
+	// find right position to trim
 	for (; end > start && end >=1; --end)
 	{
 		bool skip = false;
 		for (int i = 0; i < sizeof(p); ++i)
 		{
-			if (s[i] == p[i])
+			if (s[end] == p[i])
 			{
 				skip = true;
 				break;
@@ -126,12 +128,11 @@ static std::string trimString(const std::string& s)
 		}
 		if (!skip)
 		{
-			++end;
 			break;
 		}
 	}
 
-	return s.substr(start, end - start);
+	return s.substr(start, (end+1) - start);
 }
 
 static std::string toLowerString(const std::string s)
