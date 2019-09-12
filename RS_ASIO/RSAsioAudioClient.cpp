@@ -58,7 +58,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	if (FAILED(IsFormatSupported(ShareMode, pFormat, nullptr)))
 		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 
-	if (m_AsioSharedHost.Start(*pFormat, hnsBufferDuration, AsioSharedHost::BufferSizeMode_Default, true) != ASE_OK)
+	if (m_AsioSharedHost.Start(*pFormat, hnsBufferDuration, AsioSharedHost::BufferSizeMode_AlwaysPreferred, true) != ASE_OK)
 		return E_FAIL;
 
 	memset(&m_WaveFormat, 0, sizeof(m_WaveFormat));
@@ -73,7 +73,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 
 	UpdateChannelMap();
 
-	if (m_AsioDevice.IsOutput())
+	if (m_AsioDevice.GetConfig().isOutput)
 	{
 		m_RenderClient = new RSAsioAudioRenderClient(*this);
 	}
@@ -126,7 +126,7 @@ HRESULT RSAsioAudioClient::GetStreamLatency(REFERENCE_TIME *phnsLatency)
 	if (!m_AsioSharedHost.GetLatencyTime(in, out))
 		return E_FAIL;
 
-	*phnsLatency = m_AsioDevice.IsOutput() ? out : in;
+	*phnsLatency = m_AsioDevice.GetConfig().isOutput ? out : in;
 
 	return S_OK;
 }
@@ -141,7 +141,7 @@ HRESULT RSAsioAudioClient::GetCurrentPadding(UINT32 *pNumPaddingFrames)
 
 	bool isBufferWaiting = false;
 
-	if (m_AsioDevice.IsOutput())
+	if (m_AsioDevice.GetConfig().isOutput)
 	{
 		if (m_RenderClient)
 			isBufferWaiting = m_RenderClient->HasNewBufferWaiting();
@@ -178,14 +178,14 @@ HRESULT RSAsioAudioClient::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const 
 		rslog::error_ts() << "  unsupported number of channels: " << pFormat->nChannels << std::endl;
 		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 	}
-	if (m_AsioDevice.GetNumChannels() == 0)
+	if (m_AsioDevice.GetConfig().numAsioChannels == 0)
 	{
 		rslog::error_ts() << "  endpoint has no configured channels" << std::endl;
 		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 	}
 
 	// check compatibility with asio host
-	if (!m_AsioSharedHost.IsWaveFormatSupported(*pFormat, m_AsioDevice.IsOutput(), m_AsioDevice.GetBaseChannelNumber(), m_AsioDevice.GetNumChannels()))
+	if (!m_AsioSharedHost.IsWaveFormatSupported(*pFormat, m_AsioDevice.GetConfig().isOutput, m_AsioDevice.GetConfig().baseAsioChannelNumber, m_AsioDevice.GetConfig().numAsioChannels))
 	{
 		rslog::error_ts() << "  failed to initialize asio driver with requested format" << std::endl;
 		return AUDCLNT_E_UNSUPPORTED_FORMAT;
@@ -438,7 +438,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	if (m_ChannelMap.size() < m_WaveFormat.Format.nChannels)
 		return;
 
-	if (m_AsioDevice.IsOutput())
+	if (m_AsioDevice.GetConfig().isOutput)
 	{
 		for (WORD ch = 0; ch < m_WaveFormat.Format.nChannels; ++ch)
 		{
@@ -492,10 +492,10 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 void RSAsioAudioClient::UpdateChannelMap()
 {
-	const WORD baseChannel = m_AsioDevice.GetBaseChannelNumber();
-	const WORD maxAsioChannel = m_AsioDevice.IsOutput() ? m_AsioSharedHost.GetNumOutputChannels() : m_AsioSharedHost.GetNumInputChannels();
+	const WORD baseChannel = m_AsioDevice.GetConfig().baseAsioChannelNumber;
+	const WORD maxAsioChannel = m_AsioDevice.GetConfig().isOutput ? m_AsioSharedHost.GetNumOutputChannels() : m_AsioSharedHost.GetNumInputChannels();
 
-	const WORD numRequestedChannels = m_AsioDevice.GetNumChannels();
+	const WORD numRequestedChannels = m_AsioDevice.GetConfig().numAsioChannels;
 	const WORD numBufferChannels = m_WaveFormat.Format.nChannels;
 
 	m_ChannelMap.resize(numBufferChannels);

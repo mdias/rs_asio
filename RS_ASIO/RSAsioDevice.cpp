@@ -5,12 +5,10 @@
 #include "RSAsioAudioClient.h"
 #include "RSAsioAudioEndpointVolume.h"
 
-RSAsioDevice::RSAsioDevice(AsioSharedHost& asioSharedHost, const std::wstring& id, bool isOutput, unsigned baseChannelNumber, unsigned numChannels)
+RSAsioDevice::RSAsioDevice(AsioSharedHost& asioSharedHost, const std::wstring& id, const Config& config)
 	: m_AsioSharedHost(asioSharedHost)
 	, m_Id(id)
-	, m_IsOutput(isOutput)
-	, m_BaseChannelNumber(baseChannelNumber)
-	, m_NumChannels(numChannels)
+	, m_Config(config)
 {
 	m_AsioSharedHost.AddRef();
 }
@@ -93,24 +91,9 @@ AsioSharedHost& RSAsioDevice::GetAsioHost()
 	return m_AsioSharedHost;
 }
 
-bool RSAsioDevice::IsOutput() const
-{
-	return m_IsOutput;
-}
-
-unsigned RSAsioDevice::GetBaseChannelNumber() const
-{
-	return m_BaseChannelNumber;
-}
-
-unsigned RSAsioDevice::GetNumChannels() const
-{
-	return m_NumChannels;
-}
-
 unsigned RSAsioDevice::GetNumWasapiChannels() const
 {
-	return std::max<unsigned>(m_NumChannels, 2);
+	return std::max<unsigned>(m_Config.numAsioChannels, 2);
 }
 
 

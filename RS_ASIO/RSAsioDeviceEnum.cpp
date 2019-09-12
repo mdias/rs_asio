@@ -57,7 +57,12 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 		AsioSharedHost* host = fnFindOrCreateAsioHost(m_Config.output.asioDriverName);
 		if (host)
 		{
-			auto device = new RSAsioDevice(*host, L"{ASIO Out}", true, 0, m_Config.output.numChannels);
+			RSAsioDevice::Config config;
+			config.isOutput = true;
+			config.baseAsioChannelNumber = 0;
+			config.numAsioChannels = m_Config.output.numChannels;
+
+			auto device = new RSAsioDevice(*host, L"{ASIO Out}", config);
 			m_RenderDevices.AddDevice(device);
 			device->Release();
 			device = nullptr;
@@ -84,7 +89,12 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 				wchar_t id[64]{};
 				swprintf(id, 63, L"{ASIO IN %i}", inputIdx);
 
-				auto device = new RSAsioDevice(*host, id, false, inputCfg.useChannel, 1);
+				RSAsioDevice::Config config;
+				config.isOutput = false;
+				config.baseAsioChannelNumber = inputCfg.useChannel;
+				config.numAsioChannels = 1;
+
+				auto device = new RSAsioDevice(*host, id, config);
 				m_CaptureDevices.AddDevice(device);
 				device->Release();
 				device = nullptr;

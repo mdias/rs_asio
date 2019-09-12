@@ -21,7 +21,7 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetCount(DWORD *cProps)
 	if (!cProps)
 		return E_POINTER;
 
-	if (m_AsioDevice.IsOutput())
+	if (m_AsioDevice.GetConfig().isOutput)
 		*cProps = 2;
 	else
 		*cProps = 4;

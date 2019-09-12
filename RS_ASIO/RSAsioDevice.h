@@ -7,7 +7,15 @@ class AsioSharedHost;
 class RSAsioDevice : public ComBaseUnknown<IMMDevice>
 {
 public:
-	RSAsioDevice(AsioSharedHost& asioSharedHost, const std::wstring& id, bool isOutput, unsigned baseChannelNumber, unsigned maxChannels);
+	struct Config
+	{
+		bool isOutput;
+		unsigned baseAsioChannelNumber = 0;
+		unsigned numAsioChannels = 1;
+	};
+
+public:
+	RSAsioDevice(AsioSharedHost& asioSharedHost, const std::wstring& id, const Config& config);
 	RSAsioDevice(const RSAsioDevice&) = delete;
 	RSAsioDevice(RSAsioDevice&&) = delete;
 	virtual ~RSAsioDevice();
@@ -20,15 +28,15 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE GetState(DWORD *pdwState) override;
 
 	AsioSharedHost& GetAsioHost();
-	bool IsOutput() const;
-	unsigned GetBaseChannelNumber() const;
-	unsigned GetNumChannels() const;
+	const Config& GetConfig() const { return m_Config; }
+
 	unsigned GetNumWasapiChannels() const;
 
 	const std::wstring& GetIdRef() const { return m_Id; }
 
 private:
 	std::wstring m_Id;
+	Config m_Config;
 
 	AsioSharedHost& m_AsioSharedHost;
 	bool m_IsOutput;
