@@ -25,7 +25,7 @@ HRESULT STDMETHODCALLTYPE RSAsioDevice::QueryInterface(REFIID riid, void **ppvOb
 
 	if (riid == __uuidof(IMMEndpoint))
 	{
-		*ppvObject = new RSAsioEndpoint(*this, m_IsOutput ? eRender : eCapture);
+		*ppvObject = new RSAsioEndpoint(*this, m_Config.isOutput ? eRender : eCapture);
 		return S_OK;
 	}
 

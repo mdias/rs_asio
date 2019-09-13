@@ -39,7 +39,6 @@ private:
 	Config m_Config;
 
 	AsioSharedHost& m_AsioSharedHost;
-	bool m_IsOutput;
 	unsigned m_BaseChannelNumber;
 	unsigned m_NumChannels;
 };
