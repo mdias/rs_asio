@@ -305,6 +305,8 @@ HRESULT RSAsioAudioClient::Reset()
 
 HRESULT RSAsioAudioClient::SetEventHandle(HANDLE eventHandle)
 {
+	std::lock_guard<std::mutex> g(m_bufferMutex);
+
 	if (!m_AsioSharedHost.IsValid())
 		return AUDCLNT_E_DEVICE_INVALIDATED;
 
