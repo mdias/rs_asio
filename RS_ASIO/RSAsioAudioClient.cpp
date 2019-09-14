@@ -254,6 +254,7 @@ HRESULT RSAsioAudioClient::Start()
 		return AUDCLNT_E_NOT_STOPPED;
 
 	m_IsStarted = true;
+	m_bufferHasUpdatedData = false;
 
 	return S_OK;
 }
@@ -398,6 +399,7 @@ void RSAsioAudioClient::SwapBuffers()
 {
 	std::lock_guard<std::mutex> g(m_bufferMutex);
 	std::swap(m_frontBuffer, m_backBuffer);
+	m_bufferHasUpdatedData = true;
 }
 
 template<typename TSample>
@@ -434,6 +436,10 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	if (!m_IsStarted)
 	{
 		memset(m_frontBuffer.data(), 0, m_frontBuffer.size());
+	}
+	else if (!m_bufferHasUpdatedData)
+	{
+		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__" - buffer underrun detected" << std::endl;
 	}
 
 	// sanity check
@@ -490,6 +496,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	{
 		SetEvent(m_EventHandle);
 	}
+	m_bufferHasUpdatedData = false;
 }
 
 void RSAsioAudioClient::UpdateChannelMap()

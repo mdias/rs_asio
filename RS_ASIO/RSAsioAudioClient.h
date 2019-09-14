@@ -69,6 +69,7 @@ private:
 
 	std::vector<BYTE> m_frontBuffer;
 	std::vector<BYTE> m_backBuffer;
+	bool m_bufferHasUpdatedData = false;
 
 	std::mutex m_bufferMutex;
 	DWORD m_bufferNumFrames;
