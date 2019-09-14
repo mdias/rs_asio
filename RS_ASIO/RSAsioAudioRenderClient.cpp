@@ -58,17 +58,6 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::ReleaseBuffer(UINT32 NumFrame
 	m_WaitingForBufferRelease = false;
 	m_NewBufferWaiting = false;
 
-	static std::ofstream outFile;
-	if (!outFile.is_open())
-	{
-		outFile.open("D:\\rs_asio_audio.raw", std::ios::binary | std::ios::trunc);
-	}
-	else
-	{
-		std::vector<BYTE>& buffer = m_AsioAudioClient.GetBackBuffer();
-		outFile.write((char*)buffer.data(), 4*2* NumFramesWritten);
-	}
-
 	m_AsioAudioClient.SwapBuffers();
 
 	return S_OK;

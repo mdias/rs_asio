@@ -439,7 +439,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	}
 	else if (!m_bufferHasUpdatedData)
 	{
-		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__" - buffer underrun detected" << std::endl;
+		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer underrun detected" << std::endl;
 	}
 
 	// sanity check
