@@ -142,6 +142,20 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 
 	if (m_StartCount == 0)
 	{
+		// display channel information
+		rslog::info_ts() << "  ASIO input channels info:" << std::endl;
+		for (size_t i = 0; i < m_AsioInChannelInfo.size(); ++i)
+		{
+			const ASIOChannelInfo& ci = m_AsioInChannelInfo[i];
+			rslog::info_ts() << "    " << i << " - active: " << ci.isActive << ", channel: " << ci.channel << ", group: " << ci.channelGroup << ", isInput: " << ci.isInput << ", type: " << ci.type << ", name: " << ci.name << std::endl;
+		}
+		rslog::info_ts() << "  ASIO output channels info:" << std::endl;
+		for (size_t i = 0; i < m_AsioOutChannelInfo.size(); ++i)
+		{
+			const ASIOChannelInfo& ci = m_AsioOutChannelInfo[i];
+			rslog::info_ts() << "    " << i << " - active: " << ci.isActive << ", channel: " << ci.channel << ", group: " << ci.channelGroup << ", isInput: " << ci.isInput << ", type: " << ci.type << ", name: " << ci.name << std::endl;
+		}
+
 		// make sure all channels are using a supported format for now
 		if (m_AsioInChannelInfo.size())
 		{
@@ -270,8 +284,10 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 			}
 		}
 
+		rslog::info_ts() << "  Creating ASIO buffers (" << m_AsioOutChannelInfo.size() << " out, " << m_AsioInChannelInfo.size() << " in)..." << std::endl;
 		if (m_Driver->createBuffers(m_AsioBuffers.data(), m_AsioBuffers.size(), (LONG)bufferDurationFrames, &m_AsioCallbacks) != ASE_OK)
 		{
+			rslog::error_ts() << "  Failed to create ASIO buffers" << std::endl;
 			DisplayCurrentError();
 
 			m_AsioBuffers.clear();
@@ -285,8 +301,10 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const REFERENCE_TIME
 		else
 			m_CurrentWaveFormat.Format = format;
 
+		rslog::info_ts() << "  Starting ASIO stream..." << std::endl;
 		if (m_Driver->start() != ASE_OK)
 		{
+			rslog::error_ts() << "  Failed to start ASIO stream" << std::endl;
 			DisplayCurrentError();
 
 			if (m_Driver->disposeBuffers() != ASE_OK)
