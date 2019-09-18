@@ -638,14 +638,28 @@ void __cdecl AsioSharedHost::AsioCalback_sampleRateDidChange(ASIOSampleRate sRat
 
 long __cdecl AsioSharedHost::AsioCalback_asioMessage(long selector, long value, void* message, double* opt)
 {
-	rslog::info_ts() << __FUNCTION__ " - selector: " << selector << " value: " << value << std::endl;
+	rslog::info_ts() << __FUNCTION__ " - selector: " << selector << " value: " << value << " | returning: ";
+
+	long ret = 0;
+
+	switch (selector)
+	{
+		case kAsioEngineVersion:
+			ret = 1;
+			break;
+		case kAsioSupportsTimeInfo:
+			ret = 1;
+			break;
+	}
+
+	rslog::info << ret << std::endl;
 
 	return 0;
 }
 
 ASIOTime* __cdecl AsioSharedHost::AsioCalback_bufferSwitchTimeInfo(ASIOTime* params, long doubleBufferIndex, ASIOBool directProcess)
 {
-	rslog::info_ts() << __FUNCTION__ << std::endl;
+	AsioCalback_bufferSwitch(doubleBufferIndex, directProcess);
 
 	return nullptr;
 }
