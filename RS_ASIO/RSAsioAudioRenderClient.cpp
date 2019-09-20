@@ -67,3 +67,8 @@ void RSAsioAudioRenderClient::NotifyNewBuffer()
 {
 	m_NewBufferWaiting = false;
 }
+
+void RSAsioAudioRenderClient::NotifyUnderrun()
+{
+
+}

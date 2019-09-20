@@ -16,6 +16,7 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE ReleaseBuffer(UINT32 NumFramesWritten, DWORD dwFlags) override;
 
 	void NotifyNewBuffer();
+	void NotifyUnderrun();
 	bool HasNewBufferWaiting() const { return m_NewBufferWaiting; }
 
 private:

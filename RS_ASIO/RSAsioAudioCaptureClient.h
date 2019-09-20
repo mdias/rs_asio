@@ -17,6 +17,7 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE GetNextPacketSize(UINT32 *pNumFramesInNextPacket) override;
 
 	void NotifyNewBuffer();
+	void NotifyUnderrun();
 	bool HasNewBufferWaiting() const { return m_NewBufferWaiting; }
 
 private:
@@ -25,4 +26,5 @@ private:
 	UINT64 m_NewBufferPerfCounter = 0;
 
 	bool m_WaitingForBufferRelease = false;
+	bool m_DataDiscontinuityFlag = false;
 };

@@ -30,13 +30,18 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UIN
 	*ppData = buffer.data();
 	*pNumFramesToRead = m_NewBufferWaiting ? m_AsioAudioClient.GetBufferNumFrames() : 0;
 
+	DWORD dwOutFlags = 0;
 	if (m_NewBufferPerfCounter == 0)
 	{
-		*pdwFlags = AUDCLNT_BUFFERFLAGS_TIMESTAMP_ERROR;
+		dwOutFlags |= AUDCLNT_BUFFERFLAGS_TIMESTAMP_ERROR;
 	}
 	if (!m_NewBufferWaiting)
 	{
-		*pdwFlags = AUDCLNT_BUFFERFLAGS_SILENT;
+		dwOutFlags |= AUDCLNT_BUFFERFLAGS_SILENT;
+	}
+	if (m_DataDiscontinuityFlag)
+	{
+		dwOutFlags |= AUDCLNT_BUFFERFLAGS_DATA_DISCONTINUITY;
 	}
 
 	// not implemented
@@ -62,6 +67,7 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::ReleaseBuffer(UINT32 NumFram
 		return AUDCLNT_E_OUT_OF_ORDER;
 
 	m_WaitingForBufferRelease = false;
+	m_DataDiscontinuityFlag = false;
 	m_AsioAudioClient.SwapBuffers();
 
 	return S_OK;
@@ -89,4 +95,9 @@ void RSAsioAudioCaptureClient::NotifyNewBuffer()
 		m_NewBufferPerfCounter = 0;
 
 	m_NewBufferWaiting = true;
+}
+
+void RSAsioAudioCaptureClient::NotifyUnderrun()
+{
+	m_DataDiscontinuityFlag = true;
 }

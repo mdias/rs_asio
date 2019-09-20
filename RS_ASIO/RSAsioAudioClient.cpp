@@ -86,6 +86,8 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	m_bufferNumFrames = numFrames;
 	m_frontBuffer.resize(pFormat->nBlockAlign * numFrames);
 	m_backBuffer.resize(pFormat->nBlockAlign * numFrames);
+	memset(m_frontBuffer.data(), 0, m_frontBuffer.size());
+	memset(m_backBuffer.data(), 0, m_backBuffer.size());
 	
 	m_UsingEventHandle = useEventCallback;
 	m_IsInitialized = true;
@@ -254,7 +256,7 @@ HRESULT RSAsioAudioClient::Start()
 		return AUDCLNT_E_NOT_STOPPED;
 
 	m_IsStarted = true;
-	m_bufferHasUpdatedData = false;
+	m_bufferHasUpdatedData = true;
 
 	return S_OK;
 }
@@ -448,18 +450,21 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 	if (m_AsioDevice.GetConfig().isOutput)
 	{
-		for (WORD ch = 0; ch < m_WaveFormat.Format.nChannels; ++ch)
+		if (m_bufferHasUpdatedData)
 		{
-			const int asioCh = m_ChannelMap[ch];
-			if (asioCh >= 0)
+			for (WORD ch = 0; ch < m_WaveFormat.Format.nChannels; ++ch)
 			{
-				ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetOutputBuffer(asioCh);
-				if (bufferInfo)
+				const int asioCh = m_ChannelMap[ch];
+				if (asioCh >= 0)
 				{
-					if (m_WaveFormat.Format.wBitsPerSample == 16)
-						CopyDeinterleaveChannel<std::int16_t>(m_frontBuffer.data(), (BYTE*)bufferInfo->buffers[buffIdx], ch, m_WaveFormat.Format.nBlockAlign, m_bufferNumFrames);
-					else if (m_WaveFormat.Format.wBitsPerSample == 32)
-						CopyDeinterleaveChannel<std::int32_t>(m_frontBuffer.data(), (BYTE*)bufferInfo->buffers[buffIdx], ch, m_WaveFormat.Format.nBlockAlign, m_bufferNumFrames);
+					ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetOutputBuffer(asioCh);
+					if (bufferInfo)
+					{
+						if (m_WaveFormat.Format.wBitsPerSample == 16)
+							CopyDeinterleaveChannel<std::int16_t>(m_frontBuffer.data(), (BYTE*)bufferInfo->buffers[buffIdx], ch, m_WaveFormat.Format.nBlockAlign, m_bufferNumFrames);
+						else if (m_WaveFormat.Format.wBitsPerSample == 32)
+							CopyDeinterleaveChannel<std::int32_t>(m_frontBuffer.data(), (BYTE*)bufferInfo->buffers[buffIdx], ch, m_WaveFormat.Format.nBlockAlign, m_bufferNumFrames);
+					}
 				}
 			}
 		}
@@ -486,13 +491,21 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	if (m_CaptureClient)
 	{
 		m_CaptureClient->NotifyNewBuffer();
+		if (!m_bufferHasUpdatedData)
+		{
+			m_CaptureClient->NotifyUnderrun();
+		}
 	}
 	if (m_RenderClient)
 	{
 		m_RenderClient->NotifyNewBuffer();
+		if (!m_bufferHasUpdatedData)
+		{
+			m_RenderClient->NotifyUnderrun();
+		}
 	}
 
-	if (m_UsingEventHandle && m_EventHandle)
+	if (m_UsingEventHandle && m_EventHandle && m_bufferHasUpdatedData)
 	{
 		SetEvent(m_EventHandle);
 	}
