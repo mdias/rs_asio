@@ -43,6 +43,7 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UIN
 	{
 		dwOutFlags |= AUDCLNT_BUFFERFLAGS_DATA_DISCONTINUITY;
 	}
+	*pdwFlags = dwOutFlags;
 
 	// not implemented
 	if (pu64DevicePosition)
