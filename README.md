@@ -8,17 +8,24 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Copy the DLL files to the game folder.
 - Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
 - Make sure your ASIO interface is set to 24-bit mode.
+- Make sure Rocksmith.ini is set to run with `ExclusiveMode=1` enabled and `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
 - Extra: An RS_ASIO-log.txt file is generated inside the game directory which may help discover your ASIO driver name diagnose issues.
 
 ### How to remove/uninstall
 
 - Remove the custom DLL files from the game folder.
 
+### Audio Interfaces reported to work well
+
+- Behringer UMC204HD
+- Focusrite Scarlett Solo 2nd Gen
+- MOTU UltraLite AVB
+
 ### Known issues
 
 - Supports only 32-bit aligned, 24-bit audio sample types as of now.
 - Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
 - Ignores volume change requests by the game on the input devices.
-- Tested only on one device as of 6th, Sep. 2019.
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
+- Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 64, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
 - Hardware hotplugging while the game is running won't be noticed by the game.
