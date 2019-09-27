@@ -11,13 +11,6 @@ public:
 class AsioSharedHost : public ComBaseUnknown<IUnknown>
 {
 public:
-	enum BufferSizeMode
-	{
-		BufferSizeMode_Host,
-		BufferSizeMode_Driver,
-	};
-
-public:
 	AsioSharedHost(const CLSID& clsid, const std::string& asioDllPath);
 	AsioSharedHost(const AsioSharedHost&) = delete;
 	AsioSharedHost(AsioSharedHost&&) = delete;
@@ -26,8 +19,10 @@ public:
 	bool IsValid() const;
 	IAsioDriver* GetDriver() { return m_Driver; }
 
-	ASIOError Start(const WAVEFORMATEX& format, const REFERENCE_TIME& suggestedBufferDuration, BufferSizeMode bufferSizeMode, bool allowSmallerBuffer);
+	ASIOError Start(const WAVEFORMATEX& format, const DWORD bufferDurationFrames);
 	void Stop();
+	bool GetPreferredBufferSize(DWORD& outBufferSizeFrames) const;
+	bool ClampBufferSizeToLimits(DWORD& inOutBufferSizeFrames) const;
 
 	void AddBufferSwitchListener(IAsioBufferSwitchListener* listener);
 	void RemoveBufferSwitchListener(IAsioBufferSwitchListener* listener);
@@ -44,7 +39,7 @@ public:
 	unsigned GetNumOutputChannels() const { return m_AsioOutChannelInfo.size(); }
 
 private:
-	void DisplayCurrentError();
+	void DisplayCurrentError() const;
 
 	void __cdecl AsioCalback_bufferSwitch(long doubleBufferIndex, ASIOBool directProcess);
 	void __cdecl AsioCalback_sampleRateDidChange(ASIOSampleRate sRate);

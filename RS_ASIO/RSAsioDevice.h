@@ -6,12 +6,20 @@
 class RSAsioDevice : public ComBaseUnknown<IMMDevice>
 {
 public:
+	enum BufferSizeMode
+	{
+		BufferSizeMode_Host,
+		BufferSizeMode_Driver,
+		BufferSizeMode_Custom,
+	};
+
 	struct Config
 	{
 		bool isOutput;
 		unsigned baseAsioChannelNumber = 0;
 		unsigned numAsioChannels = 1;
-		AsioSharedHost::BufferSizeMode bufferSizeMode = AsioSharedHost::BufferSizeMode_Driver;
+		BufferSizeMode bufferSizeMode = BufferSizeMode_Driver;
+		unsigned customBufferSize = 128;
 	};
 
 public:

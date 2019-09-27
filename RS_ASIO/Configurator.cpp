@@ -277,15 +277,31 @@ static void LoadConfigIni(RSConfig& out)
 						const std::string valLower = toLowerString(val);
 						if (valLower == "driver")
 						{
-							out.asioConfig.bufferMode = AsioSharedHost::BufferSizeMode_Driver;
+							out.asioConfig.bufferMode = RSAsioDevice::BufferSizeMode_Driver;
 						}
 						else if (valLower == "host")
 						{
-							out.asioConfig.bufferMode = AsioSharedHost::BufferSizeMode_Host;
+							out.asioConfig.bufferMode = RSAsioDevice::BufferSizeMode_Host;
+						}
+						else if (valLower == "custom")
+						{
+							out.asioConfig.bufferMode = RSAsioDevice::BufferSizeMode_Custom;
 						}
 						else
 						{
 							rslog::error_ts() << __FUNCTION__ << " - invalid value for buffer size mode. valid values are \"driver\", \"host\". line: " << line << std::endl;
+						}
+					}
+					else if (key == "custombuffersize")
+					{
+						int s = 0;
+						if (parseIntString(val, s) && s > 0)
+						{
+							out.asioConfig.customBufferSize = (unsigned)s;
+						}
+						else
+						{
+							rslog::error_ts() << __FUNCTION__ << " - invalid value for buffer size, value should be an integer starting at 1. line: " << line << std::endl;
 						}
 					}
 				}
