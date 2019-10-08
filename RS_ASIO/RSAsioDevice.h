@@ -20,8 +20,8 @@ public:
 		unsigned numAsioChannels = 1;
 		BufferSizeMode bufferSizeMode = BufferSizeMode_Driver;
 		unsigned customBufferSize = 128;
-		bool enableSoftwareEndpointVolmeControl = false;
-		bool enableSoftwareMasterVolumeControl = false;
+		bool enableSoftwareEndpointVolmeControl = true;
+		bool enableSoftwareMasterVolumeControl = true;
 	};
 
 public:

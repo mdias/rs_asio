@@ -25,7 +25,6 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 
 - Supports only 32-bit aligned, 24-bit audio sample types as of now.
 - Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
-- Ignores volume change requests by the game on the input devices.
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 64, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
 - Hardware hotplugging while the game is running won't be noticed by the game.
