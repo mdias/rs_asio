@@ -7,12 +7,18 @@ struct RSAsioOutputConfig
 {
 	std::string asioDriverName;
 	unsigned numChannels = 2;
+	bool enableSoftwareEndpointVolumeControl = false;
+	bool enableSoftwareMasterVolumeControl = false;
+	int softwareMasterVolumePercent = 100;
 };
 
 struct RSAsioInputConfig
 {
 	std::string asioDriverName;
 	unsigned useChannel = 0;
+	bool enableSoftwareEndpointVolumeControl = false;
+	bool enableSoftwareMasterVolumeControl = false;
+	int softwareMasterVolumePercent = 100;
 };
 
 struct RSAsioConfig

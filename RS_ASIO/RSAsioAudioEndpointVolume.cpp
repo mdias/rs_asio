@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "RSAsioAudioEndpointVolume.h"
+#include "RSAsioDevice.h"
 
 RSAsioAudioEndpointVolume::RSAsioAudioEndpointVolume(RSAsioDevice& asioDevice)
 	: m_AsioDevice(asioDevice)
@@ -33,7 +34,13 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioEndpointVolume::SetMasterVolumeLevel(float 
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioEndpointVolume::SetMasterVolumeLevelScalar(float fLevel, LPCGUID pguidEventContext)
 {
-	return E_NOTIMPL;
+	if (fLevel < 0.0f || fLevel > 1.0f)
+		return E_INVALIDARG;
+
+	if (!m_AsioDevice.SetEndpointVolumeLevelScalar(fLevel))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioEndpointVolume::GetMasterVolumeLevel(float *pfLevelDB)
@@ -43,7 +50,12 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioEndpointVolume::GetMasterVolumeLevel(float 
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioEndpointVolume::GetMasterVolumeLevelScalar(float *pfLevel)
 {
-	return E_NOTIMPL;
+	if (!pfLevel)
+		return E_POINTER;
+
+	*pfLevel = m_AsioDevice.GetEndpointVolumeLevelScalar();
+
+	return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioEndpointVolume::SetChannelVolumeLevel(UINT nChannel, float fLevelDB, LPCGUID pguidEventContext)

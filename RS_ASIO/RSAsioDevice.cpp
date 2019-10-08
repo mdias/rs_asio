@@ -96,6 +96,53 @@ unsigned RSAsioDevice::GetNumWasapiChannels() const
 	return std::max<unsigned>(m_Config.numAsioChannels, 2);
 }
 
+bool RSAsioDevice::SetEndpointVolumeLevelScalar(float fLevel)
+{
+	if (!m_Config.enableSoftwareEndpointVolmeControl)
+		return false;
+	m_SoftwareEndpointVolumeScalar = fLevel;
+	return true;
+}
+
+float RSAsioDevice::GetEndpointVolumeLevelScalar() const
+{
+	return m_SoftwareEndpointVolumeScalar;
+}
+
+bool RSAsioDevice::SetMasterVolumeLevelScalar(float fLevel)
+{
+	if (!m_Config.enableSoftwareMasterVolumeControl)
+		return false;
+	m_SoftwareMasterVolumeScalar = fLevel;
+	return true;
+}
+
+float RSAsioDevice::GetMasterVolumeLevelScalar() const
+{
+	return m_SoftwareMasterVolumeScalar;
+}
+
+bool RSAsioDevice::GetSoftwareVolumeScalar(float* pOutScalar) const
+{
+	if (!m_Config.enableSoftwareEndpointVolmeControl && !m_Config.enableSoftwareMasterVolumeControl)
+		return false;
+
+	if (pOutScalar)
+	{
+		float volumeScalar = 1.0f;
+
+		if (m_Config.enableSoftwareEndpointVolmeControl)
+			volumeScalar *= m_SoftwareEndpointVolumeScalar;
+
+		if (m_Config.enableSoftwareMasterVolumeControl)
+			volumeScalar *= m_SoftwareMasterVolumeScalar;
+
+		*pOutScalar = volumeScalar;
+	}
+
+	return true;
+}
+
 
 
 RSAsioEndpoint::RSAsioEndpoint(RSAsioDevice& asioDevice, EDataFlow dataFlow)

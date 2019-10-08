@@ -142,33 +142,35 @@ static std::string toLowerString(const std::string s)
 	return res;
 }
 
-static void parseBoolString(const std::string& s, bool& out)
+static bool parseBoolString(const std::string& s, bool& out)
 {
 	if (s.empty())
-		return;
+		return false;
 
 	if (s == "1")
 	{
 		out = true;
-		return;
+		return true;
 	}
 	if (s == "0")
 	{
 		out = false;
-		return;
+		return true;
 	}
 
 	std::string sl = toLowerString(s);
 	if (sl == "true")
 	{
 		out = true;
-		return;
+		return true;
 	}
 	if (sl == "false")
 	{
 		out = false;
-		return;
+		return true;
 	}
+
+	return false;
 }
 
 static bool parseIntString(const std::string& s, int& out)
@@ -309,6 +311,26 @@ static void LoadConfigIni(RSConfig& out)
 				{
 					if (key == "driver")
 						out.asioConfig.output.asioDriverName = val;
+					else if (key == "enablesoftwareendpointvolumecontrol")
+					{
+						parseBoolString(val, out.asioConfig.output.enableSoftwareEndpointVolumeControl);
+					}
+					else if (key == "enablesoftwaremastervolumecontrol")
+					{
+						parseBoolString(val, out.asioConfig.output.enableSoftwareMasterVolumeControl);
+					}
+					else if (key == "softwaremastervolumepercent")
+					{
+						int v = 0;
+						if (parseIntString(val, v) && v >= 0)
+						{
+							out.asioConfig.output.softwareMasterVolumePercent = v;
+						}
+						else
+						{
+							rslog::error_ts() << __FUNCTION__ << " - invalid value for softwareMasterVolumePercent, value should be an integer between 0 and 1000. line: " << line << std::endl;
+						}
+					}
 				}
 				else if (currentSection == SectionAsioIn0 || currentSection == SectionAsioIn1)
 				{
@@ -326,6 +348,26 @@ static void LoadConfigIni(RSConfig& out)
 						else
 						{
 							rslog::error_ts() << __FUNCTION__ << " - invalid value for channel, value should be an integer starting at zero. line: " << line << std::endl;
+						}
+					}
+					else if (key == "enablesoftwareendpointvolumecontrol")
+					{
+						parseBoolString(val, asioInputConfig.enableSoftwareEndpointVolumeControl);
+					}
+					else if (key == "enablesoftwaremastervolumecontrol")
+					{
+						parseBoolString(val, asioInputConfig.enableSoftwareMasterVolumeControl);
+					}
+					else if (key == "softwaremastervolumepercent")
+					{
+						int v = 0;
+						if (parseIntString(val, v) && v >= 0)
+						{
+							asioInputConfig.softwareMasterVolumePercent = v;
+						}
+						else
+						{
+							rslog::error_ts() << __FUNCTION__ << " - invalid value for softwareMasterVolumePercent, value should be an integer between 0 and 1000. line: " << line << std::endl;
 						}
 					}
 				}

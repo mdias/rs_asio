@@ -63,8 +63,11 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 			config.numAsioChannels = m_Config.output.numChannels;
 			config.bufferSizeMode = m_Config.bufferMode;
 			config.customBufferSize = m_Config.customBufferSize;
+			config.enableSoftwareEndpointVolmeControl = m_Config.output.enableSoftwareEndpointVolumeControl;
+			config.enableSoftwareMasterVolumeControl = m_Config.output.enableSoftwareMasterVolumeControl;
 
 			auto device = new RSAsioDevice(*host, L"{ASIO Out}", config);
+			device->SetMasterVolumeLevelScalar((float)m_Config.output.softwareMasterVolumePercent / 100.0f);
 			m_RenderDevices.AddDevice(device);
 			device->Release();
 			device = nullptr;
@@ -97,8 +100,11 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 				config.numAsioChannels = 1;
 				config.bufferSizeMode = m_Config.bufferMode;
 				config.customBufferSize = m_Config.customBufferSize;
+				config.enableSoftwareEndpointVolmeControl = inputCfg.enableSoftwareEndpointVolumeControl;
+				config.enableSoftwareMasterVolumeControl = inputCfg.enableSoftwareMasterVolumeControl;
 
 				auto device = new RSAsioDevice(*host, id, config);
+				device->SetMasterVolumeLevelScalar((float)inputCfg.softwareMasterVolumePercent / 100.0f);
 				m_CaptureDevices.AddDevice(device);
 				device->Release();
 				device = nullptr;

@@ -462,6 +462,28 @@ static void CopyInterleaveChannel(BYTE* inDeinterleaved, BYTE* outInterleaved, W
 	}
 }
 
+template<typename TSample>
+static void DoSoftwareVolumeDsp(TSample* inSamples, DWORD numSamples, float fVolumeScalar)
+{
+	int scalarPercentPoints = (int)(fVolumeScalar * 100.f);
+
+	for (DWORD i = 0; i < numSamples; ++i, ++inSamples)
+	{
+		std::int64_t sample = *inSamples;
+		sample = (sample * scalarPercentPoints) / 100;
+		*inSamples = (TSample)sample;
+	}
+}
+
+template<>
+static void DoSoftwareVolumeDsp(float* inSamples, DWORD numSamples, float fVolumeScalar)
+{
+	for (DWORD i = 0; i < numSamples; ++i, ++inSamples)
+	{
+		*inSamples *= fVolumeScalar;
+	}
+}
+
 
 void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 {
@@ -479,6 +501,19 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	// sanity check
 	if (m_ChannelMap.size() < m_WaveFormat.Format.nChannels)
 		return;
+
+	// check if we want to do software volume processing
+	float fSoftwareVolumeScalar = 1.0f;
+	bool doSoftwareVolume = m_AsioDevice.GetSoftwareVolumeScalar(&fSoftwareVolumeScalar);
+	if (doSoftwareVolume)
+	{
+		const DWORD totalSamples = m_bufferNumFrames * m_WaveFormat.Format.nChannels;
+
+		if (m_WaveFormat.Format.wBitsPerSample == 16)
+			DoSoftwareVolumeDsp((std::int16_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
+		else if (m_WaveFormat.Format.wBitsPerSample == 32)
+			DoSoftwareVolumeDsp((std::int32_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
+	}
 
 	if (m_AsioDevice.GetConfig().isOutput)
 	{

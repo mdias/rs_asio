@@ -20,6 +20,8 @@ public:
 		unsigned numAsioChannels = 1;
 		BufferSizeMode bufferSizeMode = BufferSizeMode_Driver;
 		unsigned customBufferSize = 128;
+		bool enableSoftwareEndpointVolmeControl = false;
+		bool enableSoftwareMasterVolumeControl = false;
 	};
 
 public:
@@ -40,6 +42,14 @@ public:
 
 	unsigned GetNumWasapiChannels() const;
 
+	bool SetEndpointVolumeLevelScalar(float fLevel);
+	float GetEndpointVolumeLevelScalar() const;
+
+	bool SetMasterVolumeLevelScalar(float fLevel);
+	float GetMasterVolumeLevelScalar() const;
+
+	bool GetSoftwareVolumeScalar(float* pOutScalar) const;
+
 	const std::wstring& GetIdRef() const { return m_Id; }
 
 private:
@@ -49,6 +59,9 @@ private:
 	AsioSharedHost& m_AsioSharedHost;
 	unsigned m_BaseChannelNumber;
 	unsigned m_NumChannels;
+
+	float m_SoftwareEndpointVolumeScalar = 1.0f;
+	float m_SoftwareMasterVolumeScalar = 1.0f;
 };
 
 class RSAsioEndpoint : public ComBaseUnknown<IMMEndpoint>
