@@ -502,23 +502,24 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	if (m_ChannelMap.size() < m_WaveFormat.Format.nChannels)
 		return;
 
-	// check if we want to do software volume processing
+	// check if and how we want to do software volume processing
 	float fSoftwareVolumeScalar = 1.0f;
 	bool doSoftwareVolume = m_AsioDevice.GetSoftwareVolumeScalar(&fSoftwareVolumeScalar);
-	if (doSoftwareVolume)
-	{
-		const DWORD totalSamples = m_bufferNumFrames * m_WaveFormat.Format.nChannels;
-
-		if (m_WaveFormat.Format.wBitsPerSample == 16)
-			DoSoftwareVolumeDsp((std::int16_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
-		else if (m_WaveFormat.Format.wBitsPerSample == 32)
-			DoSoftwareVolumeDsp((std::int32_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
-	}
-
+	
 	if (m_AsioDevice.GetConfig().isOutput)
 	{
 		if (m_bufferHasUpdatedData)
 		{
+			if (doSoftwareVolume)
+			{
+				const DWORD totalSamples = m_bufferNumFrames * m_WaveFormat.Format.nChannels;
+
+				if (m_WaveFormat.Format.wBitsPerSample == 16)
+					DoSoftwareVolumeDsp((std::int16_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
+				else if (m_WaveFormat.Format.wBitsPerSample == 32)
+					DoSoftwareVolumeDsp((std::int32_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
+			}
+
 			for (WORD ch = 0; ch < m_WaveFormat.Format.nChannels; ++ch)
 			{
 				const int asioCh = m_ChannelMap[ch];
@@ -552,6 +553,16 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 						CopyInterleaveChannel<std::int32_t>((BYTE*)bufferInfo->buffers[buffIdx], m_frontBuffer.data(), ch, m_WaveFormat.Format.nBlockAlign, m_bufferNumFrames);
 				}
 			}
+		}
+
+		if (doSoftwareVolume)
+		{
+			const DWORD totalSamples = m_bufferNumFrames * m_WaveFormat.Format.nChannels;
+
+			if (m_WaveFormat.Format.wBitsPerSample == 16)
+				DoSoftwareVolumeDsp((std::int16_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
+			else if (m_WaveFormat.Format.wBitsPerSample == 32)
+				DoSoftwareVolumeDsp((std::int32_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
 		}
 	}
 
