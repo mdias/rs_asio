@@ -17,9 +17,11 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 
 ### Audio Interfaces reported to work well
 
+- Audient iD4
 - Behringer UMC204HD
 - Focusrite Scarlett Solo 2nd Gen
 - MOTU UltraLite AVB
+- Presonus Quantum 2 
 
 ### Known issues
 
