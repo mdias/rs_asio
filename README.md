@@ -20,7 +20,8 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Audient iD4
 - Behringer U-Phoria UM2 [(see this for more details)](https://github.com/mdias/rs_asio/issues/7)
 - Behringer UMC204HD
-- Focusrite Scarlett Solo 2nd Gen
+- Focusrite Scarlett 2i4 (see Known issues)
+- Focusrite Scarlett Solo 2nd Gen (see Known issues)
 - M-Audio 2x2
 - M-Audio M-Track Plus II
 - MOTU UltraLite AVB
