@@ -157,6 +157,7 @@
     <ClInclude Include="asio.h" />
     <ClInclude Include="AsioHelpers.h" />
     <ClInclude Include="AsioSharedHost.h" />
+    <ClInclude Include="AudioProcessing.h" />
     <ClInclude Include="ComBaseUnknown.h" />
     <ClInclude Include="DebugWrapperAudioClient.h" />
     <ClInclude Include="DebugWrapperAudioEndpointVolume.h" />
@@ -187,6 +188,7 @@
   <ItemGroup>
     <ClCompile Include="AsioHelpers.cpp" />
     <ClCompile Include="AsioSharedHost.cpp" />
+    <ClCompile Include="AudioProcessing.cpp" />
     <ClCompile Include="DebugWrapperAudioClient.cpp" />
     <ClCompile Include="DebugWrapperAudioEndpointVolume.cpp" />
     <ClCompile Include="DebugWrapperDevice.cpp" />

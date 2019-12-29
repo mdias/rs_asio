@@ -48,3 +48,6 @@ REFERENCE_TIME MilisecsToRefTime(LONGLONG ms);
 LONGLONG RefTimeToMilisecs(const REFERENCE_TIME& time);
 LONGLONG DurationToAudioFrames(const REFERENCE_TIME& time, DWORD sampleRate);
 REFERENCE_TIME AudioFramesToDuration(const LONGLONG& frames, DWORD sampleRate);
+
+bool AsioSampleTypeFromFormat(ASIOSampleType* out, WORD bitsPerSample, bool isFloat);
+WORD GetAsioSampleTypeNumBytes(ASIOSampleType sampleType);

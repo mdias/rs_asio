@@ -361,3 +361,64 @@ REFERENCE_TIME AudioFramesToDuration(const LONGLONG& frames, DWORD sampleRate)
 {
 	return (frames * 10000000) / sampleRate;
 }
+
+bool AsioSampleTypeFromFormat(ASIOSampleType* out, WORD bitsPerSample, bool isFloat)
+{
+	bool ret = true;
+	ASIOSampleType type = ASIOSTInt32LSB;
+
+	if (!isFloat)
+	{
+		switch (bitsPerSample)
+		{
+		case 16:
+			type = ASIOSTInt16LSB;
+			break;
+		case 24:
+			type = ASIOSTInt24LSB;
+			break;
+		case 32: 
+			type = ASIOSTInt32LSB;
+			break;
+		default:
+			return false;
+		}
+	}
+	else
+	{
+		switch (bitsPerSample)
+		{
+		case 32: 
+			type = ASIOSTFloat32LSB;
+			break;
+		case 64: 
+			type = ASIOSTFloat64LSB;
+			break;
+		default:
+			return false;
+		}
+	}
+
+	if (out)
+		*out = type;
+
+	return ret;
+}
+
+WORD GetAsioSampleTypeNumBytes(ASIOSampleType sampleType)
+{
+	switch (sampleType)
+	{
+	case ASIOSTInt16LSB:
+		return 2;
+	case ASIOSTInt24LSB:
+		return 3;
+	case ASIOSTInt32LSB:
+	case ASIOSTFloat32LSB:
+		return 4;
+	case ASIOSTFloat64LSB:
+		return 8;
+	}
+
+	return 0;
+}

@@ -35,6 +35,8 @@ public:
 
 	ASIOBufferInfo* GetOutputBuffer(unsigned channel);
 	ASIOBufferInfo* GetInputBuffer(unsigned channel);
+	const ASIOChannelInfo* GetOutputChannelInfo(unsigned channel) const;
+	const ASIOChannelInfo* GetInputChannelInfo(unsigned channel) const;
 	unsigned GetNumInputChannels() const { return m_AsioInChannelInfo.size(); }
 	unsigned GetNumOutputChannels() const { return m_AsioOutChannelInfo.size(); }
 

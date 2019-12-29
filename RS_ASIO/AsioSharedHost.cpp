@@ -487,11 +487,13 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 			return false;
 		}
 
-		// we currently don't support IEEE float...
 		if (wfe.SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
 		{
-			rslog::error_ts() << "  IEEE Float format is not supported" << std::endl;
-			return false;
+			if (sampleType != ASIOSTFloat32LSB && sampleType != ASIOSTFloat64LSB)
+			{
+				rslog::error_ts() << "  rejecting IEEE Float as it's incompatible with current ASIO sample type " << sampleType << std::endl;
+				return false;
+			}
 		}
 
 		// check bit depth
@@ -503,21 +505,17 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		bitsPerSample = wfe.Samples.wValidBitsPerSample;
 	}
 
-	// check bit depth
-	if (format.nBlockAlign != (4 * format.nChannels))
+	switch (sampleType)
 	{
-		rslog::error_ts() << "  nBlockAlign unsupported: " << format.nBlockAlign << std::endl;
-		return false;
-	}
-	if (bitsPerSample != 24)
-	{
-		rslog::error_ts() << "  bitsPerSample unsupported: " << bitsPerSample << std::endl;
-		return false;
-	}
-	if (sampleType != ASIOSTInt32LSB)
-	{
-		rslog::error_ts() << "  ASIO sample type " << sampleType << " is not currently supported" << std::endl;
-		return false;
+		case ASIOSTInt16LSB:
+		case ASIOSTInt24LSB:
+		case ASIOSTInt32LSB:
+		case ASIOSTFloat32LSB:
+		case ASIOSTFloat64LSB:
+			break;
+		default:
+			rslog::error_ts() << "  ASIO sample type " << sampleType << " is not currently supported" << std::endl;
+			return false;
 	}
 
 	return true;
@@ -591,6 +589,20 @@ ASIOBufferInfo* AsioSharedHost::GetInputBuffer(unsigned channel)
 		return nullptr;
 
 	return &m_AsioBuffers[m_AsioOutChannelInfo.size() + channel];
+}
+
+const ASIOChannelInfo* AsioSharedHost::GetOutputChannelInfo(unsigned channel) const
+{
+	if (channel >= m_AsioOutChannelInfo.size())
+		return nullptr;
+	return &m_AsioOutChannelInfo[channel];
+}
+
+const ASIOChannelInfo* AsioSharedHost::GetInputChannelInfo(unsigned channel) const
+{
+	if (channel >= m_AsioInChannelInfo.size())
+		return nullptr;
+	return &m_AsioInChannelInfo[channel];
 }
 
 void AsioSharedHost::DisplayCurrentError() const

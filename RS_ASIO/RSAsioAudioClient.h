@@ -58,6 +58,7 @@ private:
 	AsioSharedHost& m_AsioSharedHost;
 
 	WAVEFORMATEXTENSIBLE m_WaveFormat;
+	bool m_WaveFormatIsFloat = false;
 
 	bool m_IsInitialized = false;
 	bool m_IsStarted = false;

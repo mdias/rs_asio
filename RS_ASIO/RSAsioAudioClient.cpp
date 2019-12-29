@@ -4,6 +4,7 @@
 #include "RSAsioAudioClient.h"
 #include "RSAsioAudioRenderClient.h"
 #include "RSAsioAudioCaptureClient.h"
+#include "AudioProcessing.h"
 
 RSAsioAudioClient::RSAsioAudioClient(RSAsioDevice& asioDevice)
 	: m_AsioDevice(asioDevice)
@@ -97,6 +98,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	if (pFormat->wFormatTag == WAVE_FORMAT_EXTENSIBLE)
 	{
 		m_WaveFormat = *(WAVEFORMATEXTENSIBLE*)pFormat;
+		m_WaveFormatIsFloat = (m_WaveFormat.SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
 	}
 	else
 	{
@@ -436,55 +438,6 @@ void RSAsioAudioClient::SwapBuffers()
 	m_bufferHasUpdatedData = true;
 }
 
-template<typename TSample>
-static void CopyDeinterleaveChannel(BYTE* inInterleaved, BYTE* outDeinterleaved, WORD inputChannel, WORD inputFrameSize, DWORD numFrames)
-{
-	inInterleaved += sizeof(TSample) * inputChannel;
-
-	for (DWORD frame = 0; frame < numFrames; ++frame)
-	{
-		*(TSample*)outDeinterleaved = *(TSample*)inInterleaved;
-		inInterleaved += inputFrameSize;
-		outDeinterleaved += sizeof(TSample);
-	}
-}
-
-template<typename TSample>
-static void CopyInterleaveChannel(BYTE* inDeinterleaved, BYTE* outInterleaved, WORD outputChannel, WORD outputFrameSize, DWORD numFrames)
-{
-	outInterleaved += sizeof(TSample) * outputChannel;
-
-	for (DWORD frame = 0; frame < numFrames; ++frame)
-	{
-		*(TSample*)outInterleaved = *(TSample*)inDeinterleaved;
-		inDeinterleaved += sizeof(TSample);
-		outInterleaved += outputFrameSize;
-	}
-}
-
-template<typename TSample>
-static void DoSoftwareVolumeDsp(TSample* inSamples, DWORD numSamples, float fVolumeScalar)
-{
-	int scalarPercentPoints = (int)(fVolumeScalar * 100.f);
-
-	for (DWORD i = 0; i < numSamples; ++i, ++inSamples)
-	{
-		std::int64_t sample = *inSamples;
-		sample = (sample * scalarPercentPoints) / 100;
-		*inSamples = (TSample)sample;
-	}
-}
-
-template<>
-static void DoSoftwareVolumeDsp(float* inSamples, DWORD numSamples, float fVolumeScalar)
-{
-	for (DWORD i = 0; i < numSamples; ++i, ++inSamples)
-	{
-		*inSamples *= fVolumeScalar;
-	}
-}
-
-
 void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 {
 	std::lock_guard<std::mutex> g(m_bufferMutex);
@@ -502,6 +455,14 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	if (m_ChannelMap.size() < m_WaveFormat.Format.nChannels)
 		return;
 
+	// get game sample type
+	ASIOSampleType gameSampleType = ASIOSTFloat32LSB;
+	if (!AsioSampleTypeFromFormat(&gameSampleType, m_WaveFormat.Format.wBitsPerSample, m_WaveFormatIsFloat))
+		return;
+	const WORD gameSampleTypeSize = GetAsioSampleTypeNumBytes(gameSampleType);
+	if (!gameSampleTypeSize)
+		return;
+
 	// check if and how we want to do software volume processing
 	float fSoftwareVolumeScalar = 1.0f;
 	bool doSoftwareVolume = m_AsioDevice.GetSoftwareVolumeScalar(&fSoftwareVolumeScalar);
@@ -513,11 +474,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 			if (doSoftwareVolume)
 			{
 				const DWORD totalSamples = m_bufferNumFrames * m_WaveFormat.Format.nChannels;
-
-				if (m_WaveFormat.Format.wBitsPerSample == 16)
-					DoSoftwareVolumeDsp((std::int16_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
-				else if (m_WaveFormat.Format.wBitsPerSample == 32)
-					DoSoftwareVolumeDsp((std::int32_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
+				AudioProcessing::DoSoftwareVolumeDsp(m_frontBuffer.data(), gameSampleType, totalSamples, fSoftwareVolumeScalar);
 			}
 
 			for (WORD ch = 0; ch < m_WaveFormat.Format.nChannels; ++ch)
@@ -525,13 +482,20 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 				const int asioCh = m_ChannelMap[ch];
 				if (asioCh >= 0)
 				{
+					const ASIOChannelInfo* asioChannelInfo = m_AsioSharedHost.GetOutputChannelInfo(asioCh);
 					ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetOutputBuffer(asioCh);
-					if (bufferInfo)
+					if (bufferInfo && asioChannelInfo)
 					{
-						if (m_WaveFormat.Format.wBitsPerSample == 16)
-							CopyDeinterleaveChannel<std::int16_t>(m_frontBuffer.data(), (BYTE*)bufferInfo->buffers[buffIdx], ch, m_WaveFormat.Format.nBlockAlign, m_bufferNumFrames);
-						else if (m_WaveFormat.Format.wBitsPerSample == 32)
-							CopyDeinterleaveChannel<std::int32_t>(m_frontBuffer.data(), (BYTE*)bufferInfo->buffers[buffIdx], ch, m_WaveFormat.Format.nBlockAlign, m_bufferNumFrames);
+						const WORD asioSampleTypeSize = GetAsioSampleTypeNumBytes(asioChannelInfo->type);
+
+						if (asioSampleTypeSize)
+						{
+							AudioProcessing::CopyConvertFormat(
+								m_frontBuffer.data() + ch * gameSampleTypeSize, gameSampleType, m_WaveFormat.Format.nBlockAlign,
+								m_bufferNumFrames,
+								(BYTE*)bufferInfo->buffers[buffIdx], asioChannelInfo->type, asioSampleTypeSize
+							);
+						}
 					}
 				}
 			}
@@ -544,13 +508,20 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 			const int asioCh = m_ChannelMap[ch];
 			if (asioCh >= 0)
 			{
+				const ASIOChannelInfo* asioChannelInfo = m_AsioSharedHost.GetInputChannelInfo(asioCh);
 				ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetInputBuffer(asioCh);
-				if (bufferInfo)
+				if (bufferInfo && asioChannelInfo)
 				{
-					if (m_WaveFormat.Format.wBitsPerSample == 16)
-						CopyInterleaveChannel<std::int16_t>((BYTE*)bufferInfo->buffers[buffIdx], m_frontBuffer.data(), ch, m_WaveFormat.Format.nBlockAlign, m_bufferNumFrames);
-					else if (m_WaveFormat.Format.wBitsPerSample == 32)
-						CopyInterleaveChannel<std::int32_t>((BYTE*)bufferInfo->buffers[buffIdx], m_frontBuffer.data(), ch, m_WaveFormat.Format.nBlockAlign, m_bufferNumFrames);
+					const WORD asioSampleTypeSize = GetAsioSampleTypeNumBytes(asioChannelInfo->type);
+
+					if (asioSampleTypeSize)
+					{
+						AudioProcessing::CopyConvertFormat(
+							(BYTE*)bufferInfo->buffers[buffIdx], asioChannelInfo->type, asioSampleTypeSize,
+							m_bufferNumFrames,
+							m_frontBuffer.data() + ch * gameSampleTypeSize, gameSampleType, m_WaveFormat.Format.nBlockAlign
+						);
+					}
 				}
 			}
 		}
@@ -558,11 +529,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 		if (doSoftwareVolume)
 		{
 			const DWORD totalSamples = m_bufferNumFrames * m_WaveFormat.Format.nChannels;
-
-			if (m_WaveFormat.Format.wBitsPerSample == 16)
-				DoSoftwareVolumeDsp((std::int16_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
-			else if (m_WaveFormat.Format.wBitsPerSample == 32)
-				DoSoftwareVolumeDsp((std::int32_t*)m_frontBuffer.data(), totalSamples, fSoftwareVolumeScalar);
+			AudioProcessing::DoSoftwareVolumeDsp(m_frontBuffer.data(), gameSampleType, totalSamples, fSoftwareVolumeScalar);
 		}
 	}
 
