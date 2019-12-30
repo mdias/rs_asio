@@ -70,42 +70,46 @@ static const size_t offsetPortAudio_out_ClientProc = 0x208;
 HRESULT Patched_PortAudio_MarshalStreamComPointers(void* stream)
 {
 	BYTE* streamBytes = (BYTE*)stream;
-	void** captureClientParent = (void**)&(streamBytes[offsetPortAudio_CaptureClientParent]);
-	void** captureClientStream = (void**)&(streamBytes[offsetPortAudio_CaptureClientStream]);
-	void** in_ClientParent = (void**)&(streamBytes[offsetPortAudio_in_ClientParent]);
-	void** in_ClientStream = (void**)&(streamBytes[offsetPortAudio_in_ClientStream]);
+	IUnknown*& captureClientParent = *(IUnknown**)&(streamBytes[offsetPortAudio_CaptureClientParent]);
+	IUnknown*& captureClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_CaptureClientStream]);
+	IUnknown*& in_ClientParent = *(IUnknown**)&(streamBytes[offsetPortAudio_in_ClientParent]);
+	IUnknown*& in_ClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_in_ClientStream]);
 
-	void** renderClientParent = (void**)&(streamBytes[offsetPortAudio_RenderClientParent]);
-	void** renderClientStream = (void**)&(streamBytes[offsetPortAudio_RenderClientStream]);
-	void** out_ClientParent = (void**)&(streamBytes[offsetPortAudio_out_ClientParent]);
-	void** out_ClientStream = (void**)&(streamBytes[offsetPortAudio_out_ClientStream]);
+	IUnknown*& renderClientParent = *(IUnknown**)&(streamBytes[offsetPortAudio_RenderClientParent]);
+	IUnknown*& renderClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_RenderClientStream]);
+	IUnknown*& out_ClientParent = *(IUnknown**)&(streamBytes[offsetPortAudio_out_ClientParent]);
+	IUnknown*& out_ClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_out_ClientStream]);
 
 	rslog::info_ts() << __FUNCTION__ << std::endl;
-	*captureClientStream = nullptr;
-	*in_ClientStream = nullptr;
-	*renderClientStream = nullptr;
-	*out_ClientStream = nullptr;
+	captureClientStream = nullptr;
+	in_ClientStream = nullptr;
+	renderClientStream = nullptr;
+	out_ClientStream = nullptr;
 	
-	if ((*in_ClientParent) != nullptr)
+	if (in_ClientParent != nullptr)
 	{
 		rslog::info_ts() << "  marshalling input device" << std::endl;
 
 		// (IID_IAudioClient) marshal stream->in->clientParent into stream->in->clientStream
-		*in_ClientStream = *in_ClientParent;
+		in_ClientStream = in_ClientParent;
+		if (in_ClientParent) in_ClientParent->AddRef();
 
 		// (IID_IAudioCaptureClient) marshal stream->captureClientParent onto stream->captureClientStream
-		*captureClientStream = *captureClientParent;
+		captureClientStream = captureClientParent;
+		if (captureClientParent) captureClientParent->AddRef();
 	}
 
-	if ((*out_ClientParent) != nullptr)
+	if (out_ClientParent != nullptr)
 	{
 		rslog::info_ts() << "  marshalling output device" << std::endl;
 
 		// (IID_IAudioClient) marshal stream->out->clientParent into stream->out->clientStream
-		*out_ClientStream = *out_ClientParent;
+		out_ClientStream = out_ClientParent;
+		if (out_ClientParent) out_ClientParent->AddRef();
 
 		// (IID_IAudioRenderClient) marshal stream->renderClientParent onto stream->renderClientStream
-		*renderClientStream = *renderClientParent;
+		renderClientStream = renderClientParent;
+		if (renderClientParent) renderClientParent->AddRef();
 	}
 
 	return S_OK;
@@ -114,49 +118,49 @@ HRESULT Patched_PortAudio_MarshalStreamComPointers(void* stream)
 HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* stream)
 {
 	BYTE* streamBytes = (BYTE*)stream;
-	void** captureClientStream = (void**)&(streamBytes[offsetPortAudio_CaptureClientStream]);
-	void** captureClient = (void**)&(streamBytes[offsetPortAudio_CaptureClient]);
-	void** in_ClientStream = (void**)&(streamBytes[offsetPortAudio_in_ClientStream]);
-	void** in_ClientParent = (void**)&(streamBytes[offsetPortAudio_in_ClientParent]);
-	void** in_ClientProc = (void**)&(streamBytes[offsetPortAudio_in_ClientProc]);
+	IUnknown*& captureClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_CaptureClientStream]);
+	IUnknown*& captureClient = *(IUnknown**)&(streamBytes[offsetPortAudio_CaptureClient]);
+	IUnknown*& in_ClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_in_ClientStream]);
+	IUnknown*& in_ClientParent = *(IUnknown**)&(streamBytes[offsetPortAudio_in_ClientParent]);
+	IUnknown*& in_ClientProc = *(IUnknown**)&(streamBytes[offsetPortAudio_in_ClientProc]);
 
-	void** renderClientStream = (void**)&(streamBytes[offsetPortAudio_RenderClientStream]);
-	void** renderClient = (void**)&(streamBytes[offsetPortAudio_RenderClient]);
-	void** out_ClientStream = (void**)&(streamBytes[offsetPortAudio_out_ClientParent]);
-	void** out_ClientParent = (void**)&(streamBytes[offsetPortAudio_out_ClientParent]);
-	void** out_ClientProc = (void**)&(streamBytes[offsetPortAudio_out_ClientProc]);
+	IUnknown*& renderClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_RenderClientStream]);
+	IUnknown*& renderClient = *(IUnknown**)&(streamBytes[offsetPortAudio_RenderClient]);
+	IUnknown*& out_ClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_out_ClientParent]);
+	IUnknown*& out_ClientParent = *(IUnknown**)&(streamBytes[offsetPortAudio_out_ClientParent]);
+	IUnknown*& out_ClientProc = *(IUnknown**)&(streamBytes[offsetPortAudio_out_ClientProc]);
 
-	*captureClient = nullptr;
-	*renderClient = nullptr;
-	*in_ClientProc = nullptr;
-	*out_ClientProc = nullptr;
+	captureClient = nullptr;
+	renderClient = nullptr;
+	in_ClientProc = nullptr;
+	out_ClientProc = nullptr;
 
 	rslog::info_ts() << __FUNCTION__ << std::endl;
 
-	if ((*in_ClientParent) != nullptr)
+	if (in_ClientParent != nullptr)
 	{
 		rslog::info_ts() << "  unmarshalling input device" << std::endl;
 
 		// (IID_IAudioClient) unmarshal from stream->in->clientStream into stream->in->clientProc
-		*in_ClientProc = *in_ClientStream;
-		*in_ClientStream = nullptr;
+		in_ClientProc = in_ClientStream;
+		in_ClientStream = nullptr;
 
 		// (IID_IAudioCaptureClient) unmarshal from stream->captureClientStream onto stream->captureClient
-		*captureClient = *captureClientStream;
-		*captureClientStream = nullptr;
+		captureClient = captureClientStream;
+		captureClientStream = nullptr;
 	}
 
-	if ((*out_ClientParent) != nullptr)
+	if (out_ClientParent != nullptr)
 	{
 		rslog::info_ts() << "  unmarshalling output device" << std::endl;
 
 		// (IID_IAudioClient) unmarshal from stream->out->clientStream into stream->out->clientProc
-		*out_ClientProc = *out_ClientStream;
-		*out_ClientStream = nullptr;
+		out_ClientProc = out_ClientStream;
+		out_ClientStream = nullptr;
 
 		// (IID_IAudioRenderClient) unmarshal from stream->renderClientStream onto stream->renderClient
-		*renderClient = *renderClientStream;
-		*renderClientStream = nullptr;
+		renderClient = renderClientStream;
+		renderClientStream = nullptr;
 	}
 
 	return S_OK;
