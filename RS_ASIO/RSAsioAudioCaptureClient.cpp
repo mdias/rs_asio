@@ -6,12 +6,12 @@
 RSAsioAudioCaptureClient::RSAsioAudioCaptureClient(RSAsioAudioClient& asioAudioClient)
 	: m_AsioAudioClient(asioAudioClient)
 {
-
+	
 }
 
 RSAsioAudioCaptureClient::~RSAsioAudioCaptureClient()
 {
-
+	
 }
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UINT32 *pNumFramesToRead, DWORD *pdwFlags, UINT64 *pu64DevicePosition, UINT64 *pu64QPCPosition)

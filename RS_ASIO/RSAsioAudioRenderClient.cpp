@@ -6,18 +6,16 @@
 RSAsioAudioRenderClient::RSAsioAudioRenderClient(RSAsioAudioClient& asioAudioClient)
 	: m_AsioAudioClient(asioAudioClient)
 {
-	m_AsioAudioClient.AddRef();
+	
 }
 
 RSAsioAudioRenderClient::~RSAsioAudioRenderClient()
 {
-	m_AsioAudioClient.Release();
+	
 }
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::GetBuffer(UINT32 NumFramesRequested, BYTE **ppData)
 {
-	//rslog::info_ts() << ".";
-
 	if (!ppData)
 		return E_POINTER;
 
