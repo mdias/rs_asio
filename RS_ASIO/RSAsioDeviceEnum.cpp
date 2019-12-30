@@ -21,22 +21,21 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 	std::vector<AsioSharedHost*> createdAsioHosts;
 	auto fnFindOrCreateAsioHost = [&](const std::string& name) -> AsioSharedHost*
 	{
-		for (auto host : createdAsioHosts)
-		{
-			char driverName[256];
-			host->GetDriver()->getDriverName(driverName);
-
-			if (name == driverName)
-			{
-				host->AddRef();
-				return host;
-			}
-		}
-
 		for (const auto& info : asioDriversInfo)
 		{
 			if (info.Name == name)
 			{
+				// check if we already have this host created
+				for (const auto& host : createdAsioHosts)
+				{
+					if (host->GetAsioDllPath() == info.DllPath)
+					{
+						host->AddRef();
+						return host;
+					}
+				}
+
+				// if we got here, we don't have it created yet and we'll create it now
 				AsioSharedHost* newHost = AsioHelpers::CreateAsioHost(info);
 				if (newHost)
 				{

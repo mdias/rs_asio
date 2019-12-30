@@ -8,7 +8,10 @@ AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPat
 	, m_Trampoline_sampleRateDidChange(*this, &AsioSharedHost::AsioCalback_sampleRateDidChange)
 	, m_Trampoline_asioMessage(*this, &AsioSharedHost::AsioCalback_asioMessage)
 	, m_Trampoline_bufferSwitchTimeInfo(*this, &AsioSharedHost::AsioCalback_bufferSwitchTimeInfo)
+	, m_AsioDllPath(asioDllPath)
 {
+	rslog::info_ts() << "Creating AsioSharedHost - dll: " << m_AsioDllPath << std::endl;
+
 	m_AsioCallbacks.bufferSwitch = m_Trampoline_bufferSwitch.GetFuncPtr();
 	m_AsioCallbacks.sampleRateDidChange = m_Trampoline_sampleRateDidChange.GetFuncPtr();
 	m_AsioCallbacks.asioMessage = m_Trampoline_asioMessage.GetFuncPtr();
@@ -101,9 +104,12 @@ AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPat
 
 AsioSharedHost::~AsioSharedHost()
 {
+	rslog::info_ts() << "Destroying AsioSharedHost - dll: " << m_AsioDllPath << std::endl;
+
 	if (m_Driver)
 	{
 		m_Driver->stop();
+		std::lock_guard<std::mutex> guard(m_AsioMutex);
 		m_Driver->disposeBuffers();
 		m_Driver->Release();
 		m_Driver = nullptr;
@@ -251,6 +257,8 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const DWORD bufferDu
 
 void AsioSharedHost::Stop()
 {
+	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
+
 	if (m_StartCount == 0)
 	{
 		rslog::error_ts() << __FUNCTION__ " - too many stop calls!" << std::endl;

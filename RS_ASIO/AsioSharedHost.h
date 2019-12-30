@@ -19,6 +19,8 @@ public:
 	bool IsValid() const;
 	IAsioDriver* GetDriver() { return m_Driver; }
 
+	const std::string GetAsioDllPath() const { return m_AsioDllPath; }
+
 	ASIOError Start(const WAVEFORMATEX& format, const DWORD bufferDurationFrames);
 	void Stop();
 	bool GetPreferredBufferSize(DWORD& outBufferSizeFrames) const;
@@ -70,4 +72,5 @@ private:
 
 	unsigned m_dbgNumBufferSwitches;
 	std::string m_DriverName;
+	std::string m_AsioDllPath;
 };
