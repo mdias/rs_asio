@@ -18,7 +18,26 @@ RSAsioAudioClient::RSAsioAudioClient(RSAsioDevice& asioDevice)
 
 RSAsioAudioClient::~RSAsioAudioClient()
 {
-	Reset();
+	m_AsioSharedHost.RemoveBufferSwitchListener(this);
+
+	std::lock_guard<std::mutex> g(m_bufferMutex);
+
+	if (m_IsInitialized)
+	{
+		m_AsioSharedHost.Stop();
+	}
+
+	if (m_RenderClient)
+	{
+		m_RenderClient->Release();
+		m_RenderClient = nullptr;
+	}
+
+	if (m_CaptureClient)
+	{
+		m_CaptureClient->Release();
+		m_CaptureClient = nullptr;
+	}
 
 	m_AsioSharedHost.Release();
 	m_AsioDevice.Release();
@@ -313,29 +332,9 @@ HRESULT RSAsioAudioClient::Reset()
 
 	if (!m_IsInitialized)
 		return AUDCLNT_E_NOT_INITIALIZED;
+
 	if (m_IsStarted)
 		return AUDCLNT_E_NOT_STOPPED;
-
-	m_AsioSharedHost.RemoveBufferSwitchListener(this);
-	if (m_RenderClient)
-	{
-		m_RenderClient->Release();
-		m_RenderClient = nullptr;
-	}
-	if (m_CaptureClient)
-	{
-		m_CaptureClient->Release();
-		m_CaptureClient = nullptr;
-	}
-
-	m_AsioSharedHost.Stop();
-	m_IsInitialized = false;
-	m_EventHandle = NULL;
-	memset(&m_WaveFormat, 0, sizeof(m_WaveFormat));
-
-	m_bufferNumFrames = 0;
-	m_frontBuffer.clear();
-	m_backBuffer.clear();
 
 	return S_OK;
 }
