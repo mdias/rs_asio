@@ -108,9 +108,15 @@ AsioSharedHost::~AsioSharedHost()
 
 	if (m_Driver)
 	{
-		m_Driver->stop();
+		if (m_Driver->stop() != ASE_OK)
+		{
+			DisplayCurrentError();
+		}
 		std::lock_guard<std::mutex> guard(m_AsioMutex);
-		m_Driver->disposeBuffers();
+		if (m_Driver->disposeBuffers() != ASE_OK)
+		{
+			DisplayCurrentError();
+		}
 		m_Driver->Release();
 		m_Driver = nullptr;
 	}
@@ -257,6 +263,8 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const DWORD bufferDu
 
 void AsioSharedHost::Stop()
 {
+	std::lock_guard<std::mutex> guard(m_AsioMutex);
+
 	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
 
 	if (m_StartCount == 0)
@@ -625,6 +633,9 @@ void AsioSharedHost::DisplayCurrentError() const
 void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, ASIOBool directProcess)
 {
 	std::lock_guard<std::mutex> guard(m_AsioMutex);
+
+	if (m_StartCount == 0)
+		return;
 
 	// disable this later when driver is more mature, for now this logging is important
 	if (m_dbgNumBufferSwitches < 2)
