@@ -271,8 +271,6 @@ void AsioSharedHost::Stop()
 		}
 		m_NumBufferFrames = 0;
 		m_AsioBuffers.clear();
-		m_AsioInChannelInfo.clear();
-		m_AsioOutChannelInfo.clear();
 
 		memset(&m_CurrentWaveFormat, 0, sizeof(m_CurrentWaveFormat));
 	}

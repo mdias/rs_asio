@@ -18,7 +18,7 @@ RSAsioAudioClient::RSAsioAudioClient(RSAsioDevice& asioDevice)
 
 RSAsioAudioClient::~RSAsioAudioClient()
 {
-	m_AsioSharedHost.RemoveBufferSwitchListener(this);
+	Reset();
 
 	m_AsioSharedHost.Release();
 	m_AsioDevice.Release();
