@@ -8,6 +8,7 @@ namespace AsioHelpers
 	{
 		CLSID         Clsid = {};
 		std::string   Name;
+		std::string   Description;
 		std::string   DllPath;
 	};
 

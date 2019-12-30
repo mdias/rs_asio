@@ -135,15 +135,19 @@ static bool GetRegistryDriverInfo(AsioHelpers::DriverInfo& outInfo, HKEY hKey, c
 	{
 		AsioHelpers::DriverInfo tmpInfo;
 
+		// set name
+#ifdef UNICODE
+		tmpInfo.Name = ConvertWStrToStr(keyName);
+#else
+		tmpInfo.Name = keyName;
+#endif
+
 		// read CLSID
 		result = ReadRegistryClsid(tmpInfo.Clsid, hksub, COM_CLSID);
 		if (result)
 		{
-			// read name
-			if (!ReadRegistryStringA<128>(tmpInfo.Name, hksub, ASIO_DESC))
-			{
-				tmpInfo.Name = "NoName";
-			}
+			// read description
+			ReadRegistryStringA<128>(tmpInfo.Description, hksub, ASIO_DESC);
 
 			// figure out DLL path
 			result = GetRegistryAsioDriverPath(tmpInfo.DllPath, tmpInfo.Clsid);
