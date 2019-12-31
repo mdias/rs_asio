@@ -309,7 +309,6 @@ HRESULT RSAsioAudioClient::Start()
 		return AUDCLNT_E_NOT_STOPPED;
 
 	m_IsStarted = true;
-	m_bufferHasUpdatedData = true;
 
 	return S_OK;
 }
@@ -549,7 +548,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 		}
 	}
 
-	if (m_UsingEventHandle && m_EventHandle && m_bufferHasUpdatedData)
+	if (m_UsingEventHandle && m_EventHandle)
 	{
 		SetEvent(m_EventHandle);
 	}

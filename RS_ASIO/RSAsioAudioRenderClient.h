@@ -17,10 +17,12 @@ public:
 
 	void NotifyNewBuffer();
 	void NotifyUnderrun();
-	bool HasNewBufferWaiting() const { return m_NewBufferWaiting; }
+	bool HasNewBufferWaiting() const;
 
 private:
 	RSAsioAudioClient& m_AsioAudioClient;
 	bool m_WaitingForBufferRelease = false;
-	bool m_NewBufferWaiting = false;
+	bool m_NewBufferWaiting = true;
+
+	mutable std::mutex m_mutex;
 };

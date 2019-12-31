@@ -16,6 +16,8 @@ RSAsioAudioRenderClient::~RSAsioAudioRenderClient()
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::GetBuffer(UINT32 NumFramesRequested, BYTE **ppData)
 {
+	std::lock_guard<std::mutex> g(m_mutex);
+
 	if (!ppData)
 		return E_POINTER;
 
@@ -25,8 +27,11 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::GetBuffer(UINT32 NumFramesReq
 	if (m_WaitingForBufferRelease)
 		return AUDCLNT_E_OUT_OF_ORDER;
 
-	if (m_NewBufferWaiting && NumFramesRequested > 0)
-		return AUDCLNT_E_BUFFER_TOO_LARGE;
+	if (!m_NewBufferWaiting)
+	{
+		*ppData = nullptr;
+		return AUDCLNT_E_BUFFER_ERROR;
+	}
 
 	std::vector<BYTE>& buffer = m_AsioAudioClient.GetBackBuffer();
 	if (NumFramesRequested != m_AsioAudioClient.GetBufferNumFrames())
@@ -34,12 +39,15 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::GetBuffer(UINT32 NumFramesReq
 
 	*ppData = buffer.data();
 	m_WaitingForBufferRelease = true;
+	m_NewBufferWaiting = false;
 
 	return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::ReleaseBuffer(UINT32 NumFramesWritten, DWORD dwFlags)
 {
+	std::lock_guard<std::mutex> g(m_mutex);
+
 	if (!m_AsioAudioClient.GetAsioDevice().GetAsioHost().IsValid())
 		return AUDCLNT_E_DEVICE_INVALIDATED;
 
@@ -54,7 +62,6 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::ReleaseBuffer(UINT32 NumFrame
 		return AUDCLNT_E_BUFFER_SIZE_ERROR;
 
 	m_WaitingForBufferRelease = false;
-	m_NewBufferWaiting = false;
 
 	m_AsioAudioClient.SwapBuffers();
 
@@ -63,10 +70,18 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::ReleaseBuffer(UINT32 NumFrame
 
 void RSAsioAudioRenderClient::NotifyNewBuffer()
 {
-	m_NewBufferWaiting = false;
+	std::lock_guard<std::mutex> g(m_mutex);
+
+	m_NewBufferWaiting = true;
 }
 
 void RSAsioAudioRenderClient::NotifyUnderrun()
 {
+}
 
+bool RSAsioAudioRenderClient::HasNewBufferWaiting() const
+{
+	std::lock_guard<std::mutex> g(m_mutex);
+
+	return m_NewBufferWaiting;
 }

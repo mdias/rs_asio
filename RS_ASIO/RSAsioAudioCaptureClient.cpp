@@ -16,6 +16,8 @@ RSAsioAudioCaptureClient::~RSAsioAudioCaptureClient()
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UINT32 *pNumFramesToRead, DWORD *pdwFlags, UINT64 *pu64DevicePosition, UINT64 *pu64QPCPosition)
 {
+	std::lock_guard<std::mutex> g(m_mutex);
+
 	if (!ppData || !pNumFramesToRead || !pdwFlags)
 		return E_POINTER;
 
@@ -64,6 +66,8 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UIN
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::ReleaseBuffer(UINT32 NumFramesRead)
 {
+	std::lock_guard<std::mutex> g(m_mutex);
+
 	if (!m_WaitingForBufferRelease)
 		return AUDCLNT_E_OUT_OF_ORDER;
 
@@ -88,6 +92,8 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetNextPacketSize(UINT32 *pN
 
 void RSAsioAudioCaptureClient::NotifyNewBuffer()
 {
+	std::lock_guard<std::mutex> g(m_mutex);
+
 	LARGE_INTEGER li;
 
 	if (QueryPerformanceCounter(&li))
@@ -101,4 +107,11 @@ void RSAsioAudioCaptureClient::NotifyNewBuffer()
 void RSAsioAudioCaptureClient::NotifyUnderrun()
 {
 	m_DataDiscontinuityFlag = true;
+}
+
+bool RSAsioAudioCaptureClient::HasNewBufferWaiting() const
+{
+	std::lock_guard<std::mutex> g(m_mutex);
+
+	return m_NewBufferWaiting;
 }
