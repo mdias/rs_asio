@@ -420,7 +420,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		return false;
 	}
 
-	// reject unsupported ASIO sample formaats
+	// reject unsupported ASIO sample formats
 	switch (sampleType)
 	{
 		case ASIOSTInt16LSB:
