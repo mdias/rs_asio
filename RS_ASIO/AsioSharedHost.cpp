@@ -420,57 +420,18 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		return false;
 	}
 
-	// check if format matches with bits per sample
-	if (format.wBitsPerSample == 32)
+	// reject unsupported ASIO sample formaats
+	switch (sampleType)
 	{
-		switch (sampleType)
-		{
-			case ASIOSTInt32MSB:
-			case ASIOSTFloat32MSB:
-			case ASIOSTInt32MSB16:
-			case ASIOSTInt32MSB18:
-			case ASIOSTInt32MSB20:
-			case ASIOSTInt32MSB24:
-			case ASIOSTInt32LSB:
-			case ASIOSTFloat32LSB:
-			case ASIOSTInt32LSB16:
-			case ASIOSTInt32LSB18:
-			case ASIOSTInt32LSB20:
-			case ASIOSTInt32LSB24:
-				break;
-			default:
-				rslog::error_ts() << "  requested wBitsPerSample is " << format.wBitsPerSample << " but ASIO channels format is " << sampleType << std::endl;
-				return false;
-		}
-	}
-	else if (format.wBitsPerSample == 24)
-	{
-		switch (sampleType)
-		{
-			case ASIOSTInt24MSB:
-			case ASIOSTInt24LSB:
-				break;
-			default:
-				rslog::error_ts() << "  requested wBitsPerSample is " << format.wBitsPerSample << " but ASIO channels format is " << sampleType << std::endl;
-				return false;
-		}
-	}
-	else if (format.wBitsPerSample == 16)
-	{
-		switch (sampleType)
-		{
-		case ASIOSTInt16MSB:
 		case ASIOSTInt16LSB:
+		case ASIOSTInt24LSB:
+		case ASIOSTInt32LSB:
+		case ASIOSTFloat32LSB:
+		case ASIOSTFloat64LSB:
 			break;
 		default:
-			rslog::error_ts() << "  requested wBitsPerSample is " << format.wBitsPerSample << " but ASIO channels format is " << sampleType << std::endl;
+			rslog::error_ts() << "  ASIO sample type " << sampleType << " is not currently supported" << std::endl;
 			return false;
-		}
-	}
-	else
-	{
-		rslog::error_ts() << "  requested wBitsPerSample is not supported" << std::endl;
-		return false;
 	}
 
 	// block align sanity check
@@ -517,19 +478,6 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 			return false;
 		}
 		bitsPerSample = wfe.Samples.wValidBitsPerSample;
-	}
-
-	switch (sampleType)
-	{
-		case ASIOSTInt16LSB:
-		case ASIOSTInt24LSB:
-		case ASIOSTInt32LSB:
-		case ASIOSTFloat32LSB:
-		case ASIOSTFloat64LSB:
-			break;
-		default:
-			rslog::error_ts() << "  ASIO sample type " << sampleType << " is not currently supported" << std::endl;
-			return false;
 	}
 
 	return true;
