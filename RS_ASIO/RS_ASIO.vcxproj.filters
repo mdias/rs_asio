@@ -105,6 +105,12 @@
     <ClInclude Include="AudioProcessing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DebugWrapperRenderClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugWrapperCaptureClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -180,6 +186,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AudioProcessing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugWrapperRenderClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugWrapperCaptureClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

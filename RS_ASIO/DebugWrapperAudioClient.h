@@ -31,6 +31,9 @@ public:
 protected:
 	TBase& m_RealAudioClient;
 	std::wstring m_DeviceId;
+
+	IAudioCaptureClient* m_CaptureClient = nullptr;
+	IAudioRenderClient* m_RenderClient = nullptr;
 };
 
 template<typename TBase = IAudioClient2>

@@ -161,8 +161,10 @@
     <ClInclude Include="ComBaseUnknown.h" />
     <ClInclude Include="DebugWrapperAudioClient.h" />
     <ClInclude Include="DebugWrapperAudioEndpointVolume.h" />
+    <ClInclude Include="DebugWrapperCaptureClient.h" />
     <ClInclude Include="DebugWrapperDevicePropertyStore.h" />
     <ClInclude Include="DebugWrapperEndpoint.h" />
+    <ClInclude Include="DebugWrapperRenderClient.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="function_traits.h" />
     <ClInclude Include="Log.h" />
@@ -191,9 +193,11 @@
     <ClCompile Include="AudioProcessing.cpp" />
     <ClCompile Include="DebugWrapperAudioClient.cpp" />
     <ClCompile Include="DebugWrapperAudioEndpointVolume.cpp" />
+    <ClCompile Include="DebugWrapperCaptureClient.cpp" />
     <ClCompile Include="DebugWrapperDevice.cpp" />
     <ClCompile Include="DebugWrapperDevicePropertyStore.cpp" />
     <ClCompile Include="DebugWrapperEndpoint.cpp" />
+    <ClCompile Include="DebugWrapperRenderClient.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Patcher.cpp" />

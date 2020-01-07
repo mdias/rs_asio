@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "DebugWrapperAudioClient.h"
+#include "DebugWrapperCaptureClient.h"
+#include "DebugWrapperRenderClient.h"
 
 
 #define DEBUG_PRINT_HR(hr) if(FAILED(hr)) rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl
@@ -15,6 +17,16 @@ DebugWrapperAudioClient<TBase>::DebugWrapperAudioClient(TBase& realAudioClient, 
 template<typename TBase>
 DebugWrapperAudioClient<TBase>::~DebugWrapperAudioClient()
 {
+	if (m_CaptureClient)
+	{
+		m_CaptureClient->Release();
+		m_CaptureClient = nullptr;
+	}
+	if (m_RenderClient)
+	{
+		m_RenderClient->Release();
+		m_RenderClient = nullptr;
+	}
 	m_RealAudioClient.Release();
 }
 
@@ -187,8 +199,42 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetService(REFIID riid
 {
 	rslog::info_ts() << this->GetDeviceId() << " " __FUNCTION__ << " - riid: " << riid << std::endl;
 
+	if (riid == __uuidof(IAudioCaptureClient))
+	{
+		if (m_CaptureClient)
+		{
+			m_CaptureClient->AddRef();
+			*ppv = m_CaptureClient;
+			return S_OK;
+		}
+	}
+	else if (riid == __uuidof(IAudioRenderClient))
+	{
+		if (m_RenderClient)
+		{
+			m_RenderClient->AddRef();
+			*ppv = m_RenderClient;
+			return S_OK;
+		}
+	}
+
 	HRESULT hr = m_RealAudioClient.GetService(riid, ppv);
 	DEBUG_PRINT_HR(hr);
+	if (SUCCEEDED(hr))
+	{
+		if (riid == __uuidof(IAudioCaptureClient))
+		{
+			m_CaptureClient = new DebugWrapperCaptureClient( *(*(IAudioCaptureClient**)ppv), m_DeviceId);
+			m_CaptureClient->AddRef();
+			*ppv = m_CaptureClient;
+		}
+		else if (riid == __uuidof(IAudioRenderClient))
+		{
+			m_RenderClient = new DebugWrapperRenderClient(*(*(IAudioRenderClient**)ppv), m_DeviceId);
+			m_RenderClient->AddRef();
+			*ppv = m_RenderClient;
+		}
+	}
 
 	return hr;
 }
