@@ -31,9 +31,12 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Focusrite Scarlett Solo 2nd Gen (see Known issues)
 - M-Audio 2x2
 - M-Audio M-Track Plus II
+- M-Audio MobilePre mkII
 - Mackie Onyx Producer 2x2
 - MOTU UltraLite AVB
 - Presonus Quantum 2
+- Steinberg UR22mkII
+- Universal Audio Apollo Twin USB
 
 ### Known issues
 
