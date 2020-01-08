@@ -548,7 +548,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 		}
 	}
 
-	if (m_UsingEventHandle && m_EventHandle)
+	if (m_UsingEventHandle && m_EventHandle && m_bufferHasUpdatedData)
 	{
 		SetEvent(m_EventHandle);
 	}
