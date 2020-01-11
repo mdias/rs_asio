@@ -11,7 +11,6 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 
 - Copy the DLL files to the game folder.
 - Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
-- Make sure your ASIO interface is set to 24-bit mode.
 - Make sure Rocksmith.ini is set to run with `ExclusiveMode=1` and `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
 - Extra: An RS_ASIO-log.txt file is generated inside the game directory which may help discover your ASIO driver name and diagnose issues.
 
@@ -41,7 +40,6 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 
 ### Known issues
 
-- Supports only 32-bit aligned, 24-bit audio sample types as of now.
 - Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
