@@ -24,6 +24,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Audient iD4
 - Behringer U-Phoria UM2 [(see this for more details)](https://github.com/mdias/rs_asio/issues/7)
 - Behringer UMC204HD
+- Focusrite Saffire Pro 40
 - Focusrite Scarlett 2i2 2nd Gen (see Known issues)
 - Focusrite Scarlett 2i2 3rd Gen (see Known issues)
 - Focusrite Scarlett 2i4 1st Gen (see Known issues)
