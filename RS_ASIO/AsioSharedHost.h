@@ -42,6 +42,8 @@ public:
 	unsigned GetNumInputChannels() const { return m_AsioInChannelInfo.size(); }
 	unsigned GetNumOutputChannels() const { return m_AsioOutChannelInfo.size(); }
 
+	void ResetDebugLogAsioBufferSwitches();
+
 private:
 	void DisplayCurrentError() const;
 

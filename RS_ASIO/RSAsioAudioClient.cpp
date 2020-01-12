@@ -310,6 +310,7 @@ HRESULT RSAsioAudioClient::Start()
 		return AUDCLNT_E_NOT_STOPPED;
 
 	m_IsStarted = true;
+	m_dbgNumBufferSwitches = 0;
 
 	return S_OK;
 }
@@ -435,6 +436,9 @@ void RSAsioAudioClient::SwapBuffers()
 	std::lock_guard<std::mutex> g(m_bufferMutex);
 	std::swap(m_frontBuffer, m_backBuffer);
 	m_bufferHasUpdatedData = true;
+
+	if (m_dbgNumBufferSwitches < 3)
+		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ << std::endl;
 }
 
 void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
@@ -452,6 +456,8 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	else if (!m_bufferHasUpdatedData)
 	{
 		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer underrun detected" << std::endl;
+		m_AsioDevice.GetAsioHost().ResetDebugLogAsioBufferSwitches();
+		m_dbgNumBufferSwitches = 0;
 	}
 
 	// sanity check
@@ -553,11 +559,19 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 		}
 	}
 
-	if (m_UsingEventHandle && m_EventHandle && m_bufferHasUpdatedData)
+	const bool signalEvent = (m_UsingEventHandle && m_EventHandle && m_bufferHasUpdatedData);
+	if (signalEvent)
 	{
 		SetEvent(m_EventHandle);
 	}
 	m_bufferHasUpdatedData = false;
+
+	if (m_IsStarted && m_dbgNumBufferSwitches < 3)
+	{
+		++m_dbgNumBufferSwitches;
+		if (m_dbgNumBufferSwitches < 3)
+			rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - signalled event: " << signalEvent << std::endl;
+	}
 }
 
 void RSAsioAudioClient::UpdateChannelMap()

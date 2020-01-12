@@ -567,6 +567,11 @@ const ASIOChannelInfo* AsioSharedHost::GetInputChannelInfo(unsigned channel) con
 	return &m_AsioInChannelInfo[channel];
 }
 
+void AsioSharedHost::ResetDebugLogAsioBufferSwitches()
+{
+	m_dbgNumBufferSwitches = 0;
+}
+
 void AsioSharedHost::DisplayCurrentError() const
 {
 	if (!m_Driver)

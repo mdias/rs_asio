@@ -21,7 +21,6 @@ HRESULT STDMETHODCALLTYPE DebugWrapperCaptureClient::GetBuffer(BYTE **ppData, UI
 
 	if (m_GetCount < 3)
 	{
-		++m_GetCount;
 		rslog::info_ts() << m_DeviceId << " " __FUNCTION__  << std::endl;
 
 		hr = m_RealClient.GetBuffer(ppData, pNumFramesToRead, pdwFlags, pu64DevicePosition, pu64QPCPosition);
@@ -45,6 +44,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperCaptureClient::ReleaseBuffer(UINT32 NumFra
 
 	if (m_GetCount < 3)
 	{
+		++m_GetCount;
 		rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " NumFramesRead: " << NumFramesRead << std::endl;
 		hr = m_RealClient.ReleaseBuffer(NumFramesRead);
 	}

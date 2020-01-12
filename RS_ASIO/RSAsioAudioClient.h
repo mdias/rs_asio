@@ -72,6 +72,8 @@ private:
 	std::vector<BYTE> m_backBuffer;
 	bool m_bufferHasUpdatedData = false;
 
+	unsigned m_dbgNumBufferSwitches;
+
 	std::mutex m_bufferMutex;
 	DWORD m_bufferNumFrames;
 	std::vector<int> m_ChannelMap;
