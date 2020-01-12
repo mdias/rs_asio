@@ -444,6 +444,10 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	if (!m_IsStarted)
 	{
 		memset(m_frontBuffer.data(), 0, m_frontBuffer.size());
+		if (!m_AsioDevice.GetConfig().isOutput)
+		{
+			return;
+		}
 	}
 	else if (!m_bufferHasUpdatedData)
 	{
