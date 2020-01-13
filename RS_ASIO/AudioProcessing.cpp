@@ -262,7 +262,7 @@ bool AudioProcessing::DoSoftwareVolumeDsp(BYTE* data, ASIOSampleType inSampleTyp
 	else if (inSampleType == ASIOSTFloat64LSB)
 	{
 		const double v = (double)fVolumeScalar;
-		for (DWORD i = 0; i < numSamples; ++i, data += 4)
+		for (DWORD i = 0; i < numSamples; ++i, data += 8)
 		{
 			(*(double*)data) *= v;
 		}
