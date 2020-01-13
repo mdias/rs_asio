@@ -233,7 +233,15 @@ std::ostream & operator<<(std::ostream & os, const WAVEFORMATEX& fmt)
 	if (fmt.wFormatTag == WAVE_FORMAT_EXTENSIBLE)
 	{
 		const WAVEFORMATEXTENSIBLE& ext = (WAVEFORMATEXTENSIBLE&)fmt;
-		os << "  ext.SubFormat: " << std::hex << ext.SubFormat << std::endl;
+		os << "  ext.SubFormat: ";
+
+		if (ext.SubFormat == KSDATAFORMAT_SUBTYPE_PCM)
+			os << "KSDATAFORMAT_SUBTYPE_PCM" << std::endl;
+		else if (ext.SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
+			os << "KSDATAFORMAT_SUBTYPE_IEEE_FLOAT" << std::endl;
+		else
+			os << std::hex << ext.SubFormat << std::endl;
+
 		os << "  ext.Samples: " << std::dec << ext.Samples.wSamplesPerBlock << std::endl;
 		os << "  ext.dwChannelMask: " << std::hex << ext.dwChannelMask << std::endl;
 	}

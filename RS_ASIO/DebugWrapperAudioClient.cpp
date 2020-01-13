@@ -120,10 +120,10 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::IsFormatSupported(AUDC
 	HRESULT hr = m_RealAudioClient.IsFormatSupported(ShareMode, pFormat, ppClosestMatch);
 	DEBUG_PRINT_HR(hr);
 
-	if (FAILED(hr))
+	/*if (FAILED(hr))
 	{
 		rslog::info_ts() << (*pFormat);
-	}
+	}*/
 
 	return hr;
 }

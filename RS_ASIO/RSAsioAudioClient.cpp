@@ -78,7 +78,8 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	if (FAILED(IsFormatSupported(ShareMode, pFormat, nullptr)))
 		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 
-	rslog::info_ts() << std::dec << __FUNCTION__ " - host requested buffer duration: " << RefTimeToMilisecs(hnsBufferDuration) << "ms (" << std::dec << DurationToAudioFrames(hnsBufferDuration, pFormat->nSamplesPerSec) << " frames)" << std::endl;
+	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ " - host requested buffer duration: " << RefTimeToMilisecs(hnsBufferDuration) << "ms (" << std::dec << DurationToAudioFrames(hnsBufferDuration, pFormat->nSamplesPerSec) << " frames)" << std::endl;
+	rslog::info_ts() << m_AsioDevice.GetIdRef() << " " << (*pFormat);
 
 	// calculate buffer duration
 	DWORD bufferDurationFrames = (DWORD)DurationToAudioFrames(hnsBufferDuration, pFormat->nSamplesPerSec);
@@ -89,7 +90,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 		case RSAsioDevice::BufferSizeMode_Driver:
 			if (!m_AsioSharedHost.GetPreferredBufferSize(bufferDurationFrames))
 			{
-				rslog::error_ts() << __FUNCTION__ << " - Couldn't get driver preferred buffer size" << std::endl;
+				rslog::error_ts() << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - Couldn't get driver preferred buffer size" << std::endl;
 				return E_FAIL;
 			}
 			break;
@@ -97,17 +98,17 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 			bufferDurationFrames = m_AsioDevice.GetConfig().customBufferSize;
 			break;
 		default:
-			rslog::error_ts() << __FUNCTION__ << " - unhandled buffer size mode" << std::endl;
+			rslog::error_ts() << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - unhandled buffer size mode" << std::endl;
 			return E_INVALIDARG;
 	}
 
 	if (!m_AsioSharedHost.ClampBufferSizeToLimits(bufferDurationFrames))
 	{
-		rslog::error_ts() << __FUNCTION__ << " - Couldn't clamp buffer size to limits" << std::endl;
+		rslog::error_ts() << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - Couldn't clamp buffer size to limits" << std::endl;
 		return E_FAIL;
 	}
 
-	rslog::info_ts() << std::dec << __FUNCTION__ " - actual buffer duration: " << RefTimeToMilisecs(AudioFramesToDuration(bufferDurationFrames, pFormat->nSamplesPerSec)) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
+	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ " - actual buffer duration: " << RefTimeToMilisecs(AudioFramesToDuration(bufferDurationFrames, pFormat->nSamplesPerSec)) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
 
 	// start ASIO streaming
 	if (m_AsioSharedHost.Start(*pFormat, bufferDurationFrames) != ASE_OK)

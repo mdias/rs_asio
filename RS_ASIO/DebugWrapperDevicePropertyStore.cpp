@@ -32,41 +32,33 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetCount(DWORD *cProp
 	HRESULT hr = m_RealPropertyStore.GetCount(cProps);
 
 	DEBUG_PRINT_HR(hr);
+	/*
 	if (SUCCEEDED(hr) && cProps)
 	{
 		rslog::info_ts() << "  *cProps: " << std::dec << *cProps << std::endl;
 	}
+	*/
 
 	return hr;
 }
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetAt(DWORD iProp, PROPERTYKEY *pkey)
 {
-	//rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " - iProp: " << std::dec << iProp << std::endl;
+	rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " - iProp: " << std::dec << iProp << std::endl;
 
 	HRESULT hr = m_RealPropertyStore.GetAt(iProp, pkey);
-	//DEBUG_PRINT_HR(hr);
+	DEBUG_PRINT_HR(hr);
 
 	return hr;
 }
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetValue(REFPROPERTYKEY key, PROPVARIANT *pv)
 {
-#if 0
-	if (key != PKEY_Device_DeviceIdHiddenKey1 &&
-		key != PKEY_Device_DeviceIdHiddenKey2 &&
-		key != PKEY_AudioEngine_DeviceFormat &&
-		key != PKEY_Device_FriendlyName)
-	{
-		pv->vt = VT_EMPTY;
-		return S_OK;
-	}
-#endif
-
-	rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " - key: " << key << std::endl;
+	//rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " - key: " << key << std::endl;
 
 	HRESULT hr = m_RealPropertyStore.GetValue(key, pv);
 	DEBUG_PRINT_HR(hr);
+	/*
 	if (hr == S_OK)
 	{
 		if (pv->vt == VT_EMPTY)
@@ -89,6 +81,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetValue(REFPROPERTYK
 				rslog::info_ts() << "  friendly name: " << std::dec << pv->pszVal << std::endl;
 		}
 	}
+	*/
 
 	return hr;
 }
