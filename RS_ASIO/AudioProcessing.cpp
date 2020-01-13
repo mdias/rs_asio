@@ -234,9 +234,10 @@ bool AudioProcessing::DoSoftwareVolumeDsp(BYTE* data, ASIOSampleType inSampleTyp
 		const int scalarPercentPoints = (int)(fVolumeScalar * 100.f);
 		for (DWORD i = 0; i < numSamples; ++i, data += 3)
 		{
-			std::int64_t sample = ((*(std::int16_t*)data) << 8) | data[2];
+			std::int64_t sample = *(std::int16_t*)data;
+			sample = (sample << 8) | data[2];
 			sample = (sample * scalarPercentPoints) / 100;
-			*(std::int16_t*)data = (std::int16_t)((sample >> 8) & 0xffff);
+			*(std::int16_t*)data = (std::int16_t)(sample >> 8);
 			data[2] = sample & 0xff;
 		}
 		return true;
