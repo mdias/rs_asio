@@ -100,6 +100,7 @@ static bool AudioBlit(const BYTE* inData, const WORD inStride, BYTE* outData, co
 			inData += inStride;
 			outData += outStride;
 		}
+		return true;
 	}
 	else if (bytesPerSample == 4)
 	{
@@ -109,6 +110,7 @@ static bool AudioBlit(const BYTE* inData, const WORD inStride, BYTE* outData, co
 			inData += inStride;
 			outData += outStride;
 		}
+		return true;
 	}
 	else if (bytesPerSample == 8)
 	{
@@ -118,6 +120,7 @@ static bool AudioBlit(const BYTE* inData, const WORD inStride, BYTE* outData, co
 			inData += inStride;
 			outData += outStride;
 		}
+		return true;
 	}
 
 	return false;
