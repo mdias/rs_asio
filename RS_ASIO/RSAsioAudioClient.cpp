@@ -444,7 +444,13 @@ void RSAsioAudioClient::SwapBuffers()
 
 void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 {
-	std::lock_guard<std::mutex> g(m_bufferMutex);
+	if (!m_bufferMutex.try_lock())
+	{
+		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer underrun detected; still processing last buffer..." << std::endl;
+		return;
+	}
+
+	std::lock_guard<std::mutex> g(m_bufferMutex, std::adopt_lock);
 
 	if (!m_IsStarted)
 	{
