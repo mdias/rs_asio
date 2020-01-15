@@ -545,16 +545,22 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 	if (m_CaptureClient)
 	{
-		m_CaptureClient->NotifyNewBuffer();
-		if (!m_bufferHasUpdatedData)
+		if (m_bufferHasUpdatedData)
+		{
+			m_CaptureClient->NotifyNewBuffer();
+		}
+		else
 		{
 			m_CaptureClient->NotifyUnderrun();
 		}
 	}
 	if (m_RenderClient)
 	{
-		m_RenderClient->NotifyNewBuffer();
-		if (!m_bufferHasUpdatedData)
+		if (m_bufferHasUpdatedData)
+		{
+			m_RenderClient->NotifyNewBuffer();
+		}
+		else
 		{
 			m_RenderClient->NotifyUnderrun();
 		}
@@ -570,8 +576,6 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	if (m_IsStarted && m_dbgNumBufferSwitches < 3)
 	{
 		++m_dbgNumBufferSwitches;
-		if (m_dbgNumBufferSwitches < 3)
-			rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - signalled event: " << signalEvent << std::endl;
 	}
 }
 
