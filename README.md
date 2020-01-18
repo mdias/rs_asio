@@ -29,6 +29,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Focusrite Scarlett 2i2 3rd Gen (see Known issues)
 - Focusrite Scarlett 2i4 1st Gen (see Known issues)
 - Focusrite Scarlett 2i4 2nd Gen (see Known issues)
+- Focusrite Scarlett 6i6 2nd Gen (see Known issues)
 - Focusrite Scarlett Solo 2nd Gen (see Known issues)
 - M-Audio 2x2
 - M-Audio M-Track Plus II
