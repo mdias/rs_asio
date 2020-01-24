@@ -37,6 +37,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Mackie Onyx Producer 2x2
 - MOTU UltraLite AVB
 - Presonus Quantum 2
+- RME Multiface with HDSPe PCIe
 - Steinberg UR22mkII
 - Universal Audio Apollo Twin USB
 
