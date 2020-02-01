@@ -126,7 +126,7 @@ HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* stream)
 
 	IUnknown*& renderClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_RenderClientStream]);
 	IUnknown*& renderClient = *(IUnknown**)&(streamBytes[offsetPortAudio_RenderClient]);
-	IUnknown*& out_ClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_out_ClientParent]);
+	IUnknown*& out_ClientStream = *(IUnknown**)&(streamBytes[offsetPortAudio_out_ClientStream]);
 	IUnknown*& out_ClientParent = *(IUnknown**)&(streamBytes[offsetPortAudio_out_ClientParent]);
 	IUnknown*& out_ClientProc = *(IUnknown**)&(streamBytes[offsetPortAudio_out_ClientProc]);
 
