@@ -39,28 +39,26 @@ static TIntRet ReadAudioSampleInt(const BYTE* inData)
 template<unsigned outSize, typename TInt>
 static void WriteAudioSampleInt(TInt sample, BYTE* outData)
 {
+	const BYTE* sampleBytes = (BYTE*)&sample;
+
 	if (outSize < sizeof(TInt))
 	{
 		const int excessSize = sizeof(TInt) - outSize;
-		sample >>= 8 * excessSize;
+		sampleBytes += excessSize;
 
 		for (unsigned i = 0; i < outSize; ++i)
 		{
-			outData[outSize-i-1] = sample & 0xff;
-			sample >>= 8;
+			outData[i] = sampleBytes[i];
 		}
 	}
 	else if (outSize > sizeof(TInt))
 	{
-		unsigned i = 0;
-		for (; i < sizeof(TInt); ++i)
+		const int excessSize = outSize - sizeof(TInt);
+		outData += excessSize;
+
+		for (unsigned i = 0; i < sizeof(TInt); ++i)
 		{
-			outData[sizeof(TInt) - i - 1] = sample & 0xff;
-			sample >>= 8;
-		}
-		for (; i < outSize; ++i)
-		{
-			outData[i] = 0x00;
+			outData[i] = sampleBytes[i];
 		}
 	}
 	else
