@@ -225,12 +225,14 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::GetService(REFIID riid
 		if (riid == __uuidof(IAudioCaptureClient))
 		{
 			m_CaptureClient = new DebugWrapperCaptureClient( *(*(IAudioCaptureClient**)ppv), m_DeviceId);
+			(*(IAudioCaptureClient**)ppv)->Release();
 			m_CaptureClient->AddRef();
 			*ppv = m_CaptureClient;
 		}
 		else if (riid == __uuidof(IAudioRenderClient))
 		{
 			m_RenderClient = new DebugWrapperRenderClient(*(*(IAudioRenderClient**)ppv), m_DeviceId);
+			(*(IAudioRenderClient**)ppv)->Release();
 			m_RenderClient->AddRef();
 			*ppv = m_RenderClient;
 		}
