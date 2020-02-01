@@ -117,6 +117,11 @@ static void InitConsole()
 	freopen_s(&fDummy, "CONIN$", "r", stdin);
 }
 
+static HWND GetGameWindow()
+{
+	return FindWindowA("Rocksmith 2014", "Rocksmith 2014");
+}
+
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -129,7 +134,11 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		// InitConsole();
 #endif
 		LoadOriginalDll();
-		LoadLibrary(TEXT("RS_ASIO.dll"));
+		if (!LoadLibrary(TEXT("RS_ASIO.dll")))
+		{
+			MessageBox(GetGameWindow(), TEXT("Failed to load RS_ASIO.dll"), TEXT("Error"), MB_OK | MB_ICONERROR);
+			exit(1);
+		}
 		
 		break;
 	case DLL_PROCESS_DETACH:
