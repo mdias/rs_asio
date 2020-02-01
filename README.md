@@ -22,6 +22,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 
 - Audient iD4
 - Behringer U-Phoria UM2 [(see this for more details)](https://github.com/mdias/rs_asio/issues/7)
+- Behringer UMC1820
 - Behringer UMC202HD
 - Behringer UMC204HD
 - Focusrite Saffire Pro 40
@@ -29,15 +30,18 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Focusrite Scarlett 2i2 3rd Gen (see Known issues)
 - Focusrite Scarlett 2i4 1st Gen (see Known issues)
 - Focusrite Scarlett 2i4 2nd Gen (see Known issues)
+- Focusrite Scarlett 4i4 3rd Gen (see Known issues)
 - Focusrite Scarlett 6i6 2nd Gen (see Known issues)
 - Focusrite Scarlett Solo 2nd Gen (see Known issues)
 - M-Audio 2x2
 - M-Audio M-Track Plus II
 - M-Audio MobilePre mkII
 - Mackie Onyx Producer 2x2
+- Native Instruments Komplete Audio 6
 - MOTU UltraLite AVB
 - Presonus Quantum 2
 - RME Multiface with HDSPe PCIe
+- Roland Rubix 44
 - Steinberg UR22mkII
 - Universal Audio Apollo Twin USB
 
