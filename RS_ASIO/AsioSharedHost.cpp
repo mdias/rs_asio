@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "AsioSharedHost.h"
 
+#define TEST_OUTPUT_NOISE 0
+#define TEST_INPUT_NOISE 0
+
 typedef HRESULT(STDAPICALLTYPE * fnPtrDllGetClassObject)(REFCLSID rClsID, REFIID riid, void **pv);
 
 AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPath)
@@ -614,11 +617,43 @@ void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, AS
 		}
 	}
 
+#if TEST_INPUT_NOISE
+	const size_t numIns = m_AsioInChannelInfo.size();
+	for (size_t i = 0; i < numIns; ++i)
+	{
+		ASIOBufferInfo* asioBuffer = GetInputBuffer(i);
+		if (asioBuffer)
+		{
+			const UINT32 numBufferBytes = m_NumBufferFrames * GetAsioSampleTypeNumBytes(m_AsioInChannelInfo[i].type);
+			BYTE* pBuffer = (BYTE*)asioBuffer->buffers[doubleBufferIndex];
+			for (unsigned b = 0; b < numBufferBytes; ++b)
+			{
+				pBuffer[b] = rand() % 255;
+			}
+		}
+	}
+#endif
 
 	for (IAsioBufferSwitchListener* listener : m_AsioBufferListeners)
 	{
 		listener->OnAsioBufferSwitch((unsigned)doubleBufferIndex);
 	}
+
+#if TEST_OUTPUT_NOISE
+	for (size_t i = 0; i < numOuts; ++i)
+	{
+		ASIOBufferInfo* asioBuffer = GetOutputBuffer(i);
+		if (asioBuffer)
+		{
+			const UINT32 numBufferBytes = m_NumBufferFrames * GetAsioSampleTypeNumBytes(m_AsioOutChannelInfo[i].type);
+			BYTE* pBuffer = (BYTE*)asioBuffer->buffers[doubleBufferIndex];
+			for (unsigned b = 0; b < numBufferBytes; ++b)
+			{
+				pBuffer[b] = rand() % 255;
+			}
+		}
+	}
+#endif
 }
 
 void __cdecl AsioSharedHost::AsioCalback_sampleRateDidChange(ASIOSampleRate sRate)
