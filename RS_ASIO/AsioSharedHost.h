@@ -55,6 +55,7 @@ private:
 	HMODULE m_Module = nullptr;
 	IAsioDriver* m_Driver = nullptr;
 	ULONG m_StartCount = 0;
+	bool m_PostOutputReady = false;
 	WAVEFORMATEXTENSIBLE m_CurrentWaveFormat;
 
 	TrampolineToMethod<decltype(ASIOCallbacks::bufferSwitch)> m_Trampoline_bufferSwitch;

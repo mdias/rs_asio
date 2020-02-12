@@ -193,6 +193,10 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const DWORD bufferDu
 			}
 		}
 
+		// check if driver wants to be notified about output being ready
+		m_PostOutputReady = (m_Driver->outputReady() == ASE_OK);
+		rslog::info_ts() << "  post output ready: " << m_PostOutputReady << std::endl;
+
 		// get buffer info
 		long minAsioBufferFrames = 0;
 		long maxAsioBufferFrames = 0;
@@ -654,6 +658,9 @@ void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, AS
 		}
 	}
 #endif
+
+	if (m_PostOutputReady)
+		m_Driver->outputReady();
 }
 
 void __cdecl AsioSharedHost::AsioCalback_sampleRateDidChange(ASIOSampleRate sRate)
