@@ -584,7 +584,7 @@ void AsioSharedHost::DisplayCurrentError() const
 	if (!m_Driver)
 		return;
 
-	char err[128];
+	char err[128] = {};
 	m_Driver->getErrorMessage(err);
 
 	rslog::error_ts() << "ASIO Error: " << err << std::endl;
