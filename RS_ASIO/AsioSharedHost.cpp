@@ -639,7 +639,7 @@ long __cdecl AsioSharedHost::AsioCalback_asioMessage(long selector, long value, 
 			ret = 1;
 			break;
 		case kAsioSupportsTimeInfo:
-			ret = 1;
+			ret = 0;
 			break;
 	}
 
