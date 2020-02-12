@@ -91,6 +91,20 @@ AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPat
 			m_Driver->getDriverName(tmpName);
 
 			m_DriverName = tmpName;
+
+			// display channel information
+			rslog::info_ts() << "  ASIO input channels info:" << std::endl;
+			for (size_t i = 0; i < m_AsioInChannelInfo.size(); ++i)
+			{
+				const ASIOChannelInfo& ci = m_AsioInChannelInfo[i];
+				rslog::info_ts() << "    " << i << " - active: " << ci.isActive << ", channel: " << ci.channel << ", group: " << ci.channelGroup << ", isInput: " << ci.isInput << ", type: " << ci.type << ", name: " << ci.name << std::endl;
+			}
+			rslog::info_ts() << "  ASIO output channels info:" << std::endl;
+			for (size_t i = 0; i < m_AsioOutChannelInfo.size(); ++i)
+			{
+				const ASIOChannelInfo& ci = m_AsioOutChannelInfo[i];
+				rslog::info_ts() << "    " << i << " - active: " << ci.isActive << ", channel: " << ci.channel << ", group: " << ci.channelGroup << ", isInput: " << ci.isInput << ", type: " << ci.type << ", name: " << ci.name << std::endl;
+			}
 		}
 
 		if (err)
@@ -111,15 +125,8 @@ AsioSharedHost::~AsioSharedHost()
 
 	if (m_Driver)
 	{
-		if (m_Driver->stop() != ASE_OK)
-		{
-			DisplayCurrentError();
-		}
-		std::lock_guard<std::mutex> guard(m_AsioMutex);
-		if (m_Driver->disposeBuffers() != ASE_OK)
-		{
-			DisplayCurrentError();
-		}
+		Reset();
+
 		m_Driver->Release();
 		m_Driver = nullptr;
 	}
@@ -135,29 +142,23 @@ bool AsioSharedHost::IsValid() const
 	return m_Driver != nullptr;
 }
 
-ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const DWORD bufferDurationFrames)
+ASIOError AsioSharedHost::Setup(const WAVEFORMATEX& format, const DWORD bufferDurationFrames)
 {
 	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
 
 	if (!IsValid())
 		return ASE_NotPresent;
 
-	if (m_StartCount == 0)
+	if (m_IsSetup)
 	{
-		// display channel information
-		rslog::info_ts() << "  ASIO input channels info:" << std::endl;
-		for (size_t i = 0; i < m_AsioInChannelInfo.size(); ++i)
-		{
-			const ASIOChannelInfo& ci = m_AsioInChannelInfo[i];
-			rslog::info_ts() << "    " << i << " - active: " << ci.isActive << ", channel: " << ci.channel << ", group: " << ci.channelGroup << ", isInput: " << ci.isInput << ", type: " << ci.type << ", name: " << ci.name << std::endl;
-		}
-		rslog::info_ts() << "  ASIO output channels info:" << std::endl;
-		for (size_t i = 0; i < m_AsioOutChannelInfo.size(); ++i)
-		{
-			const ASIOChannelInfo& ci = m_AsioOutChannelInfo[i];
-			rslog::info_ts() << "    " << i << " - active: " << ci.isActive << ", channel: " << ci.channel << ", group: " << ci.channelGroup << ", isInput: " << ci.isInput << ", type: " << ci.type << ", name: " << ci.name << std::endl;
-		}
+		if (!IsWaveFormatSame(format, m_CurrentWaveFormat.Format))
+			return ASE_InvalidMode;
 
+		if (bufferDurationFrames != m_NumBufferFrames)
+			return ASE_InvalidMode;
+	}
+	else
+	{
 		// make sure all channels are using a supported format for now
 		if (m_AsioInChannelInfo.size())
 		{
@@ -240,24 +241,55 @@ ASIOError AsioSharedHost::Start(const WAVEFORMATEX& format, const DWORD bufferDu
 			return ASE_HWMalfunction;
 		}
 
-		m_dbgNumBufferSwitches = 0;
+		// store config
 		m_NumBufferFrames = (UINT32)bufferDurationFrames;
 		if (format.wFormatTag == WAVE_FORMAT_EXTENSIBLE)
 			m_CurrentWaveFormat = (WAVEFORMATEXTENSIBLE&)format;
 		else
 			m_CurrentWaveFormat.Format = format;
 
+		m_IsSetup = true;
+	}
+
+	return ASE_OK;
+}
+
+void AsioSharedHost::Reset()
+{
+	if (!m_IsSetup)
+		return;
+
+	if (m_Driver->stop() != ASE_OK)
+	{
+		DisplayCurrentError();
+	}
+	std::lock_guard<std::mutex> guard(m_AsioMutex);
+	if (m_Driver->disposeBuffers() != ASE_OK)
+	{
+		DisplayCurrentError();
+	}
+	m_AsioBuffers.clear();
+	memset(&m_CurrentWaveFormat, 0, sizeof(m_CurrentWaveFormat));
+
+	m_IsSetup = false;
+}
+
+ASIOError AsioSharedHost::Start()
+{
+	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
+
+	if (!IsValid() || !m_IsSetup)
+		return ASE_NotPresent;
+
+	if (m_StartCount == 0)
+	{
+		m_dbgNumBufferSwitches = 0;
+		
 		rslog::info_ts() << "  Starting ASIO stream..." << std::endl;
 		if (m_Driver->start() != ASE_OK)
 		{
 			rslog::error_ts() << "  Failed to start ASIO stream" << std::endl;
 			DisplayCurrentError();
-
-			if (m_Driver->disposeBuffers() != ASE_OK)
-			{
-				DisplayCurrentError();
-			}
-			m_AsioBuffers.clear();
 
 			return ASE_HWMalfunction;
 		}
@@ -279,24 +311,17 @@ void AsioSharedHost::Stop()
 		rslog::error_ts() << __FUNCTION__ " - too many stop calls!" << std::endl;
 		return;
 	}
-
-	--m_StartCount;
-
-	if (m_StartCount == 0 && m_Driver)
+	else if (m_StartCount == 1)
 	{
+		rslog::info_ts() << __FUNCTION__ "  stopping ASIO stream" << std::endl;
 		if (m_Driver->stop() != ASE_OK)
 		{
+			rslog::error_ts() << "  Failed to stop ASIO stream" << std::endl;
 			DisplayCurrentError();
 		}
-		if (m_Driver->disposeBuffers() != ASE_OK)
-		{
-			DisplayCurrentError();
-		}
-		m_NumBufferFrames = 0;
-		m_AsioBuffers.clear();
-
-		memset(&m_CurrentWaveFormat, 0, sizeof(m_CurrentWaveFormat));
 	}
+
+	--m_StartCount;
 }
 
 bool AsioSharedHost::GetPreferredBufferSize(DWORD& outBufferSizeFrames) const
@@ -524,7 +549,7 @@ UINT32 AsioSharedHost::GetBufferNumFrames() const
 
 bool AsioSharedHost::GetLatencyTime(REFERENCE_TIME& in, REFERENCE_TIME& out)
 {
-	if (!IsValid() || m_StartCount==0)
+	if (!IsValid() || !m_IsSetup)
 		return false;
 
 	long inputLatency = 0;
@@ -540,7 +565,7 @@ bool AsioSharedHost::GetLatencyTime(REFERENCE_TIME& in, REFERENCE_TIME& out)
 
 ASIOBufferInfo* AsioSharedHost::GetOutputBuffer(unsigned channel)
 {
-	if (m_StartCount == 0)
+	if (!m_IsSetup)
 		return nullptr;
 
 	if (channel >= m_AsioOutChannelInfo.size())
@@ -551,7 +576,7 @@ ASIOBufferInfo* AsioSharedHost::GetOutputBuffer(unsigned channel)
 
 ASIOBufferInfo* AsioSharedHost::GetInputBuffer(unsigned channel)
 {
-	if (m_StartCount == 0)
+	if (!m_IsSetup)
 		return nullptr;
 
 	if (channel >= m_AsioInChannelInfo.size())

@@ -21,7 +21,11 @@ public:
 
 	const std::string GetAsioDllPath() const { return m_AsioDllPath; }
 
-	ASIOError Start(const WAVEFORMATEX& format, const DWORD bufferDurationFrames);
+	ASIOError Setup(const WAVEFORMATEX& format, const DWORD bufferDurationFrames);
+	void Reset();
+
+	ASIOError Start();
+
 	void Stop();
 	bool GetPreferredBufferSize(DWORD& outBufferSizeFrames) const;
 	bool ClampBufferSizeToLimits(DWORD& inOutBufferSizeFrames) const;
@@ -56,6 +60,7 @@ private:
 	IAsioDriver* m_Driver = nullptr;
 	ULONG m_StartCount = 0;
 	bool m_PostOutputReady = false;
+	bool m_IsSetup = false;
 	WAVEFORMATEXTENSIBLE m_CurrentWaveFormat;
 
 	TrampolineToMethod<decltype(ASIOCallbacks::bufferSwitch)> m_Trampoline_bufferSwitch;

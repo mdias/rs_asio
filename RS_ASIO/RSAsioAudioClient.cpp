@@ -22,7 +22,7 @@ RSAsioAudioClient::~RSAsioAudioClient()
 
 	std::lock_guard<std::mutex> g(m_bufferMutex);
 
-	if (m_IsInitialized)
+	if (m_IsStarted)
 	{
 		m_AsioSharedHost.Stop();
 	}
@@ -110,8 +110,8 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 
 	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ " - actual buffer duration: " << RefTimeToMilisecs(AudioFramesToDuration(bufferDurationFrames, pFormat->nSamplesPerSec)) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
 
-	// start ASIO streaming
-	if (m_AsioSharedHost.Start(*pFormat, bufferDurationFrames) != ASE_OK)
+	// setup ASIO streaming
+	if (m_AsioSharedHost.Setup(*pFormat, bufferDurationFrames) != ASE_OK)
 		return E_FAIL;
 
 	memset(&m_WaveFormat, 0, sizeof(m_WaveFormat));
@@ -310,6 +310,10 @@ HRESULT RSAsioAudioClient::Start()
 	if (m_IsStarted)
 		return AUDCLNT_E_NOT_STOPPED;
 
+	// start ASIO streaming
+	if (m_AsioSharedHost.Start() != ASE_OK)
+		return E_FAIL;
+
 	m_IsStarted = true;
 	m_dbgNumBufferSwitches = 0;
 
@@ -322,6 +326,11 @@ HRESULT RSAsioAudioClient::Stop()
 
 	if (!m_IsInitialized)
 		return AUDCLNT_E_NOT_INITIALIZED;
+
+	if (m_IsStarted)
+	{
+		m_AsioSharedHost.Stop();
+	}
 
 	m_IsStarted = false;
 

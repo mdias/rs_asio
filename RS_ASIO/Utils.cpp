@@ -432,3 +432,32 @@ WORD GetAsioSampleTypeNumBytes(ASIOSampleType sampleType)
 
 	return 0;
 }
+
+bool IsWaveFormatSame(const WAVEFORMATEX& fmt_a, const WAVEFORMATEX& fmt_b)
+{
+	if (fmt_a.wFormatTag != fmt_b.wFormatTag ||
+		fmt_a.nChannels != fmt_b.nChannels ||
+		fmt_a.nSamplesPerSec != fmt_b.nSamplesPerSec ||
+		fmt_a.nAvgBytesPerSec != fmt_b.nAvgBytesPerSec ||
+		fmt_a.nBlockAlign != fmt_b.nBlockAlign ||
+		fmt_a.wBitsPerSample != fmt_b.wBitsPerSample ||
+		fmt_a.cbSize != fmt_b.cbSize)
+	{
+		return false;
+	}
+
+	if (fmt_a.wFormatTag == WAVE_FORMAT_EXTENSIBLE && fmt_a.cbSize >= sizeof(WAVEFORMATEXTENSIBLE))
+	{
+		const WAVEFORMATEXTENSIBLE& exfmt_a = (const WAVEFORMATEXTENSIBLE&)fmt_a;
+		const WAVEFORMATEXTENSIBLE& exfmt_b = (const WAVEFORMATEXTENSIBLE&)fmt_b;
+
+		if (exfmt_a.Samples.wValidBitsPerSample != exfmt_a.Samples.wValidBitsPerSample ||
+			exfmt_a.dwChannelMask != exfmt_a.dwChannelMask ||
+			exfmt_a.SubFormat != exfmt_a.SubFormat)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
