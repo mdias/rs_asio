@@ -367,6 +367,8 @@ LONGLONG DurationToAudioFrames(const REFERENCE_TIME& time, DWORD sampleRate)
 
 REFERENCE_TIME AudioFramesToDuration(const LONGLONG& frames, DWORD sampleRate)
 {
+	if (sampleRate == 0)
+		return 0;
 	return (frames * 10000000) / sampleRate;
 }
 
