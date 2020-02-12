@@ -610,6 +610,7 @@ void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, AS
 		ASIOBufferInfo* asioBuffer = GetOutputBuffer(i);
 		if (asioBuffer)
 		{
+			const UINT32 numBufferBytes = m_NumBufferFrames * GetAsioSampleTypeNumBytes(m_AsioOutChannelInfo[i].type);
 			memset(asioBuffer->buffers[doubleBufferIndex], 0, numBufferBytes);
 		}
 	}
