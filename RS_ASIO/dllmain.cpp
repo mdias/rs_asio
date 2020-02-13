@@ -5,6 +5,8 @@
 #include "RSAggregatorDeviceEnum.h"
 #include "Configurator.h"
 
+#define USE_STRUCTURED_PA 1
+
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -52,18 +54,126 @@ HRESULT STDAPICALLTYPE Patched_CoCreateInstance(REFCLSID rclsid, IUnknown *pUnkO
 	return CoCreateInstance(rclsid, pUnkOuter, dwClsContext, riid, ppOut);
 }
 
+#if USE_STRUCTURED_PA
+struct PaWasapiSubStream
+{
+	IUnknown* clientParent;    // IAudioClient
+	IUnknown* clientStream;    // IStream
+	IUnknown* clientProc;      // IAudioClient
+	char dummy[0xdc];
+};
+
+struct PaWasapiStream
+{
+	char dummy[0x108];
+
+	PaWasapiSubStream in;
+	IUnknown* captureClientParent; // IAudioCaptureClient
+	IUnknown* captureClientStream; // IStream
+	IUnknown* captureClient;       // IAudioCaptureClient
+	IUnknown* inVol;               // IAudioEndpointVolume
+
+	PaWasapiSubStream out;
+	IUnknown* renderClientParent; // IAudioRenderClient
+	IUnknown* renderClientStream; // IStream
+	IUnknown* renderClient;       // IAudioRenderClient
+	IUnknown* outVol;             // IAudioEndpointVolume
+};
+
+static void MarshalSubStreamComPointers(PaWasapiSubStream *substream)
+{
+	substream->clientStream = nullptr;
+
+	if (substream->clientParent)
+	{
+		substream->clientStream = substream->clientParent;
+		substream->clientStream->AddRef();
+	}
+	else
+	{
+		if (substream->clientProc)
+		{
+			substream->clientProc->Release();
+			substream->clientProc = nullptr;
+		}
+	}
+}
+
+HRESULT Patched_PortAudio_MarshalStreamComPointers(void* s)
+{
+	rslog::info_ts() << __FUNCTION__ << std::endl;
+
+	PaWasapiStream* stream = reinterpret_cast<PaWasapiStream*>(s);
+
+	if (stream->in.clientParent)
+	{
+		MarshalSubStreamComPointers(&stream->in);
+		stream->captureClientStream = stream->captureClientParent;
+		stream->captureClientStream->AddRef();
+	}
+
+	if (stream->out.clientParent)
+	{
+		MarshalSubStreamComPointers(&stream->out);
+		stream->renderClientStream = stream->renderClientParent;
+		stream->renderClientStream->AddRef();
+	}
+
+	return S_OK;
+}
+
+static void UnmarshalSubStreamComPointers(PaWasapiSubStream *substream)
+{
+	if (substream->clientStream)
+	{
+		substream->clientProc = substream->clientStream;
+		substream->clientStream = nullptr;
+	}
+}
+
+HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* s)
+{
+	rslog::info_ts() << __FUNCTION__ << std::endl;
+
+	PaWasapiStream* stream = reinterpret_cast<PaWasapiStream*>(s);
+
+	if (stream->in.clientParent)
+	{
+		UnmarshalSubStreamComPointers(&stream->in);
+		stream->captureClient = stream->captureClientStream;
+		stream->captureClientStream = nullptr;
+
+		// HACK: this works around the game not calling release on this. could be a bug?
+		if (stream->in.clientProc)
+		{
+			stream->in.clientProc->Release();
+		}
+	}
+
+	if (stream->out.clientParent)
+	{
+		UnmarshalSubStreamComPointers(&stream->out);
+		stream->renderClient = stream->renderClientStream;
+		stream->renderClientStream = nullptr;
+	}
+
+	return S_OK;
+}
+
+#else
+
+static const size_t offsetPortAudio_in_ClientParent = 0x108;
+static const size_t offsetPortAudio_in_ClientStream = 0x10c;
+static const size_t offsetPortAudio_in_ClientProc = 0x110;
 static const size_t offsetPortAudio_CaptureClientParent = 0x1f0;
 static const size_t offsetPortAudio_CaptureClientStream = 0x1f4;
 static const size_t offsetPortAudio_CaptureClient = 0x1f8;
-static const size_t offsetPortAudio_in_ClientStream = 0x10c;
-static const size_t offsetPortAudio_in_ClientParent = 0x108;
-static const size_t offsetPortAudio_in_ClientProc = 0x110;
 
 static const size_t offsetPortAudio_RenderClientParent = 0x2e8;
 static const size_t offsetPortAudio_RenderClientStream = 0x2ec;
 static const size_t offsetPortAudio_RenderClient = 0x2f0;
-static const size_t offsetPortAudio_out_ClientStream = 0x204;
 static const size_t offsetPortAudio_out_ClientParent = 0x200;
+static const size_t offsetPortAudio_out_ClientStream = 0x204;
 static const size_t offsetPortAudio_out_ClientProc = 0x208;
 
 
@@ -92,7 +202,7 @@ HRESULT Patched_PortAudio_MarshalStreamComPointers(void* stream)
 
 		// (IID_IAudioClient) marshal stream->in->clientParent into stream->in->clientStream
 		in_ClientStream = in_ClientParent;
-		if (in_ClientParent) in_ClientParent->AddRef();
+		in_ClientStream->AddRef();
 
 		// (IID_IAudioCaptureClient) marshal stream->captureClientParent onto stream->captureClientStream
 		captureClientStream = captureClientParent;
@@ -105,7 +215,7 @@ HRESULT Patched_PortAudio_MarshalStreamComPointers(void* stream)
 
 		// (IID_IAudioClient) marshal stream->out->clientParent into stream->out->clientStream
 		out_ClientStream = out_ClientParent;
-		if (out_ClientParent) out_ClientParent->AddRef();
+		out_ClientStream->AddRef();
 
 		// (IID_IAudioRenderClient) marshal stream->renderClientParent onto stream->renderClientStream
 		renderClientStream = renderClientParent;
@@ -165,3 +275,4 @@ HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* stream)
 
 	return S_OK;
 }
+#endif
