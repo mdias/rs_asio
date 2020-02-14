@@ -34,11 +34,13 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Focusrite Scarlett 4i4 3rd Gen (see Known issues)
 - Focusrite Scarlett 6i6 2nd Gen (see Known issues)
 - Focusrite Scarlett Solo 2nd Gen (see Known issues)
+- Juli@ XTe
 - M-Audio 2x2
 - M-Audio M-Track Plus II
 - M-Audio MobilePre mkII
 - Mackie Onyx Producer 2x2
 - Native Instruments Komplete Audio 6
+- MOTU 2408 mk3
 - MOTU UltraLite AVB
 - Presonus Quantum 2
 - RME Multiface with HDSPe PCIe
