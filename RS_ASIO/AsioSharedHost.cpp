@@ -151,11 +151,18 @@ ASIOError AsioSharedHost::Setup(const WAVEFORMATEX& format, const DWORD bufferDu
 
 	if (m_IsSetup)
 	{
-		if (!IsWaveFormatSame(format, m_CurrentWaveFormat.Format))
+		if (format.nSamplesPerSec != m_CurrentWaveFormat.Format.nSamplesPerSec ||
+			format.wFormatTag != m_CurrentWaveFormat.Format.wFormatTag)
+		{
+			rslog::error_ts() << "  wave format is different from a previous call to Setup()." << std::endl;
 			return ASE_InvalidMode;
+		}
 
 		if (bufferDurationFrames != m_NumBufferFrames)
+		{
+			rslog::error_ts() << "  buffer duration is different from a previous call to Setup()." << std::endl;
 			return ASE_InvalidMode;
+		}
 	}
 	else
 	{
