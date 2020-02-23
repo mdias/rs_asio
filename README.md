@@ -26,6 +26,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Behringer UMC1820
 - Behringer UMC202HD
 - Behringer UMC204HD
+- ESI MAYA22 USB
 - Focusrite Saffire Pro 40
 - Focusrite Scarlett 2i2 2nd Gen (see Known issues)
 - Focusrite Scarlett 2i2 3rd Gen (see Known issues)
@@ -35,6 +36,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Focusrite Scarlett 6i6 2nd Gen (see Known issues)
 - Focusrite Scarlett Solo 2nd Gen (see Known issues)
 - Juli@ XTe
+- Line6 HX Stomp
 - M-Audio 2x2
 - M-Audio M-Track Plus II
 - M-Audio MobilePre mkII
@@ -47,6 +49,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Roland Rubix 44
 - Steinberg UR22mkII
 - Universal Audio Apollo Twin USB
+- Zoom U-44
 
 ### Known issues
 
