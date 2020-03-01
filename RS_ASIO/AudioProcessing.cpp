@@ -10,18 +10,18 @@ static TFuncConvertMatrix s_FuncConvertMatrix{};
 
 static const TFuncConvertMatrix& GetFuncConvertMatrix();
 
-template<unsigned bytes, typename TIntRet>
+template<unsigned inSize, typename TIntRet>
 static TIntRet ReadAudioSampleInt(const BYTE* inData)
 {
-	if (bytes != sizeof(TIntRet))
+	if (inSize < sizeof(TIntRet))
 	{
 		TIntRet val = 0;
+		BYTE* outData = (BYTE*)&val;
 
 		unsigned i = 0;
-		for (; i < bytes; ++i)
+		for (; i < inSize; ++i)
 		{
-			val <<= 8;
-			val |= inData[i];
+			outData[i] = inData[i];
 		}
 		for (; i < sizeof(TIntRet); ++i)
 		{
@@ -29,6 +29,12 @@ static TIntRet ReadAudioSampleInt(const BYTE* inData)
 		}
 
 		return val;
+	}
+	else if (inSize > sizeof(TIntRet))
+	{
+		const int excessSize = inSize - sizeof(TIntRet);
+		inData += excessSize;
+		return *(TIntRet*)inData;
 	}
 	else
 	{
