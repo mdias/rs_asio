@@ -36,6 +36,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Focusrite Scarlett 6i6 2nd Gen (see Known issues)
 - Focusrite Scarlett Solo 2nd Gen (see Known issues)
 - Juli@ XTe
+- Lexicon Alpha
 - Line6 HX Stomp
 - M-Audio 2x2
 - M-Audio M-Track Plus II
@@ -58,3 +59,4 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
 - Hardware hotplugging while the game is running won't be noticed by the game.
+- Game sometimes crash on exit (under investigation)
