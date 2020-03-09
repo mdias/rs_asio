@@ -3,24 +3,27 @@
 This project aims to add ASIO support to `Rocksmith 2014 Edition - Remastered` in order to avoid issues with some WASAPI drivers.
 It patches game code at runtime to allow intervening in the process of WASAPI device enumeration so that we can inject our own fake WASAPI devices which internally use ASIO audio API.
 
+## How to use
+
 ### Download
 
 You can download the [latest release here](https://github.com/mdias/rs_asio/releases/latest).
 
-### How to use
+### Install
 
-- Copy the DLL files to the game folder.
+- Copy the contents of latest release to the game folder.
 - Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
 - Make sure Rocksmith.ini is set to run with `ExclusiveMode=1` and `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
 - Make sure your interface clock is set to 48kHz. RS ASIO will try to request 48kHz mode, but your drivers may or may not allow this, so it might help setting it manually.
 - Extra: An RS_ASIO-log.txt file is generated inside the game directory which may help discover your ASIO driver name and diagnose issues.
 - Look into [basic configuration guide](#basic-configuration-guide)
+- Look into [list of knows issues](#known-issues)
 
 ### How to remove/uninstall
 
 - Remove the custom DLL files from the game folder.
 
-### Audio Interfaces reported to work well
+## Audio Interfaces reported to work well
 
 - Audient iD4
 - Behringer U-Phoria UM2 [(see this for more details)](https://github.com/mdias/rs_asio/issues/7)
@@ -57,8 +60,8 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 ### Basic configuration guide
 
 1. Follow installation steps, described [above](#how-to-use)
-1. Run Rocksmith for the first time. 
-1. Look into RS_ASIO-log.txt, you will see names of drivers
+1. Run Rocksmith for the first time.
+1. Look into `RS_ASIO-log.txt`, you will see names of drivers
 
 ```txt
 0.456 [INFO]  AsioHelpers::FindDrivers
