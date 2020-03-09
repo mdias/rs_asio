@@ -41,7 +41,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Line6 HX Stomp
 - M-Audio 2x2
 - M-Audio M-Track Plus II
-- M-Audio MobilePre mkII
+- [M-Audio MobilePre mkII](https://github.com/mdias/rs_asio/issues/15)
 - Mackie Onyx Producer 2x2
 - Native Instruments Komplete Audio 6
 - MOTU 2408 mk3
@@ -49,7 +49,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Presonus Quantum 2
 - RME Multiface with HDSPe PCIe
 - Roland Rubix 44
-- Steinberg UR22mkII
+- [Steinberg UR22mkII](https://github.com/mdias/rs_asio/issues/15)
 - Universal Audio Apollo Twin USB
 - Zoom U-44
 - [XTONE Smart Stomp](#XTONE-Smart-stomp)
