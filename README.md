@@ -52,7 +52,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - [Steinberg UR22mkII](https://github.com/mdias/rs_asio/issues/15)
 - Universal Audio Apollo Twin USB
 - Zoom U-44
-- [XTONE Smart Stomp](docs/xtone smartstomp/GUIDE.md), using ASIO4All
+- [XTONE Smart Stomp](docs/xtone_smartstomp/GUIDE.md), using ASIO4All
 
 ### Basic configuration guide
 
@@ -74,7 +74,6 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
     1. Modify LatencyBuffer (try values 4,3,2,1)
     1. Modify buffersize either in ASIO driver control panel or in CustomBufferSize option in the RS_ASIO.ini file
     1. Run Rocksmith
-
 
 ### Known issues
 
