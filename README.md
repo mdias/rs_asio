@@ -5,19 +5,13 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 
 ## How to use
 
-### Download
-
-You can download the [latest release here](https://github.com/mdias/rs_asio/releases/latest).
-
-### Install
-
-- Copy the contents of latest release to the game folder.
+- Copy the contents of [latest release](https://github.com/mdias/rs_asio/releases/latest) to the game folder.
 - Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
+- Look into [basic configuration guide](#basic-configuration-guide)
 - Make sure Rocksmith.ini is set to run with `ExclusiveMode=1` and `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
 - Make sure your interface clock is set to 48kHz. RS ASIO will try to request 48kHz mode, but your drivers may or may not allow this, so it might help setting it manually.
 - Extra: An RS_ASIO-log.txt file is generated inside the game directory which may help discover your ASIO driver name and diagnose issues.
-- Look into [basic configuration guide](#basic-configuration-guide)
-- Look into [list of knows issues](#known-issues)
+- Look into [list of knows issues](#known-issues) if you experience any problems
 
 ### How to remove/uninstall
 
@@ -75,8 +69,9 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 1. Run Rocksmith again
 1. Repeat until there is no cracks in audio. Your goal is to have smallest possible values without cracks. Find smallest possible LatencyBuffer and then gradually set buffer size until there is no cracks.
     1. Modify LatencyBuffer (try values 4,3,2,1)
-    1. Modify buffersize either in ASIO driver control panel or in CustomBufferSize option in the RS_ASIO.ini file
+    1. Modify buffersize either in ASIO driver control panel or in CustomBufferSize option in the RS_ASIO.ini file. For the beginning follow rule of thumb that buffer size should be divisible to 32
     1. Run Rocksmith
+    1. Look into `RS_ASIO-log.txt` if you experience any issues
 
 ### Known issues
 
