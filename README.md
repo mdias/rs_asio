@@ -48,8 +48,8 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Roland Rubix 44
 - [Steinberg UR22mkII](https://github.com/mdias/rs_asio/issues/15)
 - Universal Audio Apollo Twin USB
-- Zoom U-44
 - [XTONE Smart Stomp](docs/xtone_smartstomp/README.md), using ASIO4All
+- Zoom U-44
 
 ### Basic configuration guide
 
