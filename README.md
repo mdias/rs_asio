@@ -26,7 +26,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - Behringer U-Phoria UM2 [(see this for more details)](https://github.com/mdias/rs_asio/issues/7)
 - Behringer UMC1820
 - Behringer UMC202HD
-- Behringer UMC204HD
+- [Behringer UMC204HD](https://github.com/mdias/rs_asio/issues/13)
 - ESI MAYA22 USB
 - Focusrite Saffire Pro 40
 - Focusrite Scarlett 2i2 2nd Gen [(Known issues)](#known-issues)
