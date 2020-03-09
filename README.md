@@ -6,6 +6,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 ## How to use
 
 - Copy the contents (`avrt.dll`, `RS_ASIO.dll`, `RS_ASIO.ini`) of [latest release](https://github.com/mdias/rs_asio/releases/latest) (zip arhive release-xxx.zip) to the game folder.
+  - If you're using Steam version of Rocksmith, you can find local folder by right clicking on a Rocksmith in your library, and selecting menu "Manage" -> "Browse local files"
 - Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
 - Look into [basic configuration guide](#basic-configuration-guide)
 - Make sure Rocksmith.ini is set to run with `ExclusiveMode=1` and `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
