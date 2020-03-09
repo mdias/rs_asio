@@ -23,19 +23,19 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 ### Audio Interfaces reported to work well
 
 - Audient iD4
-- Behringer U-Phoria UM2 see this for more details: mdias/rs_asio#7
+- Behringer U-Phoria UM2 [(see this for more details)](https://github.com/mdias/rs_asio/issues/7)
 - Behringer UMC1820
 - Behringer UMC202HD
 - Behringer UMC204HD
 - ESI MAYA22 USB
 - Focusrite Saffire Pro 40
-- Focusrite Scarlett 2i2 2nd Gen [Known issues](#known-issues)
-- Focusrite Scarlett 2i2 3rd Gen [Known issues](#known-issues)
-- Focusrite Scarlett 2i4 1st Gen [Known issues](#known-issues)
-- Focusrite Scarlett 2i4 2nd Gen [Known issues](#known-issues)
-- Focusrite Scarlett 4i4 3rd Gen [Known issues](#known-issues)
-- Focusrite Scarlett 6i6 2nd Gen [Known issues](#known-issues)
-- Focusrite Scarlett Solo 2nd Gen [Known issues](#known-issues)
+- Focusrite Scarlett 2i2 2nd Gen [(Known issues)](#known-issues)
+- Focusrite Scarlett 2i2 3rd Gen [(Known issues)](#known-issues)
+- Focusrite Scarlett 2i4 1st Gen [(Known issues)](#known-issues)
+- Focusrite Scarlett 2i4 2nd Gen [(Known issues)](#known-issues)
+- Focusrite Scarlett 4i4 3rd Gen [(Known issues)](#known-issues)
+- Focusrite Scarlett 6i6 2nd Gen [(Known issues)](#known-issues)
+- Focusrite Scarlett Solo 2nd Gen [(Known issues)](#known-issues)
 - Juli@ XTe
 - Lexicon Alpha
 - Line6 HX Stomp
