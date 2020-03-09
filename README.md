@@ -23,7 +23,7 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 ### Audio Interfaces reported to work well
 
 - Audient iD4
-- Behringer U-Phoria UM2 [(see this for more details)](mdias/rs_asio#7)
+- Behringer U-Phoria UM2 see this for more details: mdias/rs_asio#7
 - Behringer UMC1820
 - Behringer UMC202HD
 - Behringer UMC204HD
