@@ -52,22 +52,11 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
 - [Steinberg UR22mkII](https://github.com/mdias/rs_asio/issues/15)
 - Universal Audio Apollo Twin USB
 - Zoom U-44
-- [XTONE Smart Stomp](#XTONE-Smart-stomp)
-
-### Known issues
-
-- Your interface MUST support 48kHz playback
-- Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
-- Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
-- Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
-- Hardware hotplugging while the game is running won't be noticed by the game.
-- Game sometimes crash on exit (under investigation)
-
-## Interface guides
+- [XTONE Smart Stomp](docs/xtone smartstomp/GUIDE.md), using ASIO4All
 
 ### Basic configuration guide
 
-1. Follow installation steps, described above.
+1. Follow installation steps, described [above](#how-to-use)
 1. Run Rocksmith for the first time. 
 1. Look into RS_ASIO-log.txt, you will see names of drivers
 
@@ -86,30 +75,12 @@ You can download the [latest release here](https://github.com/mdias/rs_asio/rele
     1. Modify buffersize either in ASIO driver control panel or in CustomBufferSize option in the RS_ASIO.ini file
     1. Run Rocksmith
 
-### XTONE Smart Stomp
 
-Those settings worked on Lenovo Thinkpad X1 Extreme for [XTONE Smart Stomp](https://www.xsonic.cc/XTONE).
+### Known issues
 
-I found setting custom buffer size from file more convenient than messing with ASIO4All slider.
-
-In theory, this approach should work for every ASIO4All device. Note that I've disabled all other ASIO4All devices for simplicity
-
-#### Rocksmith.ini
-
-```txt
-    LatencyBuffer=2
-```
-
-#### RS_ASIO.ini
-
-```txt
-[Asio.Output]
-Driver=ASIO4ALL v2
-...
-
-[Asio.Input.0]
-Driver=ASIO4ALL v2
-...
-```
-
-![settings](docs/xtone_smartstomp.png "xtone smartstomp")
+- Your interface MUST support 48kHz playback
+- Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
+- Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
+- Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
+- Hardware hotplugging while the game is running won't be noticed by the game.
+- Game sometimes crash on exit (under investigation)
