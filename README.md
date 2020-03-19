@@ -28,6 +28,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - ESI MAYA22 USB
 - [Focusrite Clarett 4Pre USB](https://github.com/mdias/rs_asio/issues/42)
 - Focusrite Saffire Pro 40
+- Focusrite Scarlett 2i2 1st Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 2i2 2nd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 2i2 3rd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 2i4 1st Gen [(Known issues)](#known-issues)
