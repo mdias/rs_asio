@@ -35,6 +35,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Focusrite Scarlett 2i4 2nd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 4i4 3rd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 6i6 2nd Gen [(Known issues)](#known-issues)
+- Focusrite Scarlett 18i20 2nd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett Solo 2nd Gen [(Known issues)](#known-issues)
 - Juli@ XTe
 - Lexicon Alpha
