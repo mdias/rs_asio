@@ -48,6 +48,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - MOTU 2408 mk3
 - MOTU UltraLite AVB
 - Presonus Quantum 2
+- RME Babyface PRO
 - RME Multiface with HDSPe PCIe
 - Roland Rubix 44
 - [Steinberg UR22mkII](https://github.com/mdias/rs_asio/issues/15)
