@@ -46,6 +46,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Mackie Onyx Producer 2x2
 - Native Instruments Komplete Audio 6
 - MOTU 2408 mk3
+- MOTU M4
 - MOTU UltraLite AVB
 - Presonus Quantum 2
 - RME Babyface PRO
