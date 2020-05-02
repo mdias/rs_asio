@@ -36,7 +36,8 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Focusrite Scarlett 4i4 3rd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 6i6 2nd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 18i20 2nd Gen [(Known issues)](#known-issues)
-- Focusrite Scarlett Solo 2nd Gen [(Known issues)](#known-issues)
+- [Focusrite Scarlett Solo 2nd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
+- [Focusrite Scarlett Solo 3rd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - Focusrite Scarlett Solo 3rd Gen [(Known issues)](#known-issues)
 - Juli@ XTe
 - Lexicon Alpha
@@ -53,9 +54,10 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - RME Babyface PRO
 - RME Multiface with HDSPe PCIe
 - Roland Rubix 44
-- [Steinberg UR22mkII](https://github.com/mdias/rs_asio/issues/15)
+- [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - Universal Audio Apollo Twin USB
 - [XTONE Smart Stomp](docs/xtone_smartstomp/README.md), using ASIO4All
+- Zoom R24
 - Zoom U-44
 
 ### Basic configuration guide
