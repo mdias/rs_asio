@@ -38,7 +38,6 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Focusrite Scarlett 18i20 2nd Gen [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 2nd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 3rd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
-- Focusrite Scarlett Solo 3rd Gen [(Known issues)](#known-issues)
 - Juli@ XTe
 - Lexicon Alpha
 - Line6 HX Stomp
