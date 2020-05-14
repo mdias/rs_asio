@@ -130,26 +130,27 @@ static void Patch_CallRelativeAddress(const std::vector<void*>& offsets)
 void PatchOriginalCode()
 {
 	rslog::info_ts() << __FUNCTION__ << std::endl;
-	
-	// patch CoCreateInstance calls
+
+	std::vector<void*> offsets_CoCreateInstance = FindBytesOffsets(originalBytes_call_CoCreateInstance, sizeof(originalBytes_call_CoCreateInstance));
+	std::vector<void*> offsets_PaMarshalPointers = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));
+	std::vector<void*> offsets_PaUnmarshalPointers = FindBytesOffsets(originalBytes_call_UnmarshalStreamComPointers, sizeof(originalBytes_call_UnmarshalStreamComPointers));
+
+	if (offsets_CoCreateInstance.size() == 0 && offsets_PaMarshalPointers.size() == 0 && offsets_PaUnmarshalPointers.size() == 0)
 	{
+		rslog::error_ts() << "No valid locations for patching were found. Make sure you're trying this on the right game version." << std::endl;
+	}
+	else
+	{
+		// patch CoCreateInstance calls
 		rslog::info_ts() << "Patching CoCreateInstance" << std::endl;
+		Patch_CallAbsoluteAddress<(void*)&Patched_CoCreateInstance>(offsets_CoCreateInstance);
 
-		std::vector<void*> offsets = FindBytesOffsets(originalBytes_call_CoCreateInstance, sizeof(originalBytes_call_CoCreateInstance));
-		Patch_CallAbsoluteAddress<(void*)&Patched_CoCreateInstance>(offsets);
-	}
-
-	// patch PortAudio MarshalStreamComPointers
-	{
+		// patch PortAudio MarshalStreamComPointers
 		rslog::info_ts() << "Patching PortAudio MarshalStreamComPointers" << std::endl;
-		std::vector<void*> offsets = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));
-		Patch_CallRelativeAddress<(void*)&Patched_PortAudio_MarshalStreamComPointers>(offsets);
-	}
+		Patch_CallRelativeAddress<(void*)&Patched_PortAudio_MarshalStreamComPointers>(offsets_PaMarshalPointers);
 
-	// patch PortAudio UnmarshalStreamComPointers
-	{
+		// patch PortAudio UnmarshalStreamComPointers
 		rslog::info_ts() << "Patching PortAudio UnmarshalStreamComPointers" << std::endl;
-		std::vector<void*> offsets = FindBytesOffsets(originalBytes_call_UnmarshalStreamComPointers, sizeof(originalBytes_call_UnmarshalStreamComPointers));
-		Patch_CallRelativeAddress<(void*)&Patched_PortAudio_UnmarshalStreamComPointers>(offsets);
+		Patch_CallRelativeAddress<(void*)&Patched_PortAudio_UnmarshalStreamComPointers>(offsets_PaUnmarshalPointers);
 	}
 }
