@@ -88,4 +88,4 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
 - Hardware hotplugging while the game is running won't be noticed by the game.
-- Game sometimes crash on exit (under investigation)
+- Game sometimes crash on exit with ASIO4ALL
