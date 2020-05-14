@@ -18,6 +18,7 @@ public:
 
 	bool IsValid() const;
 	IAsioDriver* GetDriver() { return m_Driver; }
+	const bool GetIsAsio4All() const { return m_AsioDllIsAsio4all; }
 
 	const std::string GetAsioDllPath() const { return m_AsioDllPath; }
 
@@ -81,4 +82,5 @@ private:
 	unsigned m_dbgNumBufferSwitches;
 	std::string m_DriverName;
 	std::string m_AsioDllPath;
+	bool m_AsioDllIsAsio4all = false;
 };

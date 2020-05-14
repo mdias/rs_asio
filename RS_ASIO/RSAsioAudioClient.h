@@ -2,6 +2,7 @@
 
 #include "ComBaseUnknown.h"
 #include "AsioSharedHost.h"
+#include "MyUnknown.h"
 
 class AsioSharedHost;
 class RSAsioDevice;
@@ -77,4 +78,7 @@ private:
 	std::mutex m_bufferMutex;
 	DWORD m_bufferNumFrames;
 	std::vector<int> m_ChannelMap;
+
+	// this is used for ... hacks
+	MyUnknown* m_MyUnknown = nullptr;
 };

@@ -13,11 +13,16 @@ RSAsioAudioClient::RSAsioAudioClient(RSAsioDevice& asioDevice)
 	m_AsioDevice.AddRef();
 	m_AsioSharedHost.AddRef();
 
+	m_MyUnknown = new MyUnknown();
+	m_MyUnknown->IsAsio4All = m_AsioSharedHost.GetIsAsio4All();
+
 	memset(&m_WaveFormat, 0, sizeof(m_WaveFormat));
 }
 
 RSAsioAudioClient::~RSAsioAudioClient()
 {
+	m_MyUnknown->Release();
+
 	m_AsioSharedHost.RemoveBufferSwitchListener(this);
 
 	std::lock_guard<std::mutex> g(m_bufferMutex);
@@ -52,6 +57,12 @@ HRESULT RSAsioAudioClient::QueryInterface(REFIID riid, void **ppvObject)
 	{
 		*ppvObject = this;
 		AddRef();
+		return S_OK;
+	}
+	else if (riid == __uuidof(MyUnknown))
+	{
+		*ppvObject = m_MyUnknown;
+		m_MyUnknown->AddRef();
 		return S_OK;
 	}
 

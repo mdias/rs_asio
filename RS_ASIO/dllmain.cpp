@@ -4,6 +4,7 @@
 #include "DebugDeviceEnum.h"
 #include "RSAggregatorDeviceEnum.h"
 #include "Configurator.h"
+#include "MyUnknown.h"
 
 #define USE_STRUCTURED_PA 1
 
@@ -144,9 +145,17 @@ HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* s)
 		stream->captureClientStream = nullptr;
 
 		// HACK: this works around the game not calling release on this. could be a bug?
+		// this avoids a crash in asio4all, but introduces other possible random crashes
 		if (stream->in.clientProc)
 		{
-			stream->in.clientProc->Release();
+			MyUnknown* myUnknown = nullptr;
+			stream->in.clientProc->QueryInterface(IID_IMyUnknown, (void**)&myUnknown);
+			if (myUnknown)
+			{
+				if (myUnknown->IsAsio4All)
+					stream->in.clientProc->Release();
+				myUnknown->Release();
+			}
 		}
 	}
 

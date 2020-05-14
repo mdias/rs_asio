@@ -168,6 +168,7 @@
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="function_traits.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="MyUnknown.h" />
     <ClInclude Include="Patcher.h" />
     <ClInclude Include="RSAsioAudioCaptureClient.h" />
     <ClInclude Include="RSAsioAudioClient.h" />
