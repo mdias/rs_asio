@@ -6,7 +6,8 @@
 
 ```ini
 [Config]
-EnableWasapi=0
+EnableWasapiOutputs=0
+EnableWasapiInputs=0
 EnableAsio=1
 
 [Asio]

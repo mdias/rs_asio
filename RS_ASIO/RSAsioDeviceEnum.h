@@ -31,7 +31,8 @@ struct RSAsioConfig
 
 struct RSConfig
 {
-	bool enableWasapi = false;
+	bool enableWasapiOutputs = false;
+	bool enableWasapiInputs = false;
 	bool enableAsio = false;
 	RSAsioConfig asioConfig;
 };

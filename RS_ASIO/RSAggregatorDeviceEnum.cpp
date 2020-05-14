@@ -13,19 +13,33 @@ RSAggregatorDeviceEnum::~RSAggregatorDeviceEnum()
 	ClearAll();
 }
 
-void RSAggregatorDeviceEnum::AddDeviceEnumerator(IMMDeviceEnumerator* enumerator)
+void RSAggregatorDeviceEnum::AddDeviceEnumerator(IMMDeviceEnumerator* enumerator, bool enableOutputs, bool enableInputs)
 {
 	if (!enumerator)
 		return;
 
-	auto it = m_Enumerators.find(enumerator);
-	if (it == m_Enumerators.end())
+	TrackedEnumerator* existingTrackedEnum = FindTrackedEnumerator(enumerator);
+	if (!existingTrackedEnum)
 	{
-		m_Enumerators.emplace(enumerator);
-		enumerator->AddRef();
+		m_Enumerators.emplace_back(enumerator, enableOutputs, enableInputs);
+	}
+	else
+	{
+		existingTrackedEnum->enableOutputs |= enableOutputs;
+		existingTrackedEnum->enableInputs |= enableInputs;
 	}
 
 	m_DeviceListNeedsUpdate = true;
+}
+
+RSAggregatorDeviceEnum::TrackedEnumerator* RSAggregatorDeviceEnum::FindTrackedEnumerator(IMMDeviceEnumerator* enumerator)
+{
+	for (RSAggregatorDeviceEnum::TrackedEnumerator& te : m_Enumerators)
+	{
+		if (te.enumerator == enumerator)
+			return &te;
+	}
+	return nullptr;
 }
 
 void RSAggregatorDeviceEnum::UpdateAvailableDevices()
@@ -77,10 +91,12 @@ void RSAggregatorDeviceEnum::UpdateAvailableDevices()
 		}
 	};
 
-	for (IMMDeviceEnumerator* e : m_Enumerators)
+	for (const RSAggregatorDeviceEnum::TrackedEnumerator& te : m_Enumerators)
 	{
-		fnUpdateCollection(e, eRender, aggregatedRenderCollection, m_DefaultRenderDevices);
-		fnUpdateCollection(e, eCapture, aggregatedCaptureCollection, m_DefaultCaptureDevices);
+		if (te.enableOutputs)
+			fnUpdateCollection(te.enumerator, eRender, aggregatedRenderCollection, m_DefaultRenderDevices);
+		if (te.enableInputs)
+			fnUpdateCollection(te.enumerator, eCapture, aggregatedCaptureCollection, m_DefaultCaptureDevices);
 	}
 
 	m_RenderDevices.UpdateDevicesFromCollection(aggregatedRenderCollection, true);
@@ -92,11 +108,5 @@ void RSAggregatorDeviceEnum::UpdateAvailableDevices()
 void RSAggregatorDeviceEnum::ClearAll()
 {
 	RSBaseDeviceEnum::ClearAll();
-
-	for (IMMDeviceEnumerator* enumerator : m_Enumerators)
-	{
-		if (enumerator)
-			enumerator->Release();
-	}
 	m_Enumerators.clear();
 }

@@ -20,13 +20,16 @@ static RSConfig& GetConfig()
 	return config;
 }
 
-static void AddWasapiDevices(RSAggregatorDeviceEnum& rsEnum)
+static void AddWasapiDevices(RSAggregatorDeviceEnum& rsEnum, bool enableOutputs, bool enableInputs)
 {
+	if (!enableOutputs && !enableInputs)
+		return;
+
 	IMMDeviceEnumerator* wasapiEnum = nullptr;
 	HRESULT hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&wasapiEnum);
 	if (SUCCEEDED(hr) && wasapiEnum)
 	{
-		rsEnum.AddDeviceEnumerator(wasapiEnum);
+		rsEnum.AddDeviceEnumerator(wasapiEnum, enableOutputs, enableInputs);
 		wasapiEnum->Release();
 	}
 }
@@ -36,7 +39,7 @@ static void AddAsioDevices(RSAggregatorDeviceEnum& rsEnum)
 	auto asioEnum = new RSAsioDeviceEnum();
 	asioEnum->SetConfig(GetConfig().asioConfig);
 
-	rsEnum.AddDeviceEnumerator(asioEnum);
+	rsEnum.AddDeviceEnumerator(asioEnum, true, true);
 	asioEnum->Release();
 }
 
@@ -48,10 +51,7 @@ void SetupDeviceEnumerator(RSAggregatorDeviceEnum& rsEnum)
 	{
 		AddAsioDevices(rsEnum);
 	}
-	if (config.enableWasapi)
-	{
-		AddWasapiDevices(rsEnum);
-	}
+	AddWasapiDevices(rsEnum, config.enableWasapiOutputs, config.enableWasapiInputs);
 }
 
 static const std::wstring& GetConfigFilePath()
@@ -214,6 +214,8 @@ static void LoadConfigIni(RSConfig& out)
 		SectionAsioIn1,
 	} currentSection = SectionNone;
 
+	bool isOldWasapiCfgMode = true;
+
 	std::string currentLine;
 	size_t line = 0;
 	while (std::getline(file, currentLine))
@@ -267,8 +269,25 @@ static void LoadConfigIni(RSConfig& out)
 			{
 				if (currentSection == SectionConfig)
 				{
-					if (key == "enablewasapi")
-						parseBoolString(val, out.enableWasapi);
+					if (key == "enablewasapioutputs")
+					{
+						isOldWasapiCfgMode = false;
+						parseBoolString(val, out.enableWasapiOutputs);
+					}
+					else if (key == "enablewasapiinputs")
+					{
+						isOldWasapiCfgMode = false;
+						parseBoolString(val, out.enableWasapiInputs);
+					}
+					else if (key == "enablewasapi")
+					{
+						if (isOldWasapiCfgMode)
+						{
+							bool v = false;
+							parseBoolString(val, v);
+							out.enableWasapiOutputs = out.enableWasapiInputs = v;
+						}
+					}
 					else if (key == "enableasio")
 						parseBoolString(val, out.enableAsio);
 				}

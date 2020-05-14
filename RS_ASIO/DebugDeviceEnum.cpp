@@ -35,7 +35,7 @@ HRESULT STDMETHODCALLTYPE DebugDeviceEnum::EnumAudioEndpoints(EDataFlow dataFlow
 	rslog::info_ts() << __FUNCTION__ " - dataFlow: " << Dataflow2String(dataFlow) << " - dwStateMask: " << dwStateMask << std::endl;
 	
 	HRESULT hr = RSBaseDeviceEnum::EnumAudioEndpoints(dataFlow, dwStateMask, ppDevices);
-	rslog::info_ts() << "  hr: " << std::hex << hr << std::endl;
+	rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl;
 	if (ppDevices)
 	{
 		rslog::info_ts() << "  *ppDevices: " << *ppDevices << std::endl;
@@ -49,7 +49,7 @@ HRESULT STDMETHODCALLTYPE DebugDeviceEnum::GetDefaultAudioEndpoint(EDataFlow dat
 	rslog::info_ts() << __FUNCTION__ " - dataFlow: " << Dataflow2String(dataFlow) << " - role: " << Role2String(role) << std::endl;
 
 	HRESULT hr = RSBaseDeviceEnum::GetDefaultAudioEndpoint(dataFlow, role, ppEndpoint);
-	rslog::info_ts() << "  hr: " << std::hex << hr << std::endl;
+	rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl;
 	if (ppEndpoint)
 	{
 		rslog::info_ts() << "  *ppEndpoint: " << *ppEndpoint << std::endl;
@@ -61,7 +61,7 @@ HRESULT STDMETHODCALLTYPE DebugDeviceEnum::GetDefaultAudioEndpoint(EDataFlow dat
 HRESULT STDMETHODCALLTYPE DebugDeviceEnum::GetDevice(LPCWSTR pwstrId, IMMDevice **ppDevice)
 {
 	HRESULT hr = RSBaseDeviceEnum::GetDevice(pwstrId, ppDevice);
-	rslog::info_ts() << "  hr: " << std::hex << hr << std::endl;
+	rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl;
 	if (ppDevice)
 	{
 		rslog::info_ts() << "  *ppEndpoint: " << *ppDevice << std::endl;
