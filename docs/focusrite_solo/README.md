@@ -22,6 +22,7 @@ CustomBufferSize=48
 
 [Asio.Output]
 Driver=Focusrite USB ASIO
+BaseChannel=0
 EnableSoftwareEndpointVolumeControl=1
 EnableSoftwareMasterVolumeControl=1
 SoftwareMasterVolumePercent=100

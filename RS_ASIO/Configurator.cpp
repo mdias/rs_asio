@@ -330,6 +330,18 @@ static void LoadConfigIni(RSConfig& out)
 				{
 					if (key == "driver")
 						out.asioConfig.output.asioDriverName = val;
+					else if (key == "basechannel")
+					{
+						int c = 0;
+						if (parseIntString(val, c) && c >= 0)
+						{
+							out.asioConfig.output.baseChannel = (unsigned)c;
+						}
+						else
+						{
+							rslog::error_ts() << __FUNCTION__ << " - invalid value for channel, value should be an integer starting at zero. line: " << line << std::endl;
+						}
+					}
 					else if (key == "enablesoftwareendpointvolumecontrol")
 					{
 						parseBoolString(val, out.asioConfig.output.enableSoftwareEndpointVolumeControl);

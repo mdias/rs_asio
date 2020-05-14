@@ -6,6 +6,7 @@
 struct RSAsioOutputConfig
 {
 	std::string asioDriverName;
+	unsigned baseChannel = 0;
 	unsigned numChannels = 2;
 	bool enableSoftwareEndpointVolumeControl = true;
 	bool enableSoftwareMasterVolumeControl = true;

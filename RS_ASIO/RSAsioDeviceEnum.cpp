@@ -58,7 +58,7 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 		{
 			RSAsioDevice::Config config;
 			config.isOutput = true;
-			config.baseAsioChannelNumber = 0;
+			config.baseAsioChannelNumber = m_Config.output.baseChannel;
 			config.numAsioChannels = m_Config.output.numChannels;
 			config.bufferSizeMode = m_Config.bufferMode;
 			config.customBufferSize = m_Config.customBufferSize;

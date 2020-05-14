@@ -438,9 +438,18 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 
 	// check channels
 	const long maxChannels = output ? numOutputChannels : numInputChannels;
-	if (format.nChannels > maxChannels)
+	const long maxUsedChannel = firstAsioChannel + numAsioChannels;
+	const long actualMaxUsedChannel = std::min<long>(maxChannels, maxUsedChannel);
+	const long actualNumAsioChannels = actualMaxUsedChannel - firstAsioChannel;
+
+	if (maxUsedChannel > maxChannels)
 	{
-		rslog::error_ts() << "  unsupported number of channels: " << format.nChannels << std::endl;
+		rslog::info_ts() << "  WARNING: max requested channel " << maxUsedChannel << " is beyond the max asio channels available " << maxChannels << std::endl;
+	}
+
+	if (actualNumAsioChannels < 0)
+	{
+		rslog::error_ts() << "  no valid channels" << std::endl;
 		return false;
 	}
 
@@ -461,7 +470,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 
 	// make sure all channels use the same format
 	ASIOSampleType sampleType;
-	if (!CheckSampleTypeAcrossChannels(sampleType, output, firstAsioChannel, numAsioChannels))
+	if (!CheckSampleTypeAcrossChannels(sampleType, output, firstAsioChannel, (unsigned)actualNumAsioChannels))
 	{
 		rslog::error_ts() << "  requested channels use multiple different sample types" << std::endl;
 		return false;

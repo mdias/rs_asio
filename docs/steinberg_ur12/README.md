@@ -20,6 +20,7 @@ CustomBufferSize=
 
 [Asio.Output]
 Driver=Yamaha Steinberg USB ASIO
+BaseChannel=0
 EnableSoftwareEndpointVolumeControl=1
 EnableSoftwareMasterVolumeControl=1
 SoftwareMasterVolumePercent=100
