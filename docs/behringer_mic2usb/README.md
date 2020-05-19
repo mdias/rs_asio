@@ -1,8 +1,12 @@
 # Behringer MIC2 USB
 
-Very nice sound qulity with combination of Digitech BP355 bass processor.  
+Very nice sound qulity with combination of Digitech BP355 bass processor.
 
-Please double-check your ini-files settings before reporting an issue.  
+Please double-check your ini-files settings before reporting an issue.
+
+## First steps
+
+Run a game, skip calibration, run in-game tuner.
 
 ## Config files
 
@@ -47,33 +51,10 @@ SoftwareMasterVolumePercent=100
 
 ```ini
 [Audio]
-EnableMicrophone=1
 ExclusiveMode=1
 LatencyBuffer=1
-ForceDefaultPlaybackDevice=Stereo Headset 1
 ForceWDM=0
-ForceDirectXSink=0
-DumpAudioLog=0
-MaxOutputBufferSize=0
-RealToneCableOnly=0
 Win32UltraLowLatencyMode=1
-[Renderer.Win32]
-ShowGamepadUI=0
-ScreenWidth=1600
-ScreenHeight=1024
-Fullscreen=0
-VisualQuality=2
-RenderingWidth=0
-RenderingHeight=0
-EnablePostEffects=1
-EnableShadows=1
-EnableHighResScope=1
-EnableDepthOfField=1
-EnablePerPixelLighting=1
-MsaaSamples=4
-DisableBrowser=1
-[Net]
-UseProxy=0
 ```
 
 ## Troubleshooting
