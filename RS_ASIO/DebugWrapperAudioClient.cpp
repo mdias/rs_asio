@@ -2,6 +2,7 @@
 #include "DebugWrapperAudioClient.h"
 #include "DebugWrapperCaptureClient.h"
 #include "DebugWrapperRenderClient.h"
+#include "MyUnknown.h"
 
 
 #define DEBUG_PRINT_HR(hr) if(FAILED(hr)) rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl
@@ -44,6 +45,10 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioClient<TBase>::QueryInterface(REFIID 
 			*ppvObject = this;
 			this->AddRef();
 			hr = S_OK;
+		}
+		else if (riid == __uuidof(MyUnknown))
+		{
+			return m_RealAudioClient.QueryInterface(riid, ppvObject);
 		}
 		else
 		{

@@ -152,6 +152,7 @@ HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* s)
 			stream->in.clientProc->QueryInterface(IID_IMyUnknown, (void**)&myUnknown);
 			if (myUnknown)
 			{
+				rslog::info_ts() << "  using ref count hack" << std::endl;
 				if (myUnknown->IsAsio4All)
 					stream->in.clientProc->Release();
 				myUnknown->Release();
