@@ -49,11 +49,14 @@ AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPat
 		
 		std::string pathLowercase = asioDllPath;
 		std::transform(pathLowercase.begin(), pathLowercase.end(), pathLowercase.begin(),
-			[](unsigned char c) { return std::toupper(c); } 
+			[](unsigned char c) { return std::tolower(c); } 
 		);
 
 		m_AsioDllIsAsio4all = (pathLowercase.find("asio4all.dll") != std::string::npos);
-		rslog::info_ts() << "  info: asio4all detected" << std::endl;
+		if (m_AsioDllIsAsio4all)
+		{
+			rslog::info_ts() << "  info: asio4all detected" << std::endl;
+		}
 	}
 
 	if (m_Driver)
