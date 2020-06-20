@@ -32,14 +32,14 @@ EnableSoftwareMasterVolumeControl=1
 SoftwareMasterVolumePercent=100
 
 [Asio.Input.0]
-;Driver=QUAD CAPTURE
+Driver=QUAD CAPTURE
 Channel=0
 EnableSoftwareEndpointVolumeControl=1
 EnableSoftwareMasterVolumeControl=1
 SoftwareMasterVolumePercent=100
 
 [Asio.Input.1]
-Driver=QUAD CAPTURE
+Driver=
 Channel=1
 EnableSoftwareEndpointVolumeControl=1
 EnableSoftwareMasterVolumeControl=1
@@ -52,7 +52,8 @@ SoftwareMasterVolumePercent=100
 
 ```ini
 [Config]
-EnableWasapi=0
+EnableWasapiOutputs=0
+EnableWasapiInputs=0
 EnableAsio=1
 
 [Asio]
@@ -65,12 +66,13 @@ CustomBufferSize=
 
 [Asio.Output]
 Driver=QUAD CAPTURE
+BaseChannel=0
 EnableSoftwareEndpointVolumeControl=1
 EnableSoftwareMasterVolumeControl=1
 SoftwareMasterVolumePercent=100
 
 [Asio.Input.0]
-;Driver=QUAD CAPTURE
+Driver=
 Channel=0
 EnableSoftwareEndpointVolumeControl=1
 EnableSoftwareMasterVolumeControl=1

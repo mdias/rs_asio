@@ -54,7 +54,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - RME Babyface PRO
 - RME Multiface with HDSPe PCIe
 - Roland Rubix 44
-- Roland ua55
+- [Roland ua55](docs/roland_ua_55/README.md)
 - [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - Universal Audio Apollo Twin USB
 - [XTONE Smart Stomp](docs/xtone_smartstomp/README.md), using ASIO4All
