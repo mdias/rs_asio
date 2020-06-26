@@ -52,6 +52,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - MOTU M4
 - MOTU UltraLite AVB
 - Presonus Quantum 2
+- Presonus Studio 24c
 - RME Babyface PRO
 - RME Multiface with HDSPe PCIe
 - Roland Rubix 44
