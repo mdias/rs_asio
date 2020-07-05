@@ -151,5 +151,6 @@ These are the interface we know for sure work, reported by users like you. If yo
   
   - Check all the cables, trace the signal path from the guitar to the interface
   - Make sure you haven't muted anything & check volumes
-  - Read the ´RS_ASIO-log.txt´ file,
+  - Read the ´RS_ASIO-log.txt´ file
+  - Check the [releases page](https://github.com/mdias/rs_asio/releases/latest) for new versions & changelogs
   - Reboot your PC
