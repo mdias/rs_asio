@@ -1,24 +1,98 @@
 # RS ASIO
 
-This project aims to add ASIO support to `Rocksmith 2014 Edition - Remastered` in order to avoid issues with some WASAPI drivers.
-It patches game code at runtime to allow intervening in the process of WASAPI device enumeration so that we can inject our own fake WASAPI devices which internally use ASIO audio API.
+***Ultra low latency for `Rocksmith 2014 Edition - Remastered`***
+
+RS ASIO lets you use your ASIO capable audio interface in Rocksmith, giving you latency as low as `1ms`. That means dead accurate note detection in most cases, turning Rocksmith into the tool we always wanted it to be. RS ASIO also fixes issues with some WASAPI drivers.
+
+It patches game code at runtime to intervene in the process of WASAPI device enumeration, so that we can inject our own fake devices, which internally use the ASIO audio API. 
+
+If you don't have a USB interface, or would like to know if yours works, see the [interface support
+](#interface-support-&-troubleshooting) section.
 
 ## How to use
 
-- Copy the contents (`avrt.dll`, `RS_ASIO.dll`, `RS_ASIO.ini`) of [latest release](https://github.com/mdias/rs_asio/releases/latest) (zip arhive release-xxx.zip) to the game folder.
+- Copy the contents (`avrt.dll`, `RS_ASIO.dll`, `RS_ASIO.ini`) of the [latest release](https://github.com/mdias/rs_asio/releases/latest) (zip arhive release-xxx.zip) to the game folder
   - Only the Steam version of Rocksmith is currently supported. You can find local folder of a game by right clicking on a Rocksmith in your Steam library, and selecting menu "Manage" -> "Browse local files"
-- Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
-- Look into [basic configuration guide](#basic-configuration-guide)
-- Make sure Rocksmith.ini is set to run with `ExclusiveMode=1` and `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
-- Make sure your interface clock is set to 48kHz. RS ASIO will try to request 48kHz mode, but your drivers may or may not allow this, so it might help setting it manually.
-- Extra: An RS_ASIO-log.txt file is generated inside the game directory which may help discover your ASIO driver name and diagnose issues.
-- Look into [list of knows issues](#known-issues) if you experience any problems
 
-### How to remove/uninstall
+- Configure the `RS_ASIO.ini` and `Rocksmith.ini` files
+  - See the [configuration guide](#configuration-guide)
 
-- Remove the custom DLL files from the game folder.
+- Re-run the in-game `Calibration` (hit `Space` while in the fullscreen tuner)
 
-## Audio Interfaces reported to work well
+- Play!
+
+### Uninstallation
+
+- Remove the custom DLL files from the game folder
+
+
+### Configuration guide
+
+**Example `RS_ASIO.ini´:
+
+```ini
+[Config]
+EnableWasapiOutputs=1
+EnableWasapiInputs=1
+EnableAsio=1
+
+[Asio]
+; available buffer size modes:
+;    driver - respect buffer size setting set in the driver
+;    host   - use a buffer size as close as possible as that requested by the host application
+;    custom - use the buffer size specified in CustomBufferSize field
+BufferSizeMode=driver
+CustomBufferSize=
+
+[Asio.Output]
+Driver=ASIO 2.0 - ESI MAYA22USB
+BaseChannel=0
+EnableSoftwareEndpointVolumeControl=1
+EnableSoftwareMasterVolumeControl=1
+SoftwareMasterVolumePercent=100
+
+[Asio.Input.0]
+Driver=ASIO 2.0 - ESI MAYA22USB
+Channel=0
+EnableSoftwareEndpointVolumeControl=1
+EnableSoftwareMasterVolumeControl=1
+SoftwareMasterVolumePercent=100
+
+[Asio.Input.1]
+Driver=
+Channel=1
+EnableSoftwareEndpointVolumeControl=1
+EnableSoftwareMasterVolumeControl=1
+SoftwareMasterVolumePercent=100
+```
+1. Follow the installation steps, described [above](#how-to-use)
+1. Run Rocksmith for the first time.
+1. Check `RS_ASIO-log.txt`, which has now been created in your game folder, and you will find the names of your ASIO drivers
+
+```txt
+0.456 [INFO]  AsioHelpers::FindDrivers
+0.456 [INFO]    ASIO4ALL v2
+0.457 [INFO]    MOOER USB Audio
+0.457 [INFO]    XMOS USB Audio 2.0 ST 3086
+0.457 [INFO]    ZOOM R16_R24 ASIO Driver
+```
+
+4. Copy name of your desired driver to the [Asio...] block, ´Driver´ line
+1. Make sure Rocksmith.ini is set to run with `ExclusiveMode=1` and `Win32UltraLowLatencyMode=1`. If in doubt, use default settings
+1. Make sure your interface clock is set to 48kHz. RS ASIO will try to request 48kHz mode, but your drivers may or may not allow this, so it might help setting it manually
+1. Run Rocksmith again
+1. Open ´Rocksmith.ini´, set the lowest possible ´LatencyBuffer´ and then gradually lower the buffer size until there is no noise. Test until there are no cracks or distortion in the audio. Your goal is to achieve the lowest possible values without introducing noise. 
+    1. Modify LatencyBuffer (try values 4,3,2,1)
+    1. Modify buffersize either in your ASIO driver control panel or in the ´CustomBufferSize´ option in the RS_ASIO.ini file. In most cases the buffer size should be a multiple of 8, and lower is better. Values between 48 and 192 are commo
+    
+
+### Interface Support & Troubleshooting
+
+**Before opening an issue, please read this fully and use the search function. 
+
+**When opening an issue, post the contents of `Rocksmith.ini´, ´RS_ASIO.ini´ and ´RS_ASIO-log.txt´.
+
+These are the interface we know for sure work, reported by users like you. If your interface isn't present, please let us know if it works! Even if an interface isn't listed, it's still likely to work just fine.
 
 - [Asus Strix Soar](docs/asus_strix_soar/README.md)
 - [Audient Evo 4](docs/audient_evo_4/README.md)
@@ -66,33 +140,16 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Zoom R24
 - Zoom U-44
 
-### Basic configuration guide
-
-1. Follow installation steps, described [above](#how-to-use)
-1. Run Rocksmith for the first time.
-1. Look into `RS_ASIO-log.txt`, you will see names of drivers
-
-```txt
-0.456 [INFO]  AsioHelpers::FindDrivers
-0.456 [INFO]    ASIO4ALL v2
-0.457 [INFO]    MOOER USB Audio
-0.457 [INFO]    XMOS USB Audio 2.0 ST 3086
-0.457 [INFO]    ZOOM R16_R24 ASIO Driver
-```
-
-4. Copy name of the corresponding driver to the [Asio...] block of the RS_ASIO.ini
-1. Run Rocksmith again
-1. Repeat until there is no cracks in audio. Your goal is to have smallest possible values without cracks. Find smallest possible LatencyBuffer and then gradually set buffer size until there is no cracks.
-    1. Modify LatencyBuffer (try values 4,3,2,1)
-    1. Modify buffersize either in ASIO driver control panel or in CustomBufferSize option in the RS_ASIO.ini file. For the beginning follow rule of thumb that buffer size should be divisible to 32
-    1. Run Rocksmith
-    1. Look into `RS_ASIO-log.txt` if you experience any issues
-
-### Known issues
-
-- Your interface MUST support 48kHz playback
-- Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
-- Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
+- **Your interface MUST support 48kHz playback
+- There's no dedicated ASIO control panel (please configure your interface directly for now, if necessary)
+- The game must to be restarted to apply changes to ASIO settings
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
-- Hardware hotplugging while the game is running won't be noticed by the game.
-- Game sometimes crash on exit with ASIO4ALL
+- Hardware hotplugging while the game is running detected by the game
+- Game sometimes crashes on exit when using ASIO4ALL
+
+1. **If you're having audio problems
+  
+  - Check all the cables, trace the signal path from the guitar to the interface
+  - Make sure you haven't muted anything & check volumes
+  - Read the ´RS_ASIO-log.txt´ file,
+  - Reboot your PC
