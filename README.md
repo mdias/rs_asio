@@ -86,7 +86,7 @@ SoftwareMasterVolumePercent=100
     1. Modify buffersize either in your ASIO driver control panel or in the ´CustomBufferSize´ option in the RS_ASIO.ini file. In most cases the buffer size should be a multiple of 8, and lower is better. Values between 48 and 192 are commo
     
 
-### Interface Support & Troubleshooting
+## Interface Support & Troubleshooting
 
 **Before opening an issue, please read this fully and use the search function. 
 
