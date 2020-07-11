@@ -54,15 +54,20 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - MOTU 2408 mk3
 - MOTU M4
 - MOTU UltraLite AVB
+- [MOTU Ultralite mk4](https://github.com/mdias/rs_asio/issues/95)
 - Presonus Quantum 2
 - Presonus Studio 24c
 - RME Babyface PRO
 - RME Multiface with HDSPe PCIe
 - Roland Rubix 44
 - [Roland ua55](docs/roland_ua_55/README.md)
+- [Roland V-Studio 100](https://github.com/mdias/rs_asio/issues/91)
+- [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
 - [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
+- [SuZhou UTECK's Guitar-Cube Chord A](https://github.com/mdias/rs_asio/issues/92)
 - Universal Audio Apollo Twin USB
 - [XTONE Smart Stomp](docs/xtone_smartstomp/README.md), using ASIO4All
+- [Yamaha AG06 USB Mixing Console](https://github.com/mdias/rs_asio/issues/81)
 - Zoom R24
 - Zoom U-44
 
