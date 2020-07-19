@@ -45,6 +45,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - [Focusrite Scarlett Solo 3rd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - Juli@ XTe
 - Lexicon Alpha
+- [Line6 AMPLIFi 75](https://github.com/mdias/rs_asio/issues/97)
 - Line6 HX Stomp
 - M-Audio 2x2
 - M-Audio M-Track Plus II
