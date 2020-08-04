@@ -71,6 +71,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - [Yamaha AG06 USB Mixing Console](https://github.com/mdias/rs_asio/issues/81)
 - Zoom R24
 - Zoom U-44
+- Zoom UAC-2
 
 ### Basic configuration guide
 
