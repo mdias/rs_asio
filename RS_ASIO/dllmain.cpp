@@ -19,7 +19,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		DisableThreadLibraryCalls(hModule);
 
 		rslog::InitLog();
-		rslog::info_ts() << " - Wrapper DLL loaded (v0.5.2)" << std::endl;
+		rslog::info_ts() << " - Wrapper DLL loaded (v0.5.3)" << std::endl;
 		PatchOriginalCode();
 		break;
 	case DLL_PROCESS_DETACH:
@@ -152,9 +152,11 @@ HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* s)
 			stream->in.clientProc->QueryInterface(IID_IMyUnknown, (void**)&myUnknown);
 			if (myUnknown)
 			{
-				rslog::info_ts() << "  using ref count hack" << std::endl;
 				if (myUnknown->IsAsio4All)
+				{
+					rslog::info_ts() << "  using ref count hack" << std::endl;
 					stream->in.clientProc->Release();
+				}
 				myUnknown->Release();
 			}
 		}

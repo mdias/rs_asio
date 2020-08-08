@@ -89,6 +89,9 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	if (FAILED(IsFormatSupported(ShareMode, pFormat, nullptr)))
 		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 
+	if (m_AsioSharedHost.SetSamplerate(pFormat->nSamplesPerSec) != ASE_OK)
+		return E_FAIL;
+
 	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ " - host requested buffer duration: " << RefTimeToMilisecs(hnsBufferDuration) << "ms (" << std::dec << DurationToAudioFrames(hnsBufferDuration, pFormat->nSamplesPerSec) << " frames)" << std::endl;
 	rslog::info_ts() << m_AsioDevice.GetIdRef() << " " << (*pFormat);
 
