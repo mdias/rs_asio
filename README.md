@@ -48,6 +48,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - [Line6 AMPLIFi 75](https://github.com/mdias/rs_asio/issues/97)
 - Line6 HX Stomp
 - M-Audio 2x2
+- [M-Audio AIR 192|4](https://github.com/mdias/rs_asio/issues/98)
 - M-Audio M-Track Plus II
 - [M-Audio MobilePre mkII](https://github.com/mdias/rs_asio/issues/15)
 - Mackie Onyx Producer 2x2
