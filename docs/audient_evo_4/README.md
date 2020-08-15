@@ -172,7 +172,7 @@ CustomBufferSize=
 
 [Asio.Output]
 Driver=Audient USB Audio ASIO Driver
-BaseChannel=0
+BaseChannel=2
 EnableSoftwareEndpointVolumeControl=0
 EnableSoftwareMasterVolumeControl=0
 SoftwareMasterVolumePercent=100
