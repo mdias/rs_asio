@@ -27,50 +27,6 @@ Follow the [configuration guide](https://github.com/mdias/rs_asio#basic-configur
 
 ## Config files
 
-
-<details>
-<summary>My RS_ASIO.ini</summary>
-
-
-
-```
-[Config]
-EnableWasapiOutputs=0
-EnableWasapiInputs=0
-EnableAsio=1
-
-[Asio]
-; available buffer size modes:
-;    driver - respect buffer size setting set in the driver
-;    host   - use a buffer size as close as possible as that requested by the host application
-;    custom - use the buffer size specified in CustomBufferSize field
-BufferSizeMode=driver
-CustomBufferSize=
-
-[Asio.Output]
-Driver=Audient USB Audio ASIO Driver
-BaseChannel=0
-EnableSoftwareEndpointVolumeControl=0
-EnableSoftwareMasterVolumeControl=0
-SoftwareMasterVolumePercent=100
-
-[Asio.Input.0]
-Driver=Audient USB Audio ASIO Driver
-Channel=1
-EnableSoftwareEndpointVolumeControl=0
-EnableSoftwareMasterVolumeControl=0
-SoftwareMasterVolumePercent=100
-
-[Asio.Input.1]
-Driver=
-Channel=1
-EnableSoftwareEndpointVolumeControl=1
-EnableSoftwareMasterVolumeControl=1
-SoftwareMasterVolumePercent=100
-```
-
-</details>
-
 <details>
 <summary>My Rocksmith.ini</summary>
 
