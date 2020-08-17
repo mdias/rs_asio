@@ -2,33 +2,49 @@
 
 ## About
 
-This device is confirmed to be working as of _v0.5.2_
+This device is confirmed to be working as of _v0.5.3_
+
+_Note: This is tested for single user/player only!_
 
 ### Known issues
 
- - Guitar is only coming through when using (and configuring for) input 2. 
+ - None as of now with the latest driver and patch updates.
 
 ## Setup steps
 
 ### Install drivers
 
-Install the latest [official driver](https://audient.com/products/audio-interfaces/sono/downloads/) (v4.0.9 as of time of writing).
+Install the latest [official driver](https://audient.com/products/audio-interfaces/sono/downloads/) (v4.1.3 as of time of writing).
 
-### Set asio control panel settings
+Note: Also make sure that your interface is working fine. Easiest way is to check by installing Audacity and check if your guitar tone (clean) is being recorded. If it is recording fine and you don't have issues with the driver move ahead.
 
-Use a DAW such as [Reaper](https://www.reaper.fm/) to open the asio control panel for the Evo 4.
+### ASIO and Control panel settings
+
+Although at the time of writing this you do no need to change any default settings [sample rate (96Kz), depth (24 bit) and buffer size (1024)] for inputs and outputs in the control panel or from the EVO app in the Window's notification tray. You also won't have to disable any input (a microphone in my case) in the control panel. But make sure that your default input is set your `Mic | Line | Instrument 1`. With the current RS_ASIO patch and Audient drivers everything works fine without tinkering any settings.
+
+Here are the settings on my computer.
+
+![image](https://raw.githubusercontent.com/AmolAmrit/rs_asio/master/docs/audient_evo_4/Annotation%202020-08-16%20224310.png)
+
+![image](https://raw.githubusercontent.com/AmolAmrit/rs_asio/master/docs/audient_evo_4/Annotation%202020-08-16%20224424.png)
+
+![image](https://raw.githubusercontent.com/AmolAmrit/rs_asio/master/docs/audient_evo_4/Annotation%202020-08-16%20232812.png)
+
+![image](https://raw.githubusercontent.com/AmolAmrit/rs_asio/master/docs/audient_evo_4/Annotation%202020-08-16%20232728.png)
+
+_Note:_ **Rocksmith however supports input only at a sample rate till 48Kz. The RS_ASIO patch automatically sets the sample rate to 48Kz so by default you won't need to hinder any settings. But in case if you face issues with it is always recommende to set the sample rate manually to 48Kz from the EVO app.** 
 
 ![image](https://user-images.githubusercontent.com/10779424/86245120-ef2bad80-bba0-11ea-96cb-c04e88f91391.png)
 
 There isn't actually any panel but you should see an `e` logo in your taskbar. Right click it and set the sample rate to 48KHz. 
 
-> Note: if you don't do this, you will see an error when Rocksmith opens stating there is no output device detected.
-
 ### Setup RS_ASIO
 
-Follow the [configuration guide](https://github.com/mdias/rs_asio#basic-configuration-guide) and set desired outputs and inputs to `Audient USB Audio ASIO Driver`.
+Follow the instructions from the [configuration guide](https://github.com/mdias/rs_asio#basic-configuration-guide) to set the desired outputs and inputs to `Audient USB Audio ASIO Driver`.
 
-If you're using the interface for input, **only the second input seems to be working**. Not too sure why this is but you'll need to set the channel of your input to `1` and use the second TRS input.
+In the EVO 4 the arrangement of input is a little different. So don't get confused from the configuration file. The Channel=0 is actually Channel=1 in the EVO 4. I'll be sharing my files below too. You can see that I have commented out Asio Input 1 by using a semi colon. Because if you don't then Rocksmith will call for both inputs and your interface won't be detected as the Rocksmith cable.
+
+_Note: Our Renderer.Win32 might be different depending on our video configuration._
 
 
 ## Config files
@@ -56,23 +72,23 @@ CustomBufferSize=
 [Asio.Output]
 Driver=Audient USB Audio ASIO Driver
 BaseChannel=0
-EnableSoftwareEndpointVolumeControl=0
-EnableSoftwareMasterVolumeControl=0
+EnableSoftwareEndpointVolumeControl=1
+EnableSoftwareMasterVolumeControl=1
 SoftwareMasterVolumePercent=100
 
 [Asio.Input.0]
 Driver=Audient USB Audio ASIO Driver
-Channel=1
-EnableSoftwareEndpointVolumeControl=0
-EnableSoftwareMasterVolumeControl=0
-SoftwareMasterVolumePercent=100
-
-[Asio.Input.1]
-Driver=
-Channel=1
+Channel=0
 EnableSoftwareEndpointVolumeControl=1
 EnableSoftwareMasterVolumeControl=1
 SoftwareMasterVolumePercent=100
+
+[Asio.Input.1]
+;Driver=
+;Channel=1
+;EnableSoftwareEndpointVolumeControl=1
+;EnableSoftwareMasterVolumeControl=1
+;SoftwareMasterVolumePercent=100
 ```
 
 </details>
@@ -86,19 +102,19 @@ SoftwareMasterVolumePercent=100
 [Audio]
 EnableMicrophone=1
 ExclusiveMode=1
-LatencyBuffer=2
-ForceDefaultPlaybackDevice=
+LatencyBuffer=4
+ForceDefaultPlaybackDevice=1
 ForceWDM=0
 ForceDirectXSink=0
 DumpAudioLog=0
-MaxOutputBufferSize=
+MaxOutputBufferSize=0
 RealToneCableOnly=0
 Win32UltraLowLatencyMode=1
 [Renderer.Win32]
 ShowGamepadUI=0
-ScreenWidth=2560
-ScreenHeight=1440
-Fullscreen=0
+ScreenWidth=1920
+ScreenHeight=1080
+Fullscreen=2
 VisualQuality=2
 RenderingWidth=0
 RenderingHeight=0
@@ -111,6 +127,16 @@ MsaaSamples=4
 DisableBrowser=0
 [Net]
 UseProxy=1
+
 ```
 
 </details>
+
+## In the game
+
+_**After you have done all of this setting up. It is very important to calibrate your guitar. If you don't then some strings may not be detected as it happened with me**_
+
+## Credits: 
+[For Rocksmith.ini](https://www.reddit.com/r/rocksmith/comments/4qt9fa/solution_for_crackling_noisetoo_much_distortion/)
+
+[For solving issues](https://www.reddit.com/r/rocksmith/comments/i9nbix/help_with_rs_asio/)
