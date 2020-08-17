@@ -89,10 +89,6 @@ SoftwareMasterVolumePercent=100
 ;EnableSoftwareEndpointVolumeControl=1
 ;EnableSoftwareMasterVolumeControl=1
 ;SoftwareMasterVolumePercent=100
-</details>
-
-<details>
-<summary>My Rocksmith.ini</summary>
 ```
 
 </details>
