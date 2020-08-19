@@ -20,6 +20,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 
 ## Audio Interfaces reported to work well
 
+- [Arturia AudioFuse](https://github.com/mdias/rs_asio/issues/114)
 - [Asus Strix Soar](docs/asus_strix_soar/README.md)
 - [Audient Evo 4](docs/audient_evo_4/README.md)
 - Audient iD4
