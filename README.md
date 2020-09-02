@@ -62,6 +62,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Presonus Studio 24c
 - RME Babyface PRO
 - RME Multiface with HDSPe PCIe
+- Roland Rubix 22
 - Roland Rubix 44
 - [Roland ua55](docs/roland_ua_55/README.md)
 - [Roland V-Studio 100](https://github.com/mdias/rs_asio/issues/91)
