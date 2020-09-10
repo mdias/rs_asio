@@ -44,6 +44,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Focusrite Scarlett 18i20 2nd Gen [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 2nd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 3rd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
+- [IK Multimedia iRig HD 2](https://github.com/mdias/rs_asio/issues/117)
 - Juli@ XTe
 - Lexicon Alpha
 - [Line6 AMPLIFi 75](https://github.com/mdias/rs_asio/issues/97)
@@ -53,11 +54,13 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - M-Audio M-Track Plus II
 - [M-Audio MobilePre mkII](https://github.com/mdias/rs_asio/issues/15)
 - Mackie Onyx Producer 2x2
-- Native Instruments Komplete Audio 6
 - MOTU 2408 mk3
 - MOTU M4
 - MOTU UltraLite AVB
 - [MOTU Ultralite mk4](https://github.com/mdias/rs_asio/issues/95)
+- [Native Instruments Komplete Audio 1](https://github.com/mdias/rs_asio/issues/118)
+- Native Instruments Komplete Audio 6
+- [NUX Mighty Plug](https://github.com/mdias/rs_asio/issues/117)
 - Presonus Quantum 2
 - Presonus Studio 24c
 - RME Babyface PRO
