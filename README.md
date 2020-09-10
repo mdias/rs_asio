@@ -20,6 +20,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 
 ## Audio Interfaces reported to work well
 
+- [Alesis Core 1](https://github.com/mdias/rs_asio/issues/115)
 - [Arturia AudioFuse](https://github.com/mdias/rs_asio/issues/114)
 - [Asus Strix Soar](docs/asus_strix_soar/README.md)
 - [Audient Evo 4](docs/audient_evo_4/README.md)
@@ -33,6 +34,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - [Behringer XR18](https://github.com/mdias/rs_asio/issues/72)
 - ESI MAYA22 USB
 - [Focusrite Clarett 4Pre USB](https://github.com/mdias/rs_asio/issues/42)
+- [Focusrite Saffire 6 USB](https://github.com/mdias/rs_asio/issues/116)
 - Focusrite Saffire Pro 40
 - Focusrite Scarlett 2i2 1st Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 2i2 2nd Gen [(Known issues)](#known-issues)
