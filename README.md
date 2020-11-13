@@ -22,6 +22,10 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 
 Check out [this guide](docs/streaming/README.md).
 
+### Using RS ASIO on linux
+
+Some people have had success using RS ASIO with [wineasio](https://www.wineasio.org/) on linux. You can check out [this issue](https://github.com/mdias/rs_asio/issues/10) for more information.
+
 ## Audio Interfaces reported to work well
 
 - [Alesis Core 1](https://github.com/mdias/rs_asio/issues/115)
@@ -81,7 +85,6 @@ Check out [this guide](docs/streaming/README.md).
 - [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - [SuZhou UTECK's Guitar-Cube Chord A](https://github.com/mdias/rs_asio/issues/92)
 - Universal Audio Apollo Twin USB
-- [wineasio](https://github.com/mdias/rs_asio/issues/10)
 - [XTONE Smart Stomp](docs/xtone_smartstomp/README.md), using ASIO4All
 - [Yamaha AG06 USB Mixing Console](https://github.com/mdias/rs_asio/issues/81)
 - Zoom R24
