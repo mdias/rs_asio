@@ -116,10 +116,14 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 			return E_INVALIDARG;
 	}
 
-	if (!m_AsioSharedHost.ClampBufferSizeToLimits(bufferDurationFrames))
+	// clamp the buffer size to device limits if we're not using the preferred size from the driver
+	if (m_AsioDevice.GetConfig().bufferSizeMode != RSAsioDevice::BufferSizeMode_Driver)
 	{
-		rslog::error_ts() << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - Couldn't clamp buffer size to limits" << std::endl;
-		return E_FAIL;
+		if (!m_AsioSharedHost.ClampBufferSizeToLimits(bufferDurationFrames))
+		{
+			rslog::error_ts() << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - Couldn't clamp buffer size to limits" << std::endl;
+			return E_FAIL;
+		}
 	}
 
 	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ " - actual buffer duration: " << RefTimeToMilisecs(AudioFramesToDuration(bufferDurationFrames, pFormat->nSamplesPerSec)) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
