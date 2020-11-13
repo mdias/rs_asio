@@ -73,6 +73,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - [Roland V-Studio 100](https://github.com/mdias/rs_asio/issues/91)
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
 - [Steinberg UR22C](https://github.com/mdias/rs_asio/issues/124)
+- [Steinberg UR44C](https://github.com/mdias/rs_asio/issues/130)
 - [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - [SuZhou UTECK's Guitar-Cube Chord A](https://github.com/mdias/rs_asio/issues/92)
 - Universal Audio Apollo Twin USB
