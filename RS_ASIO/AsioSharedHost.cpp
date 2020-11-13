@@ -434,6 +434,11 @@ bool AsioSharedHost::ClampBufferSizeToLimits(DWORD& inOutBufferSizeFrames) const
 		return false;
 	}
 
+	if (minAsioBufferFrames < 0 || maxAsioBufferFrames < 0)
+	{
+		return false;
+	}
+
 	if (inOutBufferSizeFrames < (DWORD)minAsioBufferFrames)
 		inOutBufferSizeFrames = (DWORD)minAsioBufferFrames;
 	else if (inOutBufferSizeFrames > (DWORD)maxAsioBufferFrames)
@@ -454,7 +459,11 @@ bool AsioSharedHost::ClampBufferSizeToLimits(DWORD& inOutBufferSizeFrames) const
 		{
 			pow2size *= 2;
 		}
+
 		inOutBufferSizeFrames = pow2size;
+
+		if (inOutBufferSizeFrames > (DWORD)maxAsioBufferFrames)
+			inOutBufferSizeFrames = maxAsioBufferFrames;
 	}
 
 	return true;
