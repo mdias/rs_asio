@@ -77,6 +77,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - [SuZhou UTECK's Guitar-Cube Chord A](https://github.com/mdias/rs_asio/issues/92)
 - Universal Audio Apollo Twin USB
+- [wineasio](https://github.com/mdias/rs_asio/issues/10)
 - [XTONE Smart Stomp](docs/xtone_smartstomp/README.md), using ASIO4All
 - [Yamaha AG06 USB Mixing Console](https://github.com/mdias/rs_asio/issues/81)
 - Zoom R24
