@@ -18,6 +18,10 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 
 - Remove the custom DLL files from the game folder.
 
+### Streaming while using RS ASIO
+
+Check out [this guide](docs/streaming/README.md).
+
 ## Audio Interfaces reported to work well
 
 - [Alesis Core 1](https://github.com/mdias/rs_asio/issues/115)
