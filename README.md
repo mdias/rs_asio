@@ -39,6 +39,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Behringer UMC202HD
 - Behringer UMC204HD
 - [Behringer UMC404HD](https://github.com/mdias/rs_asio/issues/13)
+- [Behringer XENIX Q502USB](https://github.com/mdias/rs_asio/issues/132)
 - [Behringer XR18](https://github.com/mdias/rs_asio/issues/72)
 - ESI MAYA22 USB
 - [Focusrite Clarett 4Pre USB](https://github.com/mdias/rs_asio/issues/42)
