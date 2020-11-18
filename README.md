@@ -42,6 +42,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Behringer XENIX Q502USB](https://github.com/mdias/rs_asio/issues/132)
 - [Behringer XR18](https://github.com/mdias/rs_asio/issues/72)
 - ESI MAYA22 USB
+- [ESI MAYA44 eX](https://github.com/mdias/rs_asio/issues/134)
 - [Focusrite Clarett 4Pre USB](https://github.com/mdias/rs_asio/issues/42)
 - [Focusrite Saffire 6 USB 2.0](https://github.com/mdias/rs_asio/issues/116)
 - Focusrite Saffire Pro 40
