@@ -75,6 +75,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Native Instruments Komplete Audio 1](https://github.com/mdias/rs_asio/issues/118)
 - Native Instruments Komplete Audio 6
 - [NUX Mighty Plug](https://github.com/mdias/rs_asio/issues/117)
+- [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
 - Presonus Quantum 2
 - Presonus Studio 24c
 - RME Babyface PRO
