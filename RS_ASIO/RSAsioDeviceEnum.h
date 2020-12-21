@@ -20,12 +20,13 @@ struct RSAsioInputConfig
 	bool enableSoftwareEndpointVolumeControl = true;
 	bool enableSoftwareMasterVolumeControl = true;
 	int softwareMasterVolumePercent = 100;
+	bool microphone = false;
 };
 
 struct RSAsioConfig
 {
 	RSAsioOutputConfig output;
-	std::array<RSAsioInputConfig, 2> inputs;
+	std::array<RSAsioInputConfig, 3> inputs;
 	RSAsioDevice::BufferSizeMode bufferMode = RSAsioDevice::BufferSizeMode_Driver;
 	unsigned customBufferSize = 128;
 };

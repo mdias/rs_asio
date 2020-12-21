@@ -101,6 +101,7 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 				config.customBufferSize = m_Config.customBufferSize;
 				config.enableSoftwareEndpointVolmeControl = inputCfg.enableSoftwareEndpointVolumeControl;
 				config.enableSoftwareMasterVolumeControl = inputCfg.enableSoftwareMasterVolumeControl;
+				config.isMicrophone = inputCfg.microphone;
 
 				auto device = new RSAsioDevice(*host, id, config);
 				device->SetMasterVolumeLevelScalar((float)inputCfg.softwareMasterVolumePercent / 100.0f);

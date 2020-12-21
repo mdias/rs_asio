@@ -22,6 +22,7 @@ public:
 		unsigned customBufferSize = 128;
 		bool enableSoftwareEndpointVolmeControl = true;
 		bool enableSoftwareMasterVolumeControl = true;
+		bool isMicrophone = false;
 	};
 
 public:

@@ -24,7 +24,12 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetCount(DWORD *cProps)
 	if (m_AsioDevice.GetConfig().isOutput)
 		*cProps = 2;
 	else
-		*cProps = 4;
+	{
+		if (m_AsioDevice.GetConfig().isMicrophone)
+			*cProps = 3;
+		else
+			*cProps = 5;
+	}
 
 	return S_OK;
 }
@@ -40,9 +45,12 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetAt(DWORD iProp, PROPERTY
 		*pkey = PKEY_Device_FriendlyName;
 		return S_OK;
 	case 2:
-		*pkey = PKEY_Device_DeviceIdHiddenKey1;
+		*pkey = PKEY_AudioEndpoint_FormFactor;
 		return S_OK;
 	case 3:
+		*pkey = PKEY_Device_DeviceIdHiddenKey1;
+		return S_OK;
+	case 4:
 		*pkey = PKEY_Device_DeviceIdHiddenKey2;
 		return S_OK;
 	}
@@ -125,7 +133,7 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetValue(REFPROPERTYKEY key
 		else if (key == PKEY_AudioEndpoint_FormFactor)
 		{
 			pv->vt = VT_UI4;
-			pv->uintVal = LineLevel;
+			pv->uintVal = m_AsioDevice.GetConfig().isMicrophone ? Microphone : LineLevel;
 		}
 	}
 
