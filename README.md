@@ -75,6 +75,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [MOTU Ultralite mk4](https://github.com/mdias/rs_asio/issues/95)
 - [Native Instruments Audio Kontrol 1](https://github.com/mdias/rs_asio/issues/131)
 - [Native Instruments Komplete Audio 1](https://github.com/mdias/rs_asio/issues/118)
+- [Native Instruments Komplete Audio 2](https://github.com/mdias/rs_asio/issues/120)
 - Native Instruments Komplete Audio 6
 - [NUX Mighty Plug](https://github.com/mdias/rs_asio/issues/117)
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
