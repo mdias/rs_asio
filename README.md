@@ -43,6 +43,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Behringer XR18](https://github.com/mdias/rs_asio/issues/72)
 - ESI MAYA22 USB
 - [ESI MAYA44 eX](https://github.com/mdias/rs_asio/issues/134)
+- [Focusrite Clarett 2Pre Thunderbolt](https://github.com/mdias/rs_asio/issues/146)
 - [Focusrite Clarett 4Pre USB](https://github.com/mdias/rs_asio/issues/42)
 - [Focusrite Saffire 6 USB 2.0](https://github.com/mdias/rs_asio/issues/116)
 - Focusrite Saffire Pro 40
@@ -56,6 +57,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Focusrite Scarlett 18i20 2nd Gen [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 2nd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 3rd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
+- [IK Multimedia AXE I/O](https://github.com/mdias/rs_asio/issues/147)
 - [IK Multimedia iRig HD 2](https://github.com/mdias/rs_asio/issues/117)
 - Juli@ XTe
 - Lexicon Alpha
