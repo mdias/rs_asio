@@ -33,6 +33,7 @@ There are ways to do this that will still allow you to maintain the low latency,
 
 Some guides are available elsewhere to do this kind of thing:
 
+- [DeathlySin's tutorial for OBS streaming/recording with ASIO + VoiceMeeter](https://www.reddit.com/r/rocksmith/comments/kv6z9f/rs_asio_guide_including_routing_with_voicemeeter/)
 - [lastpixel.tv/low-latency-rocksmith-obs-streaming-with-software-effects/](https://lastpixel.tv/low-latency-rocksmith-obs-streaming-with-software-effects/)
 - [raidntrade.com/tutorials/RS-ASIO-VoiceMeeter.html](https://raidntrade.com/tutorials/RS-ASIO-VoiceMeeter.html)
 
