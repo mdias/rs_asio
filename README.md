@@ -71,6 +71,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [M-Audio MobilePre mkII](https://github.com/mdias/rs_asio/issues/15)
 - Mackie Onyx Producer 2x2
 - MOTU 2408 mk3
+- [MOTU M2](https://github.com/mdias/rs_asio/issues/151)
 - MOTU M4
 - MOTU UltraLite AVB
 - [MOTU Ultralite mk4](https://github.com/mdias/rs_asio/issues/95)
