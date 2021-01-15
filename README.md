@@ -62,7 +62,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [IK Multimedia iRig HD 2](https://github.com/mdias/rs_asio/issues/117)
 - Juli@ XTe
 - Lexicon Alpha
-- [Line6 AMPLIFi 75](https://github.com/mdias/rs_asio/issues/97)
+- [Line6 AMPLIFi 75](https://github.com/mdias/rs_asio/issues/97) **Some limitations apply. Follow the link for more information.**
 - Line6 HX Stomp
 - M-Audio 2x2
 - [M-Audio AIR 192|4](https://github.com/mdias/rs_asio/issues/98)
