@@ -479,10 +479,12 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 	std::lock_guard<std::mutex> g(m_bufferMutex, std::adopt_lock);
 
+	const bool isOutput = m_AsioDevice.GetConfig().isOutput;
+
 	if (!m_IsStarted)
 	{
 		memset(m_frontBuffer.data(), 0, m_frontBuffer.size());
-		if (!m_AsioDevice.GetConfig().isOutput)
+		if (!isOutput)
 		{
 			return;
 		}
@@ -495,8 +497,16 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	}
 
 	// sanity check
-	if (m_ChannelMap.size() < m_WaveFormat.Format.nChannels)
-		return;
+	if (isOutput)
+	{
+		if (m_ChannelMap.size() != m_AsioSharedHost.GetNumOutputChannels())
+			return;
+	}
+	else
+	{
+		if (m_ChannelMap.size() < m_WaveFormat.Format.nChannels)
+			return;
+	}
 
 	// get game sample type
 	ASIOSampleType gameSampleType = ASIOSTFloat32LSB;
@@ -510,7 +520,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	float fSoftwareVolumeScalar = 1.0f;
 	bool doSoftwareVolume = m_AsioDevice.GetSoftwareVolumeScalar(&fSoftwareVolumeScalar);
 	
-	if (m_AsioDevice.GetConfig().isOutput)
+	if (isOutput)
 	{
 		if (m_bufferHasUpdatedData)
 		{
@@ -520,24 +530,28 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 				AudioProcessing::DoSoftwareVolumeDsp(m_frontBuffer.data(), gameSampleType, totalSamples, fSoftwareVolumeScalar);
 			}
 
-			for (WORD ch = 0; ch < m_WaveFormat.Format.nChannels; ++ch)
+			for (int asioCh = 0; asioCh < m_ChannelMap.size(); ++asioCh)
 			{
-				const int asioCh = m_ChannelMap[ch];
-				if (asioCh >= 0)
+				const ASIOChannelInfo* asioChannelInfo = m_AsioSharedHost.GetOutputChannelInfo(asioCh);
+				ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetOutputBuffer(asioCh);
+				if (bufferInfo && asioChannelInfo)
 				{
-					const ASIOChannelInfo* asioChannelInfo = m_AsioSharedHost.GetOutputChannelInfo(asioCh);
-					ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetOutputBuffer(asioCh);
-					if (bufferInfo && asioChannelInfo)
+					const WORD asioSampleTypeSize = GetAsioSampleTypeNumBytes(asioChannelInfo->type);
+					const int srcCh = m_ChannelMap[asioCh];
+					if (asioSampleTypeSize)
 					{
-						const WORD asioSampleTypeSize = GetAsioSampleTypeNumBytes(asioChannelInfo->type);
-
-						if (asioSampleTypeSize)
+						if (srcCh >= 0)
 						{
 							AudioProcessing::CopyConvertFormat(
-								m_frontBuffer.data() + ch * gameSampleTypeSize, gameSampleType, m_WaveFormat.Format.nBlockAlign,
+								m_frontBuffer.data() + srcCh * gameSampleTypeSize, gameSampleType, m_WaveFormat.Format.nBlockAlign,
 								m_bufferNumFrames,
 								(BYTE*)bufferInfo->buffers[buffIdx], asioChannelInfo->type, asioSampleTypeSize
 							);
+						}
+						else
+						{
+							// output silence to unassigned channels
+							memset(bufferInfo->buffers[buffIdx], 0, asioSampleTypeSize * m_bufferNumFrames);
 						}
 					}
 				}
@@ -614,27 +628,35 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 void RSAsioAudioClient::UpdateChannelMap()
 {
+	const bool isOutput = m_AsioDevice.GetConfig().isOutput;
 	const WORD baseChannel = m_AsioDevice.GetConfig().baseAsioChannelNumber;
-	const WORD maxAsioChannel = m_AsioDevice.GetConfig().isOutput ? m_AsioSharedHost.GetNumOutputChannels() : m_AsioSharedHost.GetNumInputChannels();
+	const WORD maxAsioChannel = isOutput ? m_AsioSharedHost.GetNumOutputChannels() : m_AsioSharedHost.GetNumInputChannels();
 
 	const WORD numRequestedChannels = m_AsioDevice.GetConfig().numAsioChannels;
 	const WORD numBufferChannels = m_WaveFormat.Format.nChannels;
 
-	m_ChannelMap.resize(numBufferChannels);
-	if (numRequestedChannels > 0)
+	m_ChannelMap.resize(isOutput ? maxAsioChannel : numBufferChannels);
+	for (auto& c : m_ChannelMap)
+		c = -1;
+
+	if (isOutput)
+	{
+		WORD i = baseChannel;
+		WORD srcChannel = 0;
+		while (i < m_ChannelMap.size() && srcChannel < numRequestedChannels)
+		{
+			m_ChannelMap[i] = srcChannel;
+			++srcChannel;
+			++i;
+		}
+	}
+	else
 	{
 		for (WORD i = 0; i < numBufferChannels; ++i)
 		{
 			const WORD wantedAsioBuffer = baseChannel + (i % numRequestedChannels);
 			if (wantedAsioBuffer < maxAsioChannel)
 				m_ChannelMap[i] = wantedAsioBuffer;
-			else
-				m_ChannelMap[i] = -1;
 		}
-	}
-	else
-	{
-		for (auto& c : m_ChannelMap)
-			c = -1;
 	}
 }
