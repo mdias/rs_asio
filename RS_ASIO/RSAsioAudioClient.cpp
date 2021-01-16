@@ -630,6 +630,7 @@ void RSAsioAudioClient::UpdateChannelMap()
 {
 	const bool isOutput = m_AsioDevice.GetConfig().isOutput;
 	const WORD baseChannel = m_AsioDevice.GetConfig().baseAsioChannelNumber;
+	const WORD altOutputBaseChannel = m_AsioDevice.GetConfig().altOutputBaseAsioChannelNumber.value_or((unsigned)baseChannel);
 	const WORD maxAsioChannel = isOutput ? m_AsioSharedHost.GetNumOutputChannels() : m_AsioSharedHost.GetNumInputChannels();
 
 	const WORD numRequestedChannels = m_AsioDevice.GetConfig().numAsioChannels;
@@ -648,6 +649,20 @@ void RSAsioAudioClient::UpdateChannelMap()
 			m_ChannelMap[i] = srcChannel;
 			++srcChannel;
 			++i;
+		}
+
+		if (altOutputBaseChannel != baseChannel)
+		{
+			i = altOutputBaseChannel;
+			srcChannel = 0;
+			while (i < m_ChannelMap.size() && srcChannel < numRequestedChannels)
+			{
+				// don't overwrite primary base channel
+				if (m_ChannelMap[i] == -1)
+					m_ChannelMap[i] = srcChannel;
+				++srcChannel;
+				++i;
+			}
 		}
 	}
 	else

@@ -17,6 +17,7 @@ public:
 	{
 		bool isOutput;
 		unsigned baseAsioChannelNumber = 0;
+		std::optional<unsigned> altOutputBaseAsioChannelNumber;
 		unsigned numAsioChannels = 1;
 		BufferSizeMode bufferSizeMode = BufferSizeMode_Driver;
 		unsigned customBufferSize = 128;

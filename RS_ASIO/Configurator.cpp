@@ -345,6 +345,21 @@ static void LoadConfigIni(RSConfig& out)
 							rslog::error_ts() << __FUNCTION__ << " - invalid value for channel, value should be an integer starting at zero. line: " << line << std::endl;
 						}
 					}
+					else if (key == "altbasechannel")
+					{
+						if (val.length() > 0)
+						{
+							int c = 0;
+							if (parseIntString(val, c) && c >= 0)
+							{
+								out.asioConfig.output.altBaseChannel = (unsigned)c;
+							}
+							else
+							{
+								rslog::error_ts() << __FUNCTION__ << " - invalid value for channel, value should be an integer starting at zero. line: " << line << std::endl;
+							}
+						}
+					}
 					else if (key == "enablesoftwareendpointvolumecontrol")
 					{
 						parseBoolString(val, out.asioConfig.output.enableSoftwareEndpointVolumeControl);
