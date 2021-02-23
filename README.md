@@ -61,6 +61,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Focusrite Scarlett Solo 2nd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 3rd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - [IK Multimedia AXE I/O](https://github.com/mdias/rs_asio/issues/147)
+- [IK Multimedia iRig](https://github.com/mdias/rs_asio/issues/164), using ASIO4ALL
 - [IK Multimedia iRig HD 2](https://github.com/mdias/rs_asio/issues/117)
 - Juli@ XTe
 - Lexicon Alpha
