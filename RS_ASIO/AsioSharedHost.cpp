@@ -27,6 +27,14 @@ AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPat
 	{
 		fnPtrDllGetClassObject fn = (fnPtrDllGetClassObject)GetProcAddress(m_Module, "DllGetClassObject");
 
+		if (!fn)
+		{
+			rslog::error_ts() << "Failed to GetProcAddress for DllGetClassObject() in ASIO driver "
+				<< m_AsioDllPath << std::endl << "\tBad ASIO driver?" << std::endl;
+				
+			return;
+		}
+
 		IClassFactory* pClassFactory = nullptr;
 
 		HRESULT hr = fn(clsid, __uuidof(IClassFactory), (void**)&pClassFactory);
