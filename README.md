@@ -67,7 +67,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Lexicon Alpha
 - [Line6 AMPLIFi 75](https://github.com/mdias/rs_asio/issues/97) **Some limitations apply. Follow the link for more information.**
 - Line6 HX Stomp
-- Line6 POD Go
+- [Line6 POD Go](https://github.com/mdias/rs_asio/pull/171)
 - M-Audio 2x2
 - [M-Audio AIR 192|4](https://github.com/mdias/rs_asio/issues/98)
 - [M-Audio Fast Track Ultra 8R](https://github.com/mdias/rs_asio/issues/135)
@@ -94,6 +94,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Roland Rubix 44
 - [Roland ua55](docs/roland_ua_55/README.md)
 - [Roland V-Studio 100](https://github.com/mdias/rs_asio/issues/91)
+- [Solid State Logic SSL2+](https://github.com/mdias/rs_asio/issues/167)
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
 - [Steinberg UR22C](https://github.com/mdias/rs_asio/issues/124)
 - [Steinberg UR44C](https://github.com/mdias/rs_asio/issues/130)
