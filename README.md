@@ -70,6 +70,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Line6 POD Go](https://github.com/mdias/rs_asio/pull/171)
 - M-Audio 2x2
 - [M-Audio AIR 192|4](https://github.com/mdias/rs_asio/issues/98)
+- [M-Audio Fast Track 2](https://github.com/mdias/rs_asio/issues/175)
 - [M-Audio Fast Track Ultra 8R](https://github.com/mdias/rs_asio/issues/135)
 - M-Audio M-Track Plus II
 - [M-Audio MobilePre mkII](https://github.com/mdias/rs_asio/issues/15)
