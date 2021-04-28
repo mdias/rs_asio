@@ -89,6 +89,9 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	if (FAILED(IsFormatSupported(ShareMode, pFormat, nullptr)))
 		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 
+	if (m_AsioSharedHost.SetSamplerate(pFormat->nSamplesPerSec) != ASE_OK)
+		return E_FAIL;
+
 	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ " - host requested buffer duration: " << RefTimeToMilisecs(hnsBufferDuration) << "ms (" << std::dec << DurationToAudioFrames(hnsBufferDuration, pFormat->nSamplesPerSec) << " frames)" << std::endl;
 	rslog::info_ts() << m_AsioDevice.GetIdRef() << " " << (*pFormat);
 
@@ -113,10 +116,14 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 			return E_INVALIDARG;
 	}
 
-	if (!m_AsioSharedHost.ClampBufferSizeToLimits(bufferDurationFrames))
+	// clamp the buffer size to device limits if we're not using the preferred size from the driver
+	if (m_AsioDevice.GetConfig().bufferSizeMode != RSAsioDevice::BufferSizeMode_Driver)
 	{
-		rslog::error_ts() << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - Couldn't clamp buffer size to limits" << std::endl;
-		return E_FAIL;
+		if (!m_AsioSharedHost.ClampBufferSizeToLimits(bufferDurationFrames))
+		{
+			rslog::error_ts() << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - Couldn't clamp buffer size to limits" << std::endl;
+			return E_FAIL;
+		}
 	}
 
 	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ " - actual buffer duration: " << RefTimeToMilisecs(AudioFramesToDuration(bufferDurationFrames, pFormat->nSamplesPerSec)) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
@@ -472,10 +479,12 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 	std::lock_guard<std::mutex> g(m_bufferMutex, std::adopt_lock);
 
+	const bool isOutput = m_AsioDevice.GetConfig().isOutput;
+
 	if (!m_IsStarted)
 	{
 		memset(m_frontBuffer.data(), 0, m_frontBuffer.size());
-		if (!m_AsioDevice.GetConfig().isOutput)
+		if (!isOutput)
 		{
 			return;
 		}
@@ -488,8 +497,16 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	}
 
 	// sanity check
-	if (m_ChannelMap.size() < m_WaveFormat.Format.nChannels)
-		return;
+	if (isOutput)
+	{
+		if (m_ChannelMap.size() != m_AsioSharedHost.GetNumOutputChannels())
+			return;
+	}
+	else
+	{
+		if (m_ChannelMap.size() < m_WaveFormat.Format.nChannels)
+			return;
+	}
 
 	// get game sample type
 	ASIOSampleType gameSampleType = ASIOSTFloat32LSB;
@@ -503,7 +520,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	float fSoftwareVolumeScalar = 1.0f;
 	bool doSoftwareVolume = m_AsioDevice.GetSoftwareVolumeScalar(&fSoftwareVolumeScalar);
 	
-	if (m_AsioDevice.GetConfig().isOutput)
+	if (isOutput)
 	{
 		if (m_bufferHasUpdatedData)
 		{
@@ -513,24 +530,28 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 				AudioProcessing::DoSoftwareVolumeDsp(m_frontBuffer.data(), gameSampleType, totalSamples, fSoftwareVolumeScalar);
 			}
 
-			for (WORD ch = 0; ch < m_WaveFormat.Format.nChannels; ++ch)
+			for (int asioCh = 0; asioCh < m_ChannelMap.size(); ++asioCh)
 			{
-				const int asioCh = m_ChannelMap[ch];
-				if (asioCh >= 0)
+				const ASIOChannelInfo* asioChannelInfo = m_AsioSharedHost.GetOutputChannelInfo(asioCh);
+				ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetOutputBuffer(asioCh);
+				if (bufferInfo && asioChannelInfo)
 				{
-					const ASIOChannelInfo* asioChannelInfo = m_AsioSharedHost.GetOutputChannelInfo(asioCh);
-					ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetOutputBuffer(asioCh);
-					if (bufferInfo && asioChannelInfo)
+					const WORD asioSampleTypeSize = GetAsioSampleTypeNumBytes(asioChannelInfo->type);
+					const int srcCh = m_ChannelMap[asioCh];
+					if (asioSampleTypeSize)
 					{
-						const WORD asioSampleTypeSize = GetAsioSampleTypeNumBytes(asioChannelInfo->type);
-
-						if (asioSampleTypeSize)
+						if (srcCh >= 0)
 						{
 							AudioProcessing::CopyConvertFormat(
-								m_frontBuffer.data() + ch * gameSampleTypeSize, gameSampleType, m_WaveFormat.Format.nBlockAlign,
+								m_frontBuffer.data() + srcCh * gameSampleTypeSize, gameSampleType, m_WaveFormat.Format.nBlockAlign,
 								m_bufferNumFrames,
 								(BYTE*)bufferInfo->buffers[buffIdx], asioChannelInfo->type, asioSampleTypeSize
 							);
+						}
+						else
+						{
+							// output silence to unassigned channels
+							memset(bufferInfo->buffers[buffIdx], 0, asioSampleTypeSize * m_bufferNumFrames);
 						}
 					}
 				}
@@ -607,27 +628,50 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 void RSAsioAudioClient::UpdateChannelMap()
 {
+	const bool isOutput = m_AsioDevice.GetConfig().isOutput;
 	const WORD baseChannel = m_AsioDevice.GetConfig().baseAsioChannelNumber;
-	const WORD maxAsioChannel = m_AsioDevice.GetConfig().isOutput ? m_AsioSharedHost.GetNumOutputChannels() : m_AsioSharedHost.GetNumInputChannels();
+	const WORD altOutputBaseChannel = m_AsioDevice.GetConfig().altOutputBaseAsioChannelNumber.value_or((unsigned)baseChannel);
+	const WORD maxAsioChannel = isOutput ? m_AsioSharedHost.GetNumOutputChannels() : m_AsioSharedHost.GetNumInputChannels();
 
 	const WORD numRequestedChannels = m_AsioDevice.GetConfig().numAsioChannels;
 	const WORD numBufferChannels = m_WaveFormat.Format.nChannels;
 
-	m_ChannelMap.resize(numBufferChannels);
-	if (numRequestedChannels > 0)
+	m_ChannelMap.resize(isOutput ? maxAsioChannel : numBufferChannels);
+	for (auto& c : m_ChannelMap)
+		c = -1;
+
+	if (isOutput)
+	{
+		WORD i = baseChannel;
+		WORD srcChannel = 0;
+		while (i < m_ChannelMap.size() && srcChannel < numRequestedChannels)
+		{
+			m_ChannelMap[i] = srcChannel;
+			++srcChannel;
+			++i;
+		}
+
+		if (altOutputBaseChannel != baseChannel)
+		{
+			i = altOutputBaseChannel;
+			srcChannel = 0;
+			while (i < m_ChannelMap.size() && srcChannel < numRequestedChannels)
+			{
+				// don't overwrite primary base channel
+				if (m_ChannelMap[i] == -1)
+					m_ChannelMap[i] = srcChannel;
+				++srcChannel;
+				++i;
+			}
+		}
+	}
+	else
 	{
 		for (WORD i = 0; i < numBufferChannels; ++i)
 		{
 			const WORD wantedAsioBuffer = baseChannel + (i % numRequestedChannels);
 			if (wantedAsioBuffer < maxAsioChannel)
 				m_ChannelMap[i] = wantedAsioBuffer;
-			else
-				m_ChannelMap[i] = -1;
 		}
-	}
-	else
-	{
-		for (auto& c : m_ChannelMap)
-			c = -1;
 	}
 }

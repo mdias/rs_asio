@@ -27,6 +27,14 @@ AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPat
 	{
 		fnPtrDllGetClassObject fn = (fnPtrDllGetClassObject)GetProcAddress(m_Module, "DllGetClassObject");
 
+		if (!fn)
+		{
+			rslog::error_ts() << "Failed to GetProcAddress for DllGetClassObject() in ASIO driver "
+				<< m_AsioDllPath << std::endl << "\tBad ASIO driver?" << std::endl;
+				
+			return;
+		}
+
 		IClassFactory* pClassFactory = nullptr;
 
 		HRESULT hr = fn(clsid, __uuidof(IClassFactory), (void**)&pClassFactory);
@@ -153,6 +161,48 @@ bool AsioSharedHost::IsValid() const
 	return m_Driver != nullptr;
 }
 
+ASIOError AsioSharedHost::SetSamplerate(const DWORD rate)
+{
+	if (!IsValid())
+		return ASE_NotPresent;
+
+	// Switch ASIO sample rate if needed
+	ASIOSampleRate asioSampleRate;
+	if (m_Driver->getSampleRate(&asioSampleRate) != ASE_OK)
+	{
+		DisplayCurrentError();
+		return ASE_HWMalfunction;
+	}
+	if (std::lround(asioSampleRate) != rate)
+	{
+		if (m_IsSetup)
+		{
+			return ASE_HWMalfunction;
+		}
+		else
+		{
+			const ASIOSampleRate targetSampleRate = (ASIOSampleRate)rate;
+
+			rslog::info_ts() << std::dec << "  Switching sample rate from " << std::lround(asioSampleRate) << " to " << rate << "..." << std::endl;
+			if (m_Driver->setSampleRate(targetSampleRate) != ASE_OK)
+			{
+				DisplayCurrentError();
+				return ASE_HWMalfunction;
+			}
+			else
+			{
+				// save previously selected sample rate so that we can restore it later
+				m_SampleRateRestore = asioSampleRate;
+			}
+
+			rslog::info_ts() << " Waiting 5 seconds to give driver time to refresh" << std::endl;
+			Sleep(5000);
+		}
+	}
+
+	return ASE_OK;
+}
+
 ASIOError AsioSharedHost::Setup(const WAVEFORMATEX& format, const DWORD bufferDurationFrames)
 {
 	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
@@ -195,7 +245,7 @@ ASIOError AsioSharedHost::Setup(const WAVEFORMATEX& format, const DWORD bufferDu
 			}
 		}
 
-		// Switch ASIO sample rate if needed
+		// Ensure ASIO sample rate is correct
 		ASIOSampleRate asioSampleRate;
 		if (m_Driver->getSampleRate(&asioSampleRate) != ASE_OK)
 		{
@@ -204,12 +254,8 @@ ASIOError AsioSharedHost::Setup(const WAVEFORMATEX& format, const DWORD bufferDu
 		}
 		if (std::lround(asioSampleRate) != format.nSamplesPerSec)
 		{
-			rslog::info_ts() << std::dec << "  Switching sample rate from " << std::lround(asioSampleRate) << " to " << format.nSamplesPerSec << "..." << std::endl;
-			if (m_Driver->setSampleRate((ASIOSampleRate)format.nSamplesPerSec) != ASE_OK)
-			{
-				DisplayCurrentError();
-				return ASE_HWMalfunction;
-			}
+			rslog::error_ts() << std::dec << "  Current sample rate is " << std::lround(asioSampleRate) << " which is not the expected " << format.nSamplesPerSec << std::endl;
+			return ASE_InvalidMode;
 		}
 
 		// check if driver wants to be notified about output being ready
@@ -289,6 +335,17 @@ void AsioSharedHost::Reset()
 	m_AsioBuffers.clear();
 	memset(&m_CurrentWaveFormat, 0, sizeof(m_CurrentWaveFormat));
 
+	// restore sample rate
+	if (m_SampleRateRestore.has_value())
+	{
+		rslog::info_ts() << "Restoring previously set sample rate" << std::endl;
+		if (m_Driver->setSampleRate(m_SampleRateRestore.value()) != ASE_OK)
+		{
+			DisplayCurrentError();
+		}
+		m_SampleRateRestore.reset();
+	}
+
 	m_IsSetup = false;
 }
 
@@ -347,6 +404,12 @@ bool AsioSharedHost::GetPreferredBufferSize(DWORD& outBufferSizeFrames) const
 	if (!IsValid())
 		return false;
 
+	if (m_IsSetup)
+	{
+		outBufferSizeFrames = m_NumBufferFrames;
+		return true;
+	}
+
 	// get buffer info
 	long minAsioBufferFrames = 0;
 	long maxAsioBufferFrames = 0;
@@ -379,6 +442,11 @@ bool AsioSharedHost::ClampBufferSizeToLimits(DWORD& inOutBufferSizeFrames) const
 		return false;
 	}
 
+	if (minAsioBufferFrames < 0 || maxAsioBufferFrames < 0)
+	{
+		return false;
+	}
+
 	if (inOutBufferSizeFrames < (DWORD)minAsioBufferFrames)
 		inOutBufferSizeFrames = (DWORD)minAsioBufferFrames;
 	else if (inOutBufferSizeFrames > (DWORD)maxAsioBufferFrames)
@@ -399,7 +467,11 @@ bool AsioSharedHost::ClampBufferSizeToLimits(DWORD& inOutBufferSizeFrames) const
 		{
 			pow2size *= 2;
 		}
+
 		inOutBufferSizeFrames = pow2size;
+
+		if (inOutBufferSizeFrames > (DWORD)maxAsioBufferFrames)
+			inOutBufferSizeFrames = maxAsioBufferFrames;
 	}
 
 	return true;
@@ -718,6 +790,12 @@ void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, AS
 void __cdecl AsioSharedHost::AsioCalback_sampleRateDidChange(ASIOSampleRate sRate)
 {
 	rslog::info_ts() << __FUNCTION__ << std::endl;
+
+	if (m_IsSetup)
+	{
+		// forget about sample rate to restore; something else apparently changed the sample rate
+		m_SampleRateRestore.reset();
+	}
 }
 
 long __cdecl AsioSharedHost::AsioCalback_asioMessage(long selector, long value, void* message, double* opt)

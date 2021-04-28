@@ -32,6 +32,7 @@
 #include <algorithm>
 #include <functional>
 #include <mutex>
+#include <optional>
 #include "asio.h"
 #include "Utils.h"
 #include "Log.h"

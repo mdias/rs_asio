@@ -8,6 +8,6 @@ jobs:
     - name: Checkout current build target
       uses: actions/checkout@v2
     - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.0
+      uses: microsoft/setup-msbuild@v1.0.2
     - name: Build with MSBuild
       run: msbuild  '.\RS_ASIO.sln'

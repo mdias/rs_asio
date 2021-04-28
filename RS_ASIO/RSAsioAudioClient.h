@@ -77,6 +77,9 @@ private:
 
 	std::mutex m_bufferMutex;
 	DWORD m_bufferNumFrames;
+
+	// for output: for each asio output, which wasapi channel data to copy from
+	// for input: for each wasapi channel, which asio channel to read from
 	std::vector<int> m_ChannelMap;
 
 	// this is used for ... hacks

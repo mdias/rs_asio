@@ -159,12 +159,12 @@ static bool parseBoolString(const std::string& s, bool& out)
 	}
 
 	std::string sl = toLowerString(s);
-	if (sl == "true")
+	if (sl == "true" || sl == "yes")
 	{
 		out = true;
 		return true;
 	}
-	if (sl == "false")
+	if (sl == "false" || sl == "no")
 	{
 		out = false;
 		return true;
@@ -212,6 +212,7 @@ static void LoadConfigIni(RSConfig& out)
 		SectionAsioOut,
 		SectionAsioIn0,
 		SectionAsioIn1,
+		SectionAsioInMic,
 	} currentSection = SectionNone;
 
 	bool isOldWasapiCfgMode = true;
@@ -246,6 +247,8 @@ static void LoadConfigIni(RSConfig& out)
 					currentSection = SectionAsioIn0;
 				else if (sectionName == "asio.input.1")
 					currentSection = SectionAsioIn1;
+				else if (sectionName == "asio.input.mic")
+					currentSection = SectionAsioInMic;
 			}
 		}
 		else if (currentLine[0] == ';' || currentLine[0] == '#')
@@ -342,6 +345,21 @@ static void LoadConfigIni(RSConfig& out)
 							rslog::error_ts() << __FUNCTION__ << " - invalid value for channel, value should be an integer starting at zero. line: " << line << std::endl;
 						}
 					}
+					else if (key == "altbasechannel")
+					{
+						if (val.length() > 0)
+						{
+							int c = 0;
+							if (parseIntString(val, c) && c >= 0)
+							{
+								out.asioConfig.output.altBaseChannel = (unsigned)c;
+							}
+							else
+							{
+								rslog::error_ts() << __FUNCTION__ << " - invalid value for channel, value should be an integer starting at zero. line: " << line << std::endl;
+							}
+						}
+					}
 					else if (key == "enablesoftwareendpointvolumecontrol")
 					{
 						parseBoolString(val, out.asioConfig.output.enableSoftwareEndpointVolumeControl);
@@ -363,9 +381,12 @@ static void LoadConfigIni(RSConfig& out)
 						}
 					}
 				}
-				else if (currentSection == SectionAsioIn0 || currentSection == SectionAsioIn1)
+				else if (currentSection == SectionAsioIn0 || currentSection == SectionAsioIn1 || currentSection == SectionAsioInMic)
 				{
 					RSAsioInputConfig& asioInputConfig = out.asioConfig.inputs[currentSection - SectionAsioIn0];
+
+					if (currentSection == SectionAsioInMic)
+						asioInputConfig.microphone = true;
 
 					if (key == "driver")
 						asioInputConfig.asioDriverName = val;
