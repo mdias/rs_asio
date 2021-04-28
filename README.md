@@ -33,6 +33,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Asus Strix Soar](docs/asus_strix_soar/README.md)
 - [Audient Evo 4](docs/audient_evo_4/README.md)
 - Audient iD4
+- Audient iD22
 - [Behringer MIC2 USB](docs/behringer_mic2usb/README.md), using ASIO4All
 - Behringer U-Phoria UM2  [(see this for more details)](https://github.com/mdias/rs_asio/issues/7) **IMPORTANT: needs legacy ASIO driver**
 - Behringer UMC1820
