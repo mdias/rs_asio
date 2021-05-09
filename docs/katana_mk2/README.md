@@ -6,6 +6,7 @@
 [Config]
 ; use WasapiOutput if you want to use the Katana's speaker by feeding in the audio into the aux-in
 ; not needed when using headphones (or external speakers) via the rec/headphone out
+; To fix error where Rocksmith gets no signal try to turn the Katana On and Off, and make sure that the guitar is pluged in before you turn it on
 EnableWasapiOutputs=0
 EnableWasapiInputs=0
 EnableAsio=1
@@ -23,6 +24,9 @@ CustomBufferSize=
 ; via the speaker, so you need to use headphones/plug your speaker into the Katana's rec/headphone out
 ; if you want to use the Katana's speaker, you'd need to use a multi-device setup and feed the audio into
 ; the aux-in of the Katana
+; if you want to hear Rocksmith through your PC speakers change Driver to Driver=  (yes, empty) and set EnableWasapiOutputs=1 under Config at the top.
+; If you want to hear yourself through your speakers (using Rocksmith AMP) put Katana on stand-by mode
+; and if you want to hear yourself through your AMP using your AMP settings go to rocksmith mixer in-game and turn guitar 1 volume to 0 (so you won't hear it twice).
 [Asio.Output]
 Driver=KATANA
 BaseChannel=0
