@@ -45,6 +45,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Behringer XR18](https://github.com/mdias/rs_asio/issues/72)
 - BOSS GT-1
 - [BOSS Katana MkII](docs/katana_mk2/README.md)
+- [Creative Sound Blaster Z](https://github.com/mdias/rs_asio/issues/191)
 - ESI MAYA22 USB
 - [ESI MAYA44 eX](https://github.com/mdias/rs_asio/issues/134)
 - [Focusrite Clarett 2Pre Thunderbolt](https://github.com/mdias/rs_asio/issues/146)
