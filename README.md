@@ -92,6 +92,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
 - Presonus Quantum 2
 - Presonus Studio 24c
+- [Presonus StudioLive AR12c](https://github.com/mdias/rs_asio/issues/196)
 - RME Babyface PRO
 - RME Multiface with HDSPe PCIe
 - Roland Rubix 22
