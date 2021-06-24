@@ -109,6 +109,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Universal Audio Apollo Twin USB
 - [XTONE Smart Stomp](docs/xtone_smartstomp/README.md), using ASIO4All
 - [Yamaha AG06 USB Mixing Console](https://github.com/mdias/rs_asio/issues/81)
+- [Zoom H6](https://github.com/mdias/rs_asio/issues/198)
 - Zoom R24
 - [Zoom U-22](https://github.com/mdias/rs_asio/issues/179)
 - Zoom U-44
