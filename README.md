@@ -55,7 +55,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Focusrite Saffire Pro 40
 - Focusrite Scarlett 2i2 1st Gen [(Known issues)](#known-issues)
 - [Focusrite Scarlett 2i2 2nd Gen](https://github.com/mdias/rs_asio/issues/126) [(Known issues)](#known-issues)
-- Focusrite Scarlett 2i2 3rd Gen [(Known issues)](#known-issues)
+- [Focusrite Scarlett 2i2 3rd Gen](https://github.com/mdias/rs_asio/issues/208) [(Known issues)](#known-issues)
 - [Focusrite Scarlett 2i4 1st Gen](https://github.com/mdias/rs_asio/issues/133) [(Known issues)](#known-issues)
 - Focusrite Scarlett 2i4 2nd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 4i4 3rd Gen [(Known issues)](#known-issues)
@@ -77,6 +77,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [M-Audio Fast Track 2](https://github.com/mdias/rs_asio/issues/175)
 - [M-Audio Fast Track Ultra 8R](https://github.com/mdias/rs_asio/issues/135)
 - M-Audio M-Track Plus II
+- [M-Audio M-Track Solo](https://github.com/mdias/rs_asio/issues/207)
 - [M-Audio MobilePre mkII](https://github.com/mdias/rs_asio/issues/15)
 - Mackie Onyx Producer 2x2
 - [MIDIPLUS Studio S](docs/midiplus_studio_s/README.md)
