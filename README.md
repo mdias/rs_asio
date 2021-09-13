@@ -148,3 +148,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
 - Hardware hotplugging while the game is running won't be noticed by the game.
 - Game sometimes crash on exit with ASIO4ALL
+
+## Donating
+
+If you wish to donate to the developer of this project, you can do so through [paypal.me/mdiasdonations](https://paypal.me/mdiasdonations). However opening an issue to say "thanks" would be enough.
