@@ -80,7 +80,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [M-Audio M-Track Solo](https://github.com/mdias/rs_asio/issues/207)
 - [M-Audio MobilePre mkII](https://github.com/mdias/rs_asio/issues/15)
 - [M-Audio ProFire 2626](https://github.com/mdias/rs_asio/issues/212#issuecomment-917706302)
-- Mackie Onyx Producer 2x2
+- [Mackie Onyx Producer 2x2](https://github.com/mdias/rs_asio/issues/211)
 - [MIDIPLUS Studio S](docs/midiplus_studio_s/README.md)
 - MOTU 2408 mk3
 - [MOTU M2](https://github.com/mdias/rs_asio/issues/151)
