@@ -78,6 +78,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [M-Audio Fast Track Ultra 8R](https://github.com/mdias/rs_asio/issues/135)
 - M-Audio M-Track Plus II
 - [M-Audio M-Track Solo](https://github.com/mdias/rs_asio/issues/207)
+- [M-Audio M-Track Duo](https://github.com/mdias/rs_asio/issues/207)
 - [M-Audio MobilePre mkII](https://github.com/mdias/rs_asio/issues/15)
 - [M-Audio ProFire 2626](https://github.com/mdias/rs_asio/issues/212#issuecomment-917706302)
 - [Mackie Onyx Producer 2x2](https://github.com/mdias/rs_asio/issues/211)
