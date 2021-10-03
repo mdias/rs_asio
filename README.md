@@ -94,6 +94,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Native Instruments Komplete Audio 6
 - [Native Instruments Rig Kontrol 2](https://github.com/mdias/rs_asio/issues/214)
 - [NUX Mighty Plug](https://github.com/mdias/rs_asio/issues/117)
+- [PositiveGrid Spark 40](https://github.com/mdias/rs_asio/issues/218)
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
 - [Presonus AudioBox USB 96](https://github.com/mdias/rs_asio/issues/140)
 - Presonus Quantum 2
