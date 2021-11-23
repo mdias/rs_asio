@@ -1,0 +1,27 @@
+[Asio]
+; available buffer size modes:
+;    driver - respect buffer size setting set in the driver
+;    host   - use a buffer size as close as possible as that requested by the host application
+;    custom - use the buffer size specified in CustomBufferSize field
+BufferSizeMode=driver
+CustomBufferSize=48
+
+[Asio.Output]
+Driver=ASIO POD HD500X
+BaseChannel=0
+AltBaseChannel=
+EnableSoftwareEndpointVolumeControl=1
+EnableSoftwareMasterVolumeControl=1
+SoftwareMasterVolumePercent=100
+
+[Asio.Input.0]
+Driver=ASIO POD HD500X
+Channel=1
+EnableSoftwareEndpointVolumeControl=1
+EnableSoftwareMasterVolumeControl=1
+SoftwareMasterVolumePercent=100
+
+
+
+My line6 pod hd500x has been used normally!!!
+reminder! The display part is the default parameter!
