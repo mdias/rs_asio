@@ -74,7 +74,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Line6 AMPLIFi 75](https://github.com/mdias/rs_asio/issues/97) **Some limitations apply. Follow the link for more information.**
 - Line6 HX Stomp
 - [Line6 POD Go](https://github.com/mdias/rs_asio/pull/171)
-- [Line6 POD HD500X](docs/)
+- [Line6 POD HD500X](https://github.com/qxdwjsn/rs_asio/blob/691f9b17a5c4428c852a2064e16e056a6fa0b1fc/docs/Line6_POD_HD500X/Line6_POD_HD500X)
 - M-Audio 2x2
 - [M-Audio AIR 192|4](https://github.com/mdias/rs_asio/issues/98)
 - [M-Audio Fast Track 2](https://github.com/mdias/rs_asio/issues/175)
