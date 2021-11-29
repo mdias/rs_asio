@@ -110,6 +110,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Roland ua55](docs/roland_ua_55/README.md)
 - [Roland V-Studio 100](https://github.com/mdias/rs_asio/issues/91)
 - [Solid State Logic SSL2+](https://github.com/mdias/rs_asio/issues/167)
+- [SoundCraft Notepad-8FX](https://github.com/mdias/rs_asio/issues/86)
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
 - [Steinberg UR22C](https://github.com/mdias/rs_asio/issues/124)
 - [Steinberg UR44C](https://github.com/mdias/rs_asio/issues/130)
