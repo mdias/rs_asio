@@ -20,6 +20,17 @@ static const BYTE originalBytes_call_UnmarshalStreamComPointers[]{
 	0xe8, 0x33, 0xe0, 0xff, 0xff // call (to another uninteresting function)
 };
 
+static const uintptr_t location_TwoRealToneCablesMessageBox = 0x017b9518;
+
+static const BYTE originalBytes_TwoRealToneCablesMessageBox[]{
+	0x8b, 0xb5, 0x8c, 0xff, 0xff, 0xff // mov esi, dword ptr [ebp-0x74]
+};
+
+static const BYTE patchedBytes_TwoRealToneCablesMessageBox[]{
+	0xe9, 0x2f, 0x01, 0x00, 0x00, // jmp to 0x17b964c (skip over the message box)
+	0x90 // nop
+};
+
 static std::vector<void*> FindBytesOffsets(const BYTE* bytes, size_t numBytes)
 {
 	std::vector<void*> result;
@@ -54,6 +65,28 @@ static std::vector<void*> FindBytesOffsets(const BYTE* bytes, size_t numBytes)
 	}
 
 	return result;
+}
+
+/// <summary>
+/// Write x86 ASM (HEX) to static address.
+/// </summary>
+/// <param name="location"> - Pointer you want to edit</param>
+/// <param name="newAssembly"> - Edit you want to make</param>
+/// <param name="lengthOfAssembly"> - How long is the edit</param>
+/// <returns>Patch Completed</returns>
+static bool Patch_ReplaceAssembly(LPVOID location, LPVOID newAssembly, UINT lengthOfAssembly) {
+	DWORD dwOldProt, dwDummy;
+
+	if (!VirtualProtect(location, lengthOfAssembly, PAGE_EXECUTE_READWRITE, &dwOldProt)) {
+		return false;
+	}
+
+	memcpy(location, newAssembly, lengthOfAssembly);
+
+	FlushInstructionCache(GetCurrentProcess(), location, lengthOfAssembly);
+	VirtualProtect(location, lengthOfAssembly, dwOldProt, &dwDummy);
+
+	return true;
 }
 
 template<void* NewFn>
@@ -152,5 +185,7 @@ void PatchOriginalCode()
 		// patch PortAudio UnmarshalStreamComPointers
 		rslog::info_ts() << "Patching PortAudio UnmarshalStreamComPointers" << std::endl;
 		Patch_CallRelativeAddress<(void*)&Patched_PortAudio_UnmarshalStreamComPointers>(offsets_PaUnmarshalPointers);
+
+		Patch_ReplaceAssembly((LPVOID)location_TwoRealToneCablesMessageBox, (LPVOID)patchedBytes_TwoRealToneCablesMessageBox, sizeof(patchedBytes_TwoRealToneCablesMessageBox));
 	}
 }
