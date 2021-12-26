@@ -90,7 +90,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [MIDIPLUS Studio S](docs/midiplus_studio_s/README.md)
 - MOTU 2408 mk3
 - [MOTU M2](https://github.com/mdias/rs_asio/issues/151)
-- MOTU M4
+- [MOTU M4](https://github.com/mdias/rs_asio/issues/240)
 - MOTU UltraLite AVB
 - [MOTU Ultralite mk4](https://github.com/mdias/rs_asio/issues/95)
 - [Native Instruments Audio Kontrol 1](https://github.com/mdias/rs_asio/issues/131)
