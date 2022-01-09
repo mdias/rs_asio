@@ -49,7 +49,8 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [BOSS Katana MkII](docs/katana_mk2/README.md)
 - [Creative Sound Blaster Z](https://github.com/mdias/rs_asio/issues/191)
 - ESI MAYA22 USB
-- [ESI MAYA44 eX](https://github.com/mdias/rs_asio/issues/134)
+- [ESI MAYA44 eX](https://github.com/mdias/rs_asio/issues/134) [(Known issues)](#known-issues)
+- [ESI UGM96](https://github.com/mdias/rs_asio/issues/250) [(Known issues)](#known-issues)
 - [Focusrite Clarett 2Pre Thunderbolt](https://github.com/mdias/rs_asio/issues/146)
 - [Focusrite Clarett 4Pre USB](https://github.com/mdias/rs_asio/issues/42)
 - [Focusrite Clarett 8Pre USB](https://github.com/mdias/rs_asio/issues/158)
@@ -75,7 +76,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Juli@ XTe
 - Lexicon Alpha
 - [Line6 AMPLIFi 75](https://github.com/mdias/rs_asio/issues/97) **Some limitations apply. Follow the link for more information.**
-- Line6 HX Stomp
+- [Line6 HX Stomp](https://github.com/mdias/rs_asio/issues/251)
 - [Line6 POD Go](https://github.com/mdias/rs_asio/pull/171)
 - M-Audio 2x2
 - [M-Audio AIR 192|4](https://github.com/mdias/rs_asio/issues/98)
@@ -158,6 +159,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
+- Some ESI ASIO drivers appear to get stuck when quitting Rocksmith, requiring unplugging the USB and plugging it again to be playable again.
 - Hardware hotplugging while the game is running won't be noticed by the game.
 - Game sometimes crash on exit with ASIO4ALL
 
