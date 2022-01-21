@@ -16,8 +16,10 @@ EnableWasapiInputs=0
 EnableAsio=1
 
 [Asio]
-; use ["host"] or ["custom" + BufferSizeMode=144] - somehow that's what Rocksmith demands from my driver on Windows 11 and setting any other buffer results in no input (only output).
-; "driver" setting is useless, Focusrite ASIO panel does not allow to set a custom buffer size like "144".
+; use ["host"] or ["custom" + BufferSizeMode=144] - somehow that's what Rocksmith demands
+; from my driver on Windows 11 and setting any other buffer results in no input (only output).
+; "driver" setting is useless, Focusrite ASIO panel does not allow to set a custom buffer size like "144"
+; and no other buffer size works.
 BufferSizeMode=host
 CustomBufferSize=144
 
