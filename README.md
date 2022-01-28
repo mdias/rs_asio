@@ -43,7 +43,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Behringer UMC204](https://github.com/mdias/rs_asio/issues/156)
 - [Behringer UMC204HD](https://github.com/mdias/rs_asio/issues/161)
 - [Behringer UMC404HD](https://github.com/mdias/rs_asio/issues/13)
-- [Behringer XENIX Q502USB](https://github.com/mdias/rs_asio/issues/132)
+- [Behringer XENIX Q502USB](https://github.com/mdias/rs_asio/issues/132) **IMPORTANT: needs legacy ASIO driver**
 - [Behringer XR18](https://github.com/mdias/rs_asio/issues/72)
 - BOSS GT-1
 - [BOSS Katana MkII](docs/katana_mk2/README.md)
