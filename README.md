@@ -37,7 +37,6 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Behringer GUITAR 2 USB](https://github.com/mdias/rs_asio/issues/246), using ASIO4All
 - [Behringer MIC2 USB](docs/behringer_mic2usb/README.md), using ASIO4All
 - Behringer U-Phoria UM2  [(see this for more details)](https://github.com/mdias/rs_asio/issues/7) **IMPORTANT: needs legacy ASIO driver**
-- [Behringer U-Phoria UM22](https://github.com/mdias/rs_asio/issues/165#issuecomment-984840411) **IMPORTANT: needs legacy ASIO driver**
 - Behringer UMC1820
 - Behringer UMC202HD
 - [Behringer UMC204](https://github.com/mdias/rs_asio/issues/156)
