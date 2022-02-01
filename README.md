@@ -47,6 +47,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - BOSS GT-1
 - [BOSS Katana MkII](docs/katana_mk2/README.md)
 - [Creative Sound Blaster Z](https://github.com/mdias/rs_asio/issues/191)
+- [Darkglass Element](https://github.com/mdias/rs_asio/issues/258)
 - ESI MAYA22 USB
 - [ESI MAYA44 eX](https://github.com/mdias/rs_asio/issues/134) [(Known issues)](#known-issues)
 - [ESI UGM96](https://github.com/mdias/rs_asio/issues/250) [(Known issues)](#known-issues)
