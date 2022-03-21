@@ -123,6 +123,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Steinberg UR44C](https://github.com/mdias/rs_asio/issues/130)
 - [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - [SuZhou UTECK's Guitar-Cube Chord A](https://github.com/mdias/rs_asio/issues/92)
+- [TASCAM US-1x2](https://github.com/mdias/rs_asio/issues/266)
 - Universal Audio Apollo Twin USB
 - [XTONE Smart Stomp](docs/xtone_smartstomp/README.md), using ASIO4All
 - [Yamaha AG06 USB Mixing Console](https://github.com/mdias/rs_asio/issues/81)
