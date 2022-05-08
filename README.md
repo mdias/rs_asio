@@ -10,6 +10,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
 - Look into [basic configuration guide](#basic-configuration-guide)
 - Make sure Rocksmith.ini is set to run with `ExclusiveMode=1` and `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
+- Make sure your game is set to use the RTC input instead of the microphone one.
 - Make sure your interface clock is set to 48kHz. RS ASIO will try to request 48kHz mode, but your drivers may or may not allow this, so it might help setting it manually.
 - Extra: An RS_ASIO-log.txt file is generated inside the game directory which may help discover your ASIO driver name and diagnose issues.
 - Look into [list of knows issues](#known-issues) if you experience any problems
