@@ -34,24 +34,38 @@ static void AddWasapiDevices(RSAggregatorDeviceEnum& rsEnum, bool enableOutputs,
 	}
 }
 
-static void AddAsioDevices(RSAggregatorDeviceEnum& rsEnum)
+static void AddAsioDevices(RSAggregatorDeviceEnum& rsEnum, bool enableOutputs, bool enableInputs)
 {
 	auto asioEnum = new RSAsioDeviceEnum();
 	asioEnum->SetConfig(GetConfig().asioConfig);
 
-	rsEnum.AddDeviceEnumerator(asioEnum, true, true);
+	rsEnum.AddDeviceEnumerator(asioEnum, enableOutputs, enableInputs);
 	asioEnum->Release();
 }
 
 void SetupDeviceEnumerator(RSAggregatorDeviceEnum& rsEnum)
 {
-	const RSConfig& config = GetConfig();
+	RSConfig& config = GetConfig();
 
-	if (config.enableAsio)
+	if (!config.enableWasapiOutputs.has_value())
 	{
-		AddAsioDevices(rsEnum);
+		HWND gameWindow = FindWindowA("Rocksmith 2014", "Rocksmith 2014");
+		if (IDYES == MessageBoxA(gameWindow, "Use WASAPI output only?", "RS ASIO", MB_YESNO | MB_ICONQUESTION | MB_SYSTEMMODAL | MB_SETFOREGROUND))
+		{
+			config.enableWasapiOutputs = true;
+			config.enableAsioOutput = false;
+		}
+		else
+		{
+			config.enableWasapiOutputs = false;
+		}
 	}
-	AddWasapiDevices(rsEnum, config.enableWasapiOutputs, config.enableWasapiInputs);
+
+	if (config.enableAsioOutput || config.enableAsioInputs)
+	{
+		AddAsioDevices(rsEnum, config.enableAsioOutput, config.enableAsioInputs);
+	}
+	AddWasapiDevices(rsEnum, config.enableWasapiOutputs.value_or(false), config.enableWasapiInputs);
 }
 
 static const std::wstring& GetConfigFilePath()
@@ -275,7 +289,19 @@ static void LoadConfigIni(RSConfig& out)
 					if (key == "enablewasapioutputs")
 					{
 						isOldWasapiCfgMode = false;
-						parseBoolString(val, out.enableWasapiOutputs);
+						bool v = false;
+						if (parseBoolString(val, v))
+						{
+							out.enableWasapiOutputs = v;
+						}
+						else
+						{
+							int i = 0;
+							if (parseIntString(val, i) && i < 0)
+							{
+								out.enableWasapiOutputs.reset();
+							}
+						}
 					}
 					else if (key == "enablewasapiinputs")
 					{
@@ -292,7 +318,11 @@ static void LoadConfigIni(RSConfig& out)
 						}
 					}
 					else if (key == "enableasio")
-						parseBoolString(val, out.enableAsio);
+					{
+						parseBoolString(val, out.enableAsioOutput);
+						out.enableAsioInputs = out.enableAsioOutput;
+
+					}
 				}
 				else if (currentSection == SectionAsio)
 				{

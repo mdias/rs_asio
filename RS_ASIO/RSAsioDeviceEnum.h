@@ -3,6 +3,8 @@
 #include "RSBaseDeviceEnum.h"
 #include "RSAsioDevice.h"
 
+#include <optional>
+
 struct RSAsioOutputConfig
 {
 	std::string asioDriverName;
@@ -34,9 +36,10 @@ struct RSAsioConfig
 
 struct RSConfig
 {
-	bool enableWasapiOutputs = false;
+	std::optional<bool> enableWasapiOutputs = false;
 	bool enableWasapiInputs = false;
-	bool enableAsio = false;
+	bool enableAsioOutput = false;
+	bool enableAsioInputs = false;
 	RSAsioConfig asioConfig;
 };
 
