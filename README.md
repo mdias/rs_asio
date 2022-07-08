@@ -116,6 +116,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - RME Multiface with HDSPe PCIe
 - Roland Rubix 22
 - Roland Rubix 44
+- [Roland UA-1G](https://github.com/mdias/rs_asio/issues/291#issuecomment-1179084242)
 - [Roland ua55](docs/roland_ua_55/README.md)
 - [Roland V-Studio 100](https://github.com/mdias/rs_asio/issues/91)
 - [Solid State Logic SSL2+](https://github.com/mdias/rs_asio/issues/167)
