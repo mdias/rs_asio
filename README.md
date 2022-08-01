@@ -30,6 +30,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 ## Audio Interfaces reported to work well
 
 - [Alesis Core 1](https://github.com/mdias/rs_asio/issues/115)
+- [Antelope Audio Zen Tour](https://github.com/mdias/rs_asio/issues/294)
 - [Arturia AudioFuse](https://github.com/mdias/rs_asio/issues/114)
 - [Arturia MiniFuse 1](https://github.com/mdias/rs_asio/issues/287)
 - [Arturia MiniFuse 2](https://github.com/mdias/rs_asio/issues/282)
@@ -105,6 +106,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Native Instruments Komplete Audio 2](https://github.com/mdias/rs_asio/issues/120)
 - Native Instruments Komplete Audio 6
 - [Native Instruments Rig Kontrol 2](https://github.com/mdias/rs_asio/issues/214)
+- [Neural DSP Quad Cortex](https://github.com/mdias/rs_asio/issues/294)
 - [NUX Mighty Plug](https://github.com/mdias/rs_asio/issues/117)
 - [PositiveGrid Spark 40](https://github.com/mdias/rs_asio/issues/218)
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
