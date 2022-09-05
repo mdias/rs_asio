@@ -530,7 +530,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 				AudioProcessing::DoSoftwareVolumeDsp(m_frontBuffer.data(), gameSampleType, totalSamples, fSoftwareVolumeScalar);
 			}
 
-			for (int asioCh = 0; asioCh < m_ChannelMap.size(); ++asioCh)
+			for (DWORD asioCh = 0; asioCh < m_ChannelMap.size(); ++asioCh)
 			{
 				const ASIOChannelInfo* asioChannelInfo = m_AsioSharedHost.GetOutputChannelInfo(asioCh);
 				ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetOutputBuffer(asioCh);
