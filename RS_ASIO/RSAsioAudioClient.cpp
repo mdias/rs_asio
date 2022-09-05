@@ -14,7 +14,7 @@ RSAsioAudioClient::RSAsioAudioClient(RSAsioDevice& asioDevice)
 	m_AsioSharedHost.AddRef();
 
 	m_MyUnknown = new MyUnknown();
-	m_MyUnknown->RefCountHackEnabled = m_AsioSharedHost.GetIsAsio4All();
+	m_MyUnknown->RefCountHackEnabled = asioDevice.GetConfig().enableRefCountHack.value_or(m_AsioSharedHost.GetIsAsio4All());
 
 	memset(&m_WaveFormat, 0, sizeof(m_WaveFormat));
 }

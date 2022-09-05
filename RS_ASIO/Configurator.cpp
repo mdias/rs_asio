@@ -321,7 +321,6 @@ static void LoadConfigIni(RSConfig& out)
 					{
 						parseBoolString(val, out.enableAsioOutput);
 						out.enableAsioInputs = out.enableAsioOutput;
-
 					}
 				}
 				else if (currentSection == SectionAsio)
@@ -410,6 +409,14 @@ static void LoadConfigIni(RSConfig& out)
 							rslog::error_ts() << __FUNCTION__ << " - invalid value for softwareMasterVolumePercent, value should be an integer between 0 and 1000. line: " << line << std::endl;
 						}
 					}
+					else if (key == "enablerefcounthack")
+					{
+						bool v = false;
+						if (parseBoolString(val, v))
+						{
+							out.asioConfig.output.enableRefCountHack = v;
+						}
+					}
 				}
 				else if (currentSection == SectionAsioIn0 || currentSection == SectionAsioIn1 || currentSection == SectionAsioInMic)
 				{
@@ -450,6 +457,14 @@ static void LoadConfigIni(RSConfig& out)
 						else
 						{
 							rslog::error_ts() << __FUNCTION__ << " - invalid value for softwareMasterVolumePercent, value should be an integer between 0 and 1000. line: " << line << std::endl;
+						}
+					}
+					else if (key == "enablerefcounthack")
+					{
+						bool v = false;
+						if (parseBoolString(val, v))
+						{
+							asioInputConfig.enableRefCountHack = v;
 						}
 					}
 				}

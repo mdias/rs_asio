@@ -14,6 +14,7 @@ struct RSAsioOutputConfig
 	bool enableSoftwareEndpointVolumeControl = true;
 	bool enableSoftwareMasterVolumeControl = true;
 	int softwareMasterVolumePercent = 100;
+	std::optional<bool> enableRefCountHack;
 };
 
 struct RSAsioInputConfig
@@ -24,6 +25,7 @@ struct RSAsioInputConfig
 	bool enableSoftwareMasterVolumeControl = true;
 	int softwareMasterVolumePercent = 100;
 	bool microphone = false;
+	std::optional<bool> enableRefCountHack;
 };
 
 struct RSAsioConfig

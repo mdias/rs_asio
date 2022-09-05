@@ -19,7 +19,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		DisableThreadLibraryCalls(hModule);
 
 		rslog::InitLog();
-		rslog::info_ts() << " - Wrapper DLL loaded (v0.5.8)" << std::endl;
+		rslog::info_ts() << " - Wrapper DLL loaded (v0.5.9)" << std::endl;
 		PatchOriginalCode();
 		break;
 	case DLL_PROCESS_DETACH:
@@ -167,6 +167,23 @@ HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* s)
 		UnmarshalSubStreamComPointers(&stream->out);
 		stream->renderClient = stream->renderClientStream;
 		stream->renderClientStream = nullptr;
+
+		// HACK: this works around the game not calling release on this. could be a bug?
+		// this avoids a crash in asio4all, but introduces other possible random crashes
+		if (stream->out.clientProc)
+		{
+			MyUnknown* myUnknown = nullptr;
+			stream->out.clientProc->QueryInterface(IID_IMyUnknown, (void**)&myUnknown);
+			if (myUnknown)
+			{
+				if (myUnknown->RefCountHackEnabled)
+				{
+					rslog::info_ts() << "  using ref count hack" << std::endl;
+					stream->out.clientProc->Release();
+				}
+				myUnknown->Release();
+			}
+		}
 	}
 
 	return S_OK;
