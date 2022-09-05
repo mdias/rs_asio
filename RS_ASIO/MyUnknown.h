@@ -8,5 +8,5 @@ DEFINE_GUID(IID_IMyUnknown , 0xf2d67f48, 0x1977, 0x4991, 0xa3, 0xfc, 0xa0, 0x93,
 class __declspec(uuid("F2D67F48-1977-4991-A3FC-A093835A7DC2")) MyUnknown : public ComBaseUnknown<IUnknown>
 {
 public:
-	bool IsAsio4All = false;
+	bool RefCountHackEnabled = false;
 };
