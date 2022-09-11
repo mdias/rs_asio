@@ -46,15 +46,14 @@ static const BYTE originalBytes_call_UnmarshalStreamComPointers[]{
 	0xe8, 0x71, 0xe3, 0xff, 0xff // call (to another uninteresting function)
 };
 
-static const uintptr_t location_TwoRealToneCablesMessageBox = 0x017b9518;
-
 static const BYTE originalBytes_TwoRealToneCablesMessageBox[]{
-	0x8b, 0xb5, 0x8c, 0xff, 0xff, 0xff // mov esi, dword ptr [ebp-0x74]
-};
-
-static const BYTE patchedBytes_TwoRealToneCablesMessageBox[]{
-	0xe9, 0x2f, 0x01, 0x00, 0x00, // jmp to 0x17b964c (skip over the message box)
-	0x90 // nop
+//	0x8b, 0x75, 0x8c, // mov esi, ....
+	0xe8, 0x7c, 0x22, 0xe2, 0xff, // call
+	0x84, 0xc0, // test al, al
+	0x74, 0x6b, // jz ...
+	0xba, 0x34, 0xfe, 0x1c, 0x01, // mov edx, offset "TooManyGuitarInputs"
+	0x8d, 0xb3, 0x4c, 0x01, 0x00, 0x00, // lea esi, [ebx+0x14C]
+	0xe8, 0xd8, 0xd8, 0xc4, 0xff // call
 };
 
 static std::vector<void*> FindBytesOffsets(const BYTE* bytes, size_t numBytes)
@@ -93,26 +92,26 @@ static std::vector<void*> FindBytesOffsets(const BYTE* bytes, size_t numBytes)
 	return result;
 }
 
-/// <summary>
-/// Write x86 ASM (HEX) to static address.
-/// </summary>
-/// <param name="location"> - Pointer you want to edit</param>
-/// <param name="newAssembly"> - Edit you want to make</param>
-/// <param name="lengthOfAssembly"> - How long is the edit</param>
-/// <returns>Patch Completed</returns>
-static bool Patch_ReplaceAssembly(LPVOID location, LPVOID newAssembly, UINT lengthOfAssembly) {
-	DWORD dwOldProt, dwDummy;
-
-	if (!VirtualProtect(location, lengthOfAssembly, PAGE_EXECUTE_READWRITE, &dwOldProt)) {
-		return false;
+static void Patch_ReplaceWithNops(void* offset, size_t numBytes)
+{
+	DWORD oldProtectFlags = 0;
+	if (!VirtualProtect(offset, numBytes, PAGE_WRITECOPY, &oldProtectFlags))
+	{
+		rslog::error_ts() << "Failed to change memory protection" << std::endl;
 	}
+	else
+	{
+		BYTE* byte = (BYTE*)offset;
+		for (size_t i = 0; i < numBytes; ++i)
+		{
+			byte[i] = 0x90; // nop
+		}
 
-	memcpy(location, newAssembly, lengthOfAssembly);
-
-	FlushInstructionCache(GetCurrentProcess(), location, lengthOfAssembly);
-	VirtualProtect(location, lengthOfAssembly, dwOldProt, &dwDummy);
-
-	return true;
+		if (!VirtualProtect(offset, numBytes, oldProtectFlags, &oldProtectFlags))
+		{
+			rslog::error_ts() << "Failed to restore memory protection" << std::endl;
+		}
+	}
 }
 
 template<void* NewFn>
@@ -211,6 +210,8 @@ void PatchOriginalCode()
 	std::vector<void*> offsets_PaMarshalPointers = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));
 	std::vector<void*> offsets_PaUnmarshalPointers = FindBytesOffsets(originalBytes_call_UnmarshalStreamComPointers, sizeof(originalBytes_call_UnmarshalStreamComPointers));
 
+	std::vector<void*> offsets_TwoRealToneCablesMessageBox = FindBytesOffsets(originalBytes_TwoRealToneCablesMessageBox, sizeof(originalBytes_TwoRealToneCablesMessageBox));
+
 	if (offsets_CoCreateInstanceAbs.size() == 0 && offsets_PaMarshalPointers.size() == 0 && offsets_PaUnmarshalPointers.size() == 0)
 	{
 		rslog::error_ts() << "No valid locations for patching were found. Make sure you're trying this on the right game version." << std::endl;
@@ -230,6 +231,12 @@ void PatchOriginalCode()
 		rslog::info_ts() << "Patching PortAudio UnmarshalStreamComPointers" << std::endl;
 		Patch_CallRelativeAddress<(void*)&Patched_PortAudio_UnmarshalStreamComPointers>(offsets_PaUnmarshalPointers);
 
-		//Patch_ReplaceAssembly((LPVOID)location_TwoRealToneCablesMessageBox, (LPVOID)patchedBytes_TwoRealToneCablesMessageBox, sizeof(patchedBytes_TwoRealToneCablesMessageBox));
+		// patch two guitar cables connected message in single-player
+		rslog::info_ts() << "Patching Two Guitar Tones Connected Message Box (num locations: " << offsets_TwoRealToneCablesMessageBox.size() << ")" << std::endl;
+		for (void* offset : offsets_TwoRealToneCablesMessageBox)
+		{
+			rslog::info_ts() << "Patching bytes at " << offset << std::endl;
+			Patch_ReplaceWithNops(offset, sizeof(originalBytes_TwoRealToneCablesMessageBox));
+		}
 	}
 }
