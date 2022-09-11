@@ -139,7 +139,7 @@ static void Patch_CallRelativeAddress(const std::vector<void*>& offsets)
 		bytes += 5 + relOffset;
 
 		DWORD oldProtectFlags = 0;
-		if (!VirtualProtect(offset, 6, PAGE_WRITECOPY, &oldProtectFlags))
+		if (!VirtualProtect(bytes, 6, PAGE_WRITECOPY, &oldProtectFlags))
 		{
 			rslog::error_ts() << "Failed to change memory protection" << std::endl;
 		}
@@ -151,7 +151,7 @@ static void Patch_CallRelativeAddress(const std::vector<void*>& offsets)
 			void** callAddress = (void**)(bytes + 2);
 			*callAddress = fnAddressIndirect;
 
-			if (!VirtualProtect(offset, 6, oldProtectFlags, &oldProtectFlags))
+			if (!VirtualProtect(bytes, 6, oldProtectFlags, &oldProtectFlags))
 			{
 				rslog::error_ts() << "Failed to restore memory protection" << std::endl;
 			}
