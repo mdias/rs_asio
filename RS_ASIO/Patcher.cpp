@@ -4,20 +4,46 @@
 typedef HRESULT(STDAPICALLTYPE *CoCreateInstancePtr)(REFCLSID rclsid, IUnknown *pUnkOuter, DWORD dwClsContext, REFIID riid, void **ppOut);
 
 static const BYTE originalBytes_call_CoCreateInstance[]{
-	0xff, 0x15, 0x34, 0x87, 0x18, 0x02,
-	0x85, 0xc0
+	0xe8, 0x3e, 0x9d, 0x7d, 0x00, // call relative
+	0xcd, // ?
+	0x85, 0xc0 // test eax, eax
 };
 
+static const BYTE originalBytes_call_CoCreateInstance2[]{
+	0xe8, 0xc2, 0x23, 0x57, 0x00, // call relative
+	0x96, // xchg eax, esi
+	0x85, 0xc0 // test eax, eax
+};
+
+static const BYTE originalBytes_call_CoCreateInstance3[]{
+	0xe8, 0x4d, 0xfa, 0x5a, 0x00, // call relative
+	0x85, 0xc0, // test eax, eax
+	0x75, 0x74 // jnz short ..
+};
+
+static const BYTE originalBytes_call_CoCreateInstance4[]{
+	0xe8, 0x31, 0xdd, 0x4a, 0x00, // call relative
+	0x85, 0xc0, // test eax, eax
+	0x79, 0x0c // jns short ..
+};
+
+static const BYTE originalBytes_call_CoCreateInstance5[]{
+	0xe8, 0x79, 0x7a, 0x4a, 0x00, // call relative
+	0x85, 0xc0, // test eax, eax
+	0x78, 0x33 // js short ..
+};
+
+
 static const BYTE originalBytes_call_PortAudio_MarshalStreamComPointers[]{
-	0xe8, 0x9e, 0xe1, 0xff, 0xff, // call
+	0xe8, 0xdc, 0xe4, 0xff, 0xff, // call
 	0x83, 0xc4, 0x04, // add esp, 4
 	0x85, 0xc0 // test eax, eax
 };
 
 static const BYTE originalBytes_call_UnmarshalStreamComPointers[]{
-	0xe8, 0x59, 0xdf, 0xff, 0xff, // call
+	0xe8, 0x97, 0xe2, 0xff, 0xff, // call
 	0x57, // push edi
-	0xe8, 0x33, 0xe0, 0xff, 0xff // call (to another uninteresting function)
+	0xe8, 0x71, 0xe3, 0xff, 0xff // call (to another uninteresting function)
 };
 
 static const uintptr_t location_TwoRealToneCablesMessageBox = 0x017b9518;
@@ -110,6 +136,9 @@ static void Patch_CallAbsoluteAddress(const std::vector<void*>& offsets)
 		}
 		else
 		{
+			bytes[0] = 0xff;
+			bytes[1] = 0x15;
+
 			void** callAddress = (void**)(bytes + 2);
 			*callAddress = fnAddressIndirect;
 
@@ -159,16 +188,30 @@ static void Patch_CallRelativeAddress(const std::vector<void*>& offsets)
 	}
 }
 
+template<typename T>
+void vector_append(std::vector<T>& inOut, const std::vector<T>& source)
+{
+	for (auto& it : source)
+	{
+		inOut.push_back(it);
+	}
+}
 
 void PatchOriginalCode()
 {
 	rslog::info_ts() << __FUNCTION__ << std::endl;
 
-	std::vector<void*> offsets_CoCreateInstance = FindBytesOffsets(originalBytes_call_CoCreateInstance, sizeof(originalBytes_call_CoCreateInstance));
+	std::vector<void*> offsets_CoCreateInstanceAbs = FindBytesOffsets(originalBytes_call_CoCreateInstance, sizeof(originalBytes_call_CoCreateInstance));
+	vector_append(offsets_CoCreateInstanceAbs, FindBytesOffsets(originalBytes_call_CoCreateInstance2, sizeof(originalBytes_call_CoCreateInstance2)));
+
+	std::vector<void*> offsets_CoCreateInstanceRel = FindBytesOffsets(originalBytes_call_CoCreateInstance3, sizeof(originalBytes_call_CoCreateInstance3));
+	vector_append(offsets_CoCreateInstanceRel, FindBytesOffsets(originalBytes_call_CoCreateInstance4, sizeof(originalBytes_call_CoCreateInstance4)));
+	vector_append(offsets_CoCreateInstanceRel, FindBytesOffsets(originalBytes_call_CoCreateInstance5, sizeof(originalBytes_call_CoCreateInstance5)));
+
 	std::vector<void*> offsets_PaMarshalPointers = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));
 	std::vector<void*> offsets_PaUnmarshalPointers = FindBytesOffsets(originalBytes_call_UnmarshalStreamComPointers, sizeof(originalBytes_call_UnmarshalStreamComPointers));
 
-	if (offsets_CoCreateInstance.size() == 0 && offsets_PaMarshalPointers.size() == 0 && offsets_PaUnmarshalPointers.size() == 0)
+	if (offsets_CoCreateInstanceAbs.size() == 0 && offsets_PaMarshalPointers.size() == 0 && offsets_PaUnmarshalPointers.size() == 0)
 	{
 		rslog::error_ts() << "No valid locations for patching were found. Make sure you're trying this on the right game version." << std::endl;
 	}
@@ -176,7 +219,8 @@ void PatchOriginalCode()
 	{
 		// patch CoCreateInstance calls
 		rslog::info_ts() << "Patching CoCreateInstance" << std::endl;
-		Patch_CallAbsoluteAddress<(void*)&Patched_CoCreateInstance>(offsets_CoCreateInstance);
+		Patch_CallAbsoluteAddress<(void*)&Patched_CoCreateInstance>(offsets_CoCreateInstanceAbs);
+		Patch_CallRelativeAddress<(void*)&Patched_CoCreateInstance>(offsets_CoCreateInstanceRel);
 
 		// patch PortAudio MarshalStreamComPointers
 		rslog::info_ts() << "Patching PortAudio MarshalStreamComPointers" << std::endl;
@@ -186,6 +230,6 @@ void PatchOriginalCode()
 		rslog::info_ts() << "Patching PortAudio UnmarshalStreamComPointers" << std::endl;
 		Patch_CallRelativeAddress<(void*)&Patched_PortAudio_UnmarshalStreamComPointers>(offsets_PaUnmarshalPointers);
 
-		Patch_ReplaceAssembly((LPVOID)location_TwoRealToneCablesMessageBox, (LPVOID)patchedBytes_TwoRealToneCablesMessageBox, sizeof(patchedBytes_TwoRealToneCablesMessageBox));
+		//Patch_ReplaceAssembly((LPVOID)location_TwoRealToneCablesMessageBox, (LPVOID)patchedBytes_TwoRealToneCablesMessageBox, sizeof(patchedBytes_TwoRealToneCablesMessageBox));
 	}
 }
