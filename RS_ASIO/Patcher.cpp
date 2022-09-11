@@ -107,6 +107,7 @@ static void Patch_ReplaceWithNops(void* offset, size_t numBytes)
 			byte[i] = 0x90; // nop
 		}
 
+		FlushInstructionCache(GetCurrentProcess(), offset, numBytes);
 		if (!VirtualProtect(offset, numBytes, oldProtectFlags, &oldProtectFlags))
 		{
 			rslog::error_ts() << "Failed to restore memory protection" << std::endl;
@@ -141,6 +142,7 @@ static void Patch_CallAbsoluteAddress(const std::vector<void*>& offsets)
 			void** callAddress = (void**)(bytes + 2);
 			*callAddress = fnAddressIndirect;
 
+			FlushInstructionCache(GetCurrentProcess(), offset, 6);
 			if (!VirtualProtect(offset, 6, oldProtectFlags, &oldProtectFlags))
 			{
 				rslog::error_ts() << "Failed to restore memory protection" << std::endl;
@@ -179,6 +181,7 @@ static void Patch_CallRelativeAddress(const std::vector<void*>& offsets)
 			void** callAddress = (void**)(bytes + 2);
 			*callAddress = fnAddressIndirect;
 
+			FlushInstructionCache(GetCurrentProcess(), bytes, 6);
 			if (!VirtualProtect(bytes, 6, oldProtectFlags, &oldProtectFlags))
 			{
 				rslog::error_ts() << "Failed to restore memory protection" << std::endl;
