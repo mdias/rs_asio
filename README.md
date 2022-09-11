@@ -3,6 +3,11 @@
 This project aims to add ASIO support to `Rocksmith 2014 Edition - Remastered` in order to avoid issues with some WASAPI drivers.
 It patches game code at runtime to allow intervening in the process of WASAPI device enumeration so that we can inject our own fake WASAPI devices which internally use ASIO audio API.
 
+# ATTENTION !!!
+
+As of the 10th of September 2022 there has been a patch to `Rocksmith 2014 Edition - Remastered` that broke compatibility with RS ASIO.
+Please check [this reddit thread](https://www.reddit.com/r/rocksmith/comments/xa49mq/important_update_coming_to_rocksmith_2014/) for more information and a temporary workaround.
+
 ## How to use
 
 - Copy the contents (`avrt.dll`, `RS_ASIO.dll`, `RS_ASIO.ini`) of [latest release](https://github.com/mdias/rs_asio/releases/latest) (zip archive release-xxx.zip) to the game folder.
