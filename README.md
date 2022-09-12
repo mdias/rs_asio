@@ -114,6 +114,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Presonus Quantum 2
 - [Presonus Studio 24c](https://github.com/mdias/rs_asio/issues/280)
 - [Presonus StudioLive AR12c](https://github.com/mdias/rs_asio/issues/196)
+- ReaRoute ASIO (Reaper virtual ASIO router)
 - RME Babyface PRO
 - RME Multiface with HDSPe PCIe
 - Roland Rubix 22
@@ -130,6 +131,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Steinberg UR44C](https://github.com/mdias/rs_asio/issues/130)
 - [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - [SuZhou UTECK's Guitar-Cube Chord A](https://github.com/mdias/rs_asio/issues/92)
+- Swissonic UA-2x2
 - [TASCAM US-1x2](https://github.com/mdias/rs_asio/issues/266)
 - [Universal Audio Apollo Twin USB](https://github.com/mdias/rs_asio/issues/307) (requires older driver)
 - [Universal Audio Volt 1](docs/universal_audio_volt1/README.md)
