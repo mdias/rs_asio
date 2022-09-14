@@ -15,6 +15,8 @@ static const BYTE originalBytes_call_CoCreateInstance2[]{
 	0x85, 0xc0 // test eax, eax
 };
 
+// these are unused for now
+/*
 static const BYTE originalBytes_call_CoCreateInstance3[]{
 	0xe8, 0x4d, 0xfa, 0x5a, 0x00, // call relative
 	0x85, 0xc0, // test eax, eax
@@ -32,6 +34,7 @@ static const BYTE originalBytes_call_CoCreateInstance5[]{
 	0x85, 0xc0, // test eax, eax
 	0x78, 0x33 // js short ..
 };
+*/
 
 
 static const BYTE originalBytes_call_PortAudio_MarshalStreamComPointers[]{
@@ -206,9 +209,11 @@ void PatchOriginalCode()
 	std::vector<void*> offsets_CoCreateInstanceAbs = FindBytesOffsets(originalBytes_call_CoCreateInstance, sizeof(originalBytes_call_CoCreateInstance));
 	vector_append(offsets_CoCreateInstanceAbs, FindBytesOffsets(originalBytes_call_CoCreateInstance2, sizeof(originalBytes_call_CoCreateInstance2)));
 
-	std::vector<void*> offsets_CoCreateInstanceRel = FindBytesOffsets(originalBytes_call_CoCreateInstance3, sizeof(originalBytes_call_CoCreateInstance3));
-	vector_append(offsets_CoCreateInstanceRel, FindBytesOffsets(originalBytes_call_CoCreateInstance4, sizeof(originalBytes_call_CoCreateInstance4)));
-	vector_append(offsets_CoCreateInstanceRel, FindBytesOffsets(originalBytes_call_CoCreateInstance5, sizeof(originalBytes_call_CoCreateInstance5)));
+	// this is not patching properly, and causing issues with midi stuff in RSMods.
+	// we don't seem to need it, so let's keep it disabled.
+	//std::vector<void*> offsets_CoCreateInstanceRel = FindBytesOffsets(originalBytes_call_CoCreateInstance3, sizeof(originalBytes_call_CoCreateInstance3));
+	//vector_append(offsets_CoCreateInstanceRel, FindBytesOffsets(originalBytes_call_CoCreateInstance4, sizeof(originalBytes_call_CoCreateInstance4)));
+	//vector_append(offsets_CoCreateInstanceRel, FindBytesOffsets(originalBytes_call_CoCreateInstance5, sizeof(originalBytes_call_CoCreateInstance5)));
 
 	std::vector<void*> offsets_PaMarshalPointers = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));
 	std::vector<void*> offsets_PaUnmarshalPointers = FindBytesOffsets(originalBytes_call_UnmarshalStreamComPointers, sizeof(originalBytes_call_UnmarshalStreamComPointers));
@@ -224,7 +229,7 @@ void PatchOriginalCode()
 		// patch CoCreateInstance calls
 		rslog::info_ts() << "Patching CoCreateInstance" << std::endl;
 		Patch_CallAbsoluteAddress<(void*)&Patched_CoCreateInstance>(offsets_CoCreateInstanceAbs);
-		Patch_CallRelativeAddress<(void*)&Patched_CoCreateInstance>(offsets_CoCreateInstanceRel);
+		//Patch_CallRelativeAddress<(void*)&Patched_CoCreateInstance>(offsets_CoCreateInstanceRel);
 
 		// patch PortAudio MarshalStreamComPointers
 		rslog::info_ts() << "Patching PortAudio MarshalStreamComPointers" << std::endl;
