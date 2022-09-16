@@ -64,6 +64,7 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::ReleaseBuffer(UINT32 NumFrame
 	m_WaitingForBufferRelease = false;
 	m_DataDiscontinuityFlag = false;
 
+	// move the data we've put in the backbuffer to the frontbuffer for output
 	m_AsioAudioClient.SwapBuffers();
 
 	return S_OK;
