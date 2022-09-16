@@ -101,12 +101,25 @@ void RSAsioAudioCaptureClient::NotifyNewBuffer()
 	else
 		m_NewBufferPerfCounter = 0;
 
+	m_DataDiscontinuityFlag |= m_NewBufferWaiting;
 	m_NewBufferWaiting = true;
-}
 
-void RSAsioAudioCaptureClient::NotifyUnderrun()
-{
-	m_DataDiscontinuityFlag = true;
+	if (m_DataDiscontinuityFlag)
+	{
+		++m_NumSequentialDiscontinuities;
+		if (m_NumSequentialDiscontinuities == 1)
+		{
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - data discontinuity" << std::endl;
+		}
+	}
+	else
+	{
+		if (m_NumSequentialDiscontinuities >= 2)
+		{
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - recovered from " << m_NumSequentialDiscontinuities << " discontinuities" << std::endl;
+		}
+		m_NumSequentialDiscontinuities = 0;
+	}
 }
 
 bool RSAsioAudioCaptureClient::HasNewBufferWaiting() const

@@ -45,7 +45,7 @@ public:
 
 	RSAsioDevice& GetAsioDevice() { return m_AsioDevice; }
 
-	std::vector<BYTE>& GetBackBuffer() { return m_frontBuffer; }
+	std::vector<BYTE>& GetBackBuffer() { return m_backBuffer; }
 	DWORD GetBufferNumFrames() const { return m_bufferNumFrames; }
 	void SwapBuffers();
 
@@ -71,7 +71,7 @@ private:
 
 	std::vector<BYTE> m_frontBuffer;
 	std::vector<BYTE> m_backBuffer;
-	bool m_bufferHasUpdatedData = false;
+	bool m_BuffersWereSwapped = false;
 
 	unsigned m_dbgNumBufferSwitches;
 

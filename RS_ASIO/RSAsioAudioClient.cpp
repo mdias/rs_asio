@@ -163,7 +163,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	
 	m_UsingEventHandle = useEventCallback;
 	m_IsInitialized = true;
-	m_bufferHasUpdatedData = !m_AsioDevice.GetConfig().isOutput;
+	m_BuffersWereSwapped = /*!m_AsioDevice.GetConfig().isOutput*/false;
 
 	m_AsioSharedHost.AddBufferSwitchListener(this);
 
@@ -463,7 +463,7 @@ void RSAsioAudioClient::SwapBuffers()
 {
 	std::lock_guard<std::mutex> g(m_bufferMutex);
 	std::swap(m_frontBuffer, m_backBuffer);
-	m_bufferHasUpdatedData = true;
+	m_BuffersWereSwapped = true;
 
 	if (m_dbgNumBufferSwitches < 3)
 		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ << std::endl;
@@ -471,13 +471,7 @@ void RSAsioAudioClient::SwapBuffers()
 
 void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 {
-	if (!m_bufferMutex.try_lock())
-	{
-		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer underrun detected; still processing last buffer..." << std::endl;
-		return;
-	}
-
-	std::lock_guard<std::mutex> g(m_bufferMutex, std::adopt_lock);
+	std::lock_guard<std::mutex> g(m_bufferMutex);
 
 	const bool isOutput = m_AsioDevice.GetConfig().isOutput;
 
@@ -488,12 +482,6 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 		{
 			return;
 		}
-	}
-	else if (!m_bufferHasUpdatedData)
-	{
-		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - buffer underrun detected" << std::endl;
-		m_AsioDevice.GetAsioHost().ResetDebugLogAsioBufferSwitches();
-		m_dbgNumBufferSwitches = 0;
 	}
 
 	// sanity check
@@ -522,7 +510,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	
 	if (isOutput)
 	{
-		if (m_bufferHasUpdatedData)
+		if (m_BuffersWereSwapped)
 		{
 			if (doSoftwareVolume)
 			{
@@ -592,37 +580,25 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 	if (m_CaptureClient)
 	{
-		if (m_bufferHasUpdatedData)
-		{
-			m_CaptureClient->NotifyNewBuffer();
-		}
-		else
-		{
-			m_CaptureClient->NotifyUnderrun();
-		}
+		m_CaptureClient->NotifyNewBuffer();
 	}
 	if (m_RenderClient)
 	{
-		if (m_bufferHasUpdatedData)
-		{
-			m_RenderClient->NotifyNewBuffer();
-		}
-		else
-		{
-			m_RenderClient->NotifyUnderrun();
-		}
+		m_RenderClient->NotifyNewBuffer();
 	}
-
-	const bool signalEvent = (m_UsingEventHandle && m_EventHandle && m_bufferHasUpdatedData);
-	if (signalEvent)
-	{
-		SetEvent(m_EventHandle);
-	}
-	m_bufferHasUpdatedData = false;
 
 	if (m_IsStarted && m_dbgNumBufferSwitches < 3)
 	{
 		++m_dbgNumBufferSwitches;
+	}
+
+	m_BuffersWereSwapped = false;
+
+	// notifying the host application should be the last thing we do
+	const bool signalEvent = (m_UsingEventHandle && m_EventHandle);
+	if (signalEvent)
+	{
+		SetEvent(m_EventHandle);
 	}
 }
 

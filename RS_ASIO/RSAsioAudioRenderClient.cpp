@@ -62,6 +62,7 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::ReleaseBuffer(UINT32 NumFrame
 		return AUDCLNT_E_BUFFER_SIZE_ERROR;
 
 	m_WaitingForBufferRelease = false;
+	m_DataDiscontinuityFlag = false;
 
 	m_AsioAudioClient.SwapBuffers();
 
@@ -72,11 +73,25 @@ void RSAsioAudioRenderClient::NotifyNewBuffer()
 {
 	std::lock_guard<std::mutex> g(m_mutex);
 
+	m_DataDiscontinuityFlag |= m_NewBufferWaiting;
 	m_NewBufferWaiting = true;
-}
 
-void RSAsioAudioRenderClient::NotifyUnderrun()
-{
+	if (m_DataDiscontinuityFlag)
+	{
+		++m_NumSequentialDiscontinuities;
+		if (m_NumSequentialDiscontinuities == 1)
+		{
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - data discontinuity" << std::endl;
+		}
+	}
+	else
+	{
+		if (m_NumSequentialDiscontinuities >= 2)
+		{
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - recovered from " << m_NumSequentialDiscontinuities << " discontinuities" << std::endl;
+		}
+		m_NumSequentialDiscontinuities = 0;
+	}
 }
 
 bool RSAsioAudioRenderClient::HasNewBufferWaiting() const
