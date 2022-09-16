@@ -109,18 +109,31 @@ void RSAsioAudioCaptureClient::NotifyNewBuffer()
 	if (m_DataDiscontinuityFlag)
 	{
 		++m_NumSequentialDiscontinuities;
-		if (m_NumSequentialDiscontinuities == 1)
-		{
-			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - data discontinuity" << std::endl;
-		}
 	}
 	else
 	{
 		if (m_NumSequentialDiscontinuities >= 2)
 		{
-			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - recovered from " << m_NumSequentialDiscontinuities << " discontinuities" << std::endl;
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - recovered from " << m_NumSequentialDiscontinuities << " discontinuities. Ignoring for some time." << std::endl;
+			m_IgnoreDiscontinuityLoggingCountdown = 1000;
 		}
 		m_NumSequentialDiscontinuities = 0;
+	}
+
+	if (m_IgnoreDiscontinuityLoggingCountdown == 0)
+	{
+		if (m_NumSequentialDiscontinuities == 1)
+		{
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - data discontinuity" << std::endl;
+		}
+		else if (m_NumSequentialDiscontinuities == 100)
+		{
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - data discontinuity x" << m_NumSequentialDiscontinuities << ". Not showing any more." << std::endl;
+		}
+	}
+	else
+	{
+		--m_NumSequentialDiscontinuities;
 	}
 }
 

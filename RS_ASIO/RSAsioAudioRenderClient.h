@@ -25,6 +25,7 @@ private:
 	bool m_DataDiscontinuityFlag = false;
 
 	unsigned m_NumSequentialDiscontinuities = 0;
+	unsigned m_IgnoreDiscontinuityLoggingCountdown = 0;
 
 	mutable std::mutex m_mutex;
 };
