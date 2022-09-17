@@ -16,13 +16,16 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE ReleaseBuffer(UINT32 NumFramesWritten, DWORD dwFlags) override;
 
 	void NotifyNewBuffer();
-	void NotifyUnderrun();
 	bool HasNewBufferWaiting() const;
 
 private:
 	RSAsioAudioClient& m_AsioAudioClient;
 	bool m_WaitingForBufferRelease = false;
 	bool m_NewBufferWaiting = true;
+	bool m_DataDiscontinuityFlag = false;
+
+	unsigned m_NumSequentialDiscontinuities = 0;
+	unsigned m_IgnoreDiscontinuityLoggingCountdown = 0;
 
 	mutable std::mutex m_mutex;
 };

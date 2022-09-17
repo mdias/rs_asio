@@ -17,7 +17,6 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE GetNextPacketSize(UINT32 *pNumFramesInNextPacket) override;
 
 	void NotifyNewBuffer();
-	void NotifyUnderrun();
 	bool HasNewBufferWaiting() const;
 
 private:
@@ -27,6 +26,9 @@ private:
 
 	bool m_WaitingForBufferRelease = false;
 	bool m_DataDiscontinuityFlag = false;
+
+	unsigned m_NumSequentialDiscontinuities = 0;
+	unsigned m_IgnoreDiscontinuityLoggingCountdown = 0;
 
 	mutable std::mutex m_mutex;
 };

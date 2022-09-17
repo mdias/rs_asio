@@ -27,6 +27,9 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UIN
 	if (m_WaitingForBufferRelease)
 		return AUDCLNT_E_OUT_OF_ORDER;
 
+	// put the newest input data on the backbuffer
+	m_AsioAudioClient.SwapBuffers();
+
 	std::vector<BYTE>& buffer = m_AsioAudioClient.GetBackBuffer();
 
 	*ppData = buffer.data();
@@ -73,7 +76,6 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::ReleaseBuffer(UINT32 NumFram
 
 	m_WaitingForBufferRelease = false;
 	m_DataDiscontinuityFlag = false;
-	m_AsioAudioClient.SwapBuffers();
 
 	return S_OK;
 }
@@ -101,12 +103,38 @@ void RSAsioAudioCaptureClient::NotifyNewBuffer()
 	else
 		m_NewBufferPerfCounter = 0;
 
+	m_DataDiscontinuityFlag |= m_NewBufferWaiting;
 	m_NewBufferWaiting = true;
-}
 
-void RSAsioAudioCaptureClient::NotifyUnderrun()
-{
-	m_DataDiscontinuityFlag = true;
+	if (m_DataDiscontinuityFlag)
+	{
+		++m_NumSequentialDiscontinuities;
+	}
+	else
+	{
+		if (m_NumSequentialDiscontinuities >= 2)
+		{
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - recovered from " << m_NumSequentialDiscontinuities << " discontinuities. Ignoring for some time." << std::endl;
+			m_IgnoreDiscontinuityLoggingCountdown = 1000;
+		}
+		m_NumSequentialDiscontinuities = 0;
+	}
+
+	if (m_IgnoreDiscontinuityLoggingCountdown == 0)
+	{
+		if (m_NumSequentialDiscontinuities == 1)
+		{
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - data discontinuity" << std::endl;
+		}
+		else if (m_NumSequentialDiscontinuities == 100)
+		{
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - data discontinuity x" << m_NumSequentialDiscontinuities << ". Not showing any more." << std::endl;
+		}
+	}
+	else
+	{
+		--m_NumSequentialDiscontinuities;
+	}
 }
 
 bool RSAsioAudioCaptureClient::HasNewBufferWaiting() const
