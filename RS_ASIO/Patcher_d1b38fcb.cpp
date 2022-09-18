@@ -5,8 +5,6 @@
 
 // this file contains the patch code for the game version released ON 2022-09-11 (post-patch)
 
-typedef HRESULT(STDAPICALLTYPE* CoCreateInstancePtr)(REFCLSID rclsid, IUnknown* pUnkOuter, DWORD dwClsContext, REFIID riid, void** ppOut);
-
 static const BYTE originalBytes_call_CoCreateInstance[]{
 	0xe8, 0x3e, 0x9d, 0x7d, 0x00, // call relative
 	0xcd, // ?
