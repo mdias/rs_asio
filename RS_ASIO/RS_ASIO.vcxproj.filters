@@ -114,6 +114,9 @@
     <ClInclude Include="MyUnknown.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="crc32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -195,6 +198,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DebugWrapperCaptureClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="crc32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Patcher_d1b38fcb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Patcher_21a8959a.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
