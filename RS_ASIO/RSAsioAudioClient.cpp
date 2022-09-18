@@ -163,7 +163,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	
 	m_UsingEventHandle = useEventCallback;
 	m_IsInitialized = true;
-	m_BuffersWereSwapped = /*!m_AsioDevice.GetConfig().isOutput*/false;
+	m_BuffersWereSwapped = false;
 
 	m_AsioSharedHost.AddBufferSwitchListener(this);
 
