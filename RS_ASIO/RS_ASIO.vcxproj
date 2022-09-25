@@ -178,6 +178,7 @@
     <ClInclude Include="Patcher.h" />
     <ClInclude Include="RSAsioAudioCaptureClient.h" />
     <ClInclude Include="RSAsioAudioClient.h" />
+    <ClInclude Include="RSAsioAudioClientServiceBase.h" />
     <ClInclude Include="RSAsioAudioRenderClient.h" />
     <ClInclude Include="RSAsioAudioEndpointVolume.h" />
     <ClInclude Include="RSAsioDevice.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="Patcher_21a8959a.cpp" />
     <ClCompile Include="RSAsioAudioCaptureClient.cpp" />
     <ClCompile Include="RSAsioAudioClient.cpp" />
+    <ClCompile Include="RSAsioAudioClientServiceBase.cpp" />
     <ClCompile Include="RSAsioAudioEndpointVolume.cpp" />
     <ClCompile Include="RSAsioAudioRenderClient.cpp" />
     <ClCompile Include="RSAsioDevice.cpp" />

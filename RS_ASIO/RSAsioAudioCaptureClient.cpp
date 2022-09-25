@@ -4,14 +4,8 @@
 #include "RSAsioDevice.h"
 
 RSAsioAudioCaptureClient::RSAsioAudioCaptureClient(RSAsioAudioClient& asioAudioClient)
-	: m_AsioAudioClient(asioAudioClient)
+	: RSAsioAudioClientServiceBase<IAudioCaptureClient>(asioAudioClient)
 {
-	
-}
-
-RSAsioAudioCaptureClient::~RSAsioAudioCaptureClient()
-{
-	
 }
 
 HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UINT32 *pNumFramesToRead, DWORD *pdwFlags, UINT64 *pu64DevicePosition, UINT64 *pu64QPCPosition)
@@ -90,56 +84,4 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetNextPacketSize(UINT32 *pN
 	*pNumFramesInNextPacket = m_AsioAudioClient.GetBufferNumFrames();
 
 	return S_OK;
-}
-
-void RSAsioAudioCaptureClient::NotifyNewBuffer()
-{
-	std::lock_guard<std::mutex> g(m_mutex);
-
-	LARGE_INTEGER li;
-
-	if (QueryPerformanceCounter(&li))
-		m_NewBufferPerfCounter = li.QuadPart;
-	else
-		m_NewBufferPerfCounter = 0;
-
-	m_DataDiscontinuityFlag |= m_NewBufferWaiting;
-	m_NewBufferWaiting = true;
-
-	if (m_DataDiscontinuityFlag)
-	{
-		++m_NumSequentialDiscontinuities;
-	}
-	else
-	{
-		if (m_NumSequentialDiscontinuities >= 2)
-		{
-			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - recovered from " << m_NumSequentialDiscontinuities << " discontinuities. Ignoring for some time." << std::endl;
-			m_IgnoreDiscontinuityLoggingCountdown = 1000;
-		}
-		m_NumSequentialDiscontinuities = 0;
-	}
-
-	if (m_IgnoreDiscontinuityLoggingCountdown == 0)
-	{
-		if (m_NumSequentialDiscontinuities == 1)
-		{
-			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - data discontinuity" << std::endl;
-		}
-		else if (m_NumSequentialDiscontinuities == 100)
-		{
-			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " __FUNCTION__ " - data discontinuity x" << m_NumSequentialDiscontinuities << ". Not showing any more." << std::endl;
-		}
-	}
-	else
-	{
-		--m_NumSequentialDiscontinuities;
-	}
-}
-
-bool RSAsioAudioCaptureClient::HasNewBufferWaiting() const
-{
-	std::lock_guard<std::mutex> g(m_mutex);
-
-	return m_NewBufferWaiting;
 }
