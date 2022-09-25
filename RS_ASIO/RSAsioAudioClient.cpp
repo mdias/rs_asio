@@ -592,10 +592,15 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 		++m_dbgNumBufferSwitches;
 	}
 
+	// NOTE: we cannot notify the application multiple times otherwise it will ask for all those
+	// buffers and since we don't save old buffers, it will eventually error out. Some interfaces
+	// will trigger this behavior quickly.
+	const bool askApplicationForMoreData = m_BuffersWereSwapped;
+
 	m_BuffersWereSwapped = false;
 
 	// notifying the host application should be the last thing we do
-	const bool signalEvent = (m_UsingEventHandle && m_EventHandle);
+	const bool signalEvent = (m_UsingEventHandle && m_EventHandle && askApplicationForMoreData);
 	if (signalEvent)
 	{
 		SetEvent(m_EventHandle);
