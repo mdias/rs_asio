@@ -58,7 +58,7 @@ void RSAsioAudioClientServiceBase<TBaseClientService>::NotifyNewBuffer()
 	}
 	else
 	{
-		--m_NumSequentialDiscontinuities;
+		--m_IgnoreDiscontinuityLoggingCountdown;
 	}
 }
 
