@@ -333,6 +333,7 @@ HRESULT RSAsioAudioClient::Start()
 		return E_FAIL;
 
 	m_IsStarted = true;
+	m_IsFirstBuffer = true;
 	m_dbgNumBufferSwitches = 0;
 
 	return S_OK;
@@ -592,15 +593,17 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 		++m_dbgNumBufferSwitches;
 	}
 
-	// NOTE: we cannot notify the application multiple times otherwise it will ask for all those
+	// NOTE(1): we cannot notify the application multiple times otherwise it will ask for all those
 	// buffers and since we don't save old buffers, it will eventually error out. Some interfaces
 	// will trigger this behavior quickly.
-	const bool askApplicationForMoreData = m_BuffersWereSwapped;
+	// NOTE(2): for input we want to force signal the app for the first incoming buffer.
+	const bool signalApplicationAboutNewBuffer = isOutput ? m_BuffersWereSwapped : (m_IsFirstBuffer || m_BuffersWereSwapped);
 
 	m_BuffersWereSwapped = false;
+	m_IsFirstBuffer = false;
 
 	// notifying the host application should be the last thing we do
-	const bool signalEvent = (m_UsingEventHandle && m_EventHandle && askApplicationForMoreData);
+	const bool signalEvent = (m_UsingEventHandle && m_EventHandle && signalApplicationAboutNewBuffer);
 	if (signalEvent)
 	{
 		SetEvent(m_EventHandle);

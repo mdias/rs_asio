@@ -72,6 +72,7 @@ private:
 	std::vector<BYTE> m_frontBuffer;
 	std::vector<BYTE> m_backBuffer;
 	bool m_BuffersWereSwapped = false;
+	bool m_IsFirstBuffer = false;
 
 	unsigned m_dbgNumBufferSwitches;
 
