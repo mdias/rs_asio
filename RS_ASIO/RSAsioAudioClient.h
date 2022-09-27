@@ -77,6 +77,7 @@ private:
 	unsigned m_dbgNumBufferSwitches;
 
 	std::mutex m_bufferMutex;
+	std::mutex m_controlMutex;
 	DWORD m_bufferNumFrames;
 
 	// for output: for each asio output, which wasapi channel data to copy from

@@ -716,7 +716,13 @@ void AsioSharedHost::DisplayCurrentError() const
 
 void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, ASIOBool directProcess)
 {
-	std::lock_guard<std::mutex> guard(m_AsioMutex);
+	if (!m_AsioMutex.try_lock())
+	{
+		rslog::info_ts() << m_DriverName << " " __FUNCTION__ " - aborting buffer switch handling as mutex is already locked." << std::endl;
+		return;
+	}
+
+	std::lock_guard<std::mutex> guard(m_AsioMutex, std::adopt_lock);
 
 	if (m_StartCount == 0)
 		return;

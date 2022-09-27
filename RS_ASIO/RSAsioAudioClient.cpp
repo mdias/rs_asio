@@ -71,7 +71,7 @@ HRESULT RSAsioAudioClient::QueryInterface(REFIID riid, void **ppvObject)
 
 HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamFlags, REFERENCE_TIME hnsBufferDuration, REFERENCE_TIME hnsPeriodicity, const WAVEFORMATEX *pFormat, LPCGUID AudioSessionGuid)
 {
-	std::lock_guard<std::mutex> g(m_bufferMutex);
+	std::lock_guard<std::mutex> g(m_controlMutex);
 
 	if (!pFormat)
 		return E_POINTER;
@@ -314,7 +314,7 @@ HRESULT RSAsioAudioClient::GetDevicePeriod(REFERENCE_TIME *phnsDefaultDevicePeri
 
 HRESULT RSAsioAudioClient::Start()
 {
-	std::lock_guard<std::mutex> g(m_bufferMutex);
+	std::lock_guard<std::mutex> g(m_controlMutex);
 
 	if (!m_IsInitialized)
 		return AUDCLNT_E_NOT_INITIALIZED;
@@ -341,7 +341,7 @@ HRESULT RSAsioAudioClient::Start()
 
 HRESULT RSAsioAudioClient::Stop()
 {
-	std::lock_guard<std::mutex> g(m_bufferMutex);
+	std::lock_guard<std::mutex> g(m_controlMutex);
 
 	if (!m_IsInitialized)
 		return AUDCLNT_E_NOT_INITIALIZED;
@@ -358,7 +358,7 @@ HRESULT RSAsioAudioClient::Stop()
 
 HRESULT RSAsioAudioClient::Reset()
 {
-	std::lock_guard<std::mutex> g(m_bufferMutex);
+	std::lock_guard<std::mutex> g(m_controlMutex);
 
 	if (!m_IsInitialized)
 		return AUDCLNT_E_NOT_INITIALIZED;
@@ -371,7 +371,7 @@ HRESULT RSAsioAudioClient::Reset()
 
 HRESULT RSAsioAudioClient::SetEventHandle(HANDLE eventHandle)
 {
-	std::lock_guard<std::mutex> g(m_bufferMutex);
+	std::lock_guard<std::mutex> g(m_controlMutex);
 
 	if (!m_AsioSharedHost.IsValid())
 		return AUDCLNT_E_DEVICE_INVALIDATED;
@@ -381,6 +381,11 @@ HRESULT RSAsioAudioClient::SetEventHandle(HANDLE eventHandle)
 
 	if (!m_UsingEventHandle)
 		return AUDCLNT_E_EVENTHANDLE_NOT_EXPECTED;
+
+	// the docs don't mention which error to return - if any - when we attempt to set the event handle
+	// after calling Start()
+	if (m_IsStarted)
+		return E_FAIL;
 
 	m_EventHandle = eventHandle;
 
