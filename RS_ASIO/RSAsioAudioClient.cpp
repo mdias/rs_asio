@@ -492,7 +492,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	if (!m_IsStarted)
 	{
 		memset(m_frontBuffer.data(), 0, m_frontBuffer.size());
-		if (!isOutput)
+		if (isInput)
 		{
 			return;
 		}
@@ -524,6 +524,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	
 	if (isOutput)
 	{
+		// no need to do software volume if we're streaming silence
 		if (m_BuffersWereSwapped)
 		{
 			if (doSoftwareVolume)
@@ -531,30 +532,30 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 				const DWORD totalSamples = m_bufferNumFrames * m_WaveFormat.Format.nChannels;
 				AudioProcessing::DoSoftwareVolumeDsp(m_frontBuffer.data(), gameSampleType, totalSamples, fSoftwareVolumeScalar);
 			}
+		}
 
-			for (DWORD asioCh = 0; asioCh < m_ChannelMap.size(); ++asioCh)
+		for (DWORD asioCh = 0; asioCh < m_ChannelMap.size(); ++asioCh)
+		{
+			const ASIOChannelInfo* asioChannelInfo = m_AsioSharedHost.GetOutputChannelInfo(asioCh);
+			ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetOutputBuffer(asioCh);
+			if (bufferInfo && asioChannelInfo)
 			{
-				const ASIOChannelInfo* asioChannelInfo = m_AsioSharedHost.GetOutputChannelInfo(asioCh);
-				ASIOBufferInfo* bufferInfo = m_AsioSharedHost.GetOutputBuffer(asioCh);
-				if (bufferInfo && asioChannelInfo)
+				const WORD asioSampleTypeSize = GetAsioSampleTypeNumBytes(asioChannelInfo->type);
+				const int srcCh = m_ChannelMap[asioCh];
+				if (asioSampleTypeSize)
 				{
-					const WORD asioSampleTypeSize = GetAsioSampleTypeNumBytes(asioChannelInfo->type);
-					const int srcCh = m_ChannelMap[asioCh];
-					if (asioSampleTypeSize)
+					if (srcCh >= 0)
 					{
-						if (srcCh >= 0)
-						{
-							AudioProcessing::CopyConvertFormat(
-								m_frontBuffer.data() + srcCh * gameSampleTypeSize, gameSampleType, m_WaveFormat.Format.nBlockAlign,
-								m_bufferNumFrames,
-								(BYTE*)bufferInfo->buffers[buffIdx], asioChannelInfo->type, asioSampleTypeSize
-							);
-						}
-						else
-						{
-							// output silence to unassigned channels
-							memset(bufferInfo->buffers[buffIdx], 0, asioSampleTypeSize * m_bufferNumFrames);
-						}
+						AudioProcessing::CopyConvertFormat(
+							m_frontBuffer.data() + srcCh * gameSampleTypeSize, gameSampleType, m_WaveFormat.Format.nBlockAlign,
+							m_bufferNumFrames,
+							(BYTE*)bufferInfo->buffers[buffIdx], asioChannelInfo->type, asioSampleTypeSize
+						);
+					}
+					else
+					{
+						// output silence to unassigned channels
+						memset(bufferInfo->buffers[buffIdx], 0, asioSampleTypeSize * m_bufferNumFrames);
 					}
 				}
 			}
