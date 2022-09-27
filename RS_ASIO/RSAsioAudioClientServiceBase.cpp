@@ -4,8 +4,9 @@
 #include "RSAsioDevice.h"
 
 template<typename TBaseClientService>
-RSAsioAudioClientServiceBase<TBaseClientService>::RSAsioAudioClientServiceBase(RSAsioAudioClient& asioAudioClient)
+RSAsioAudioClientServiceBase<TBaseClientService>::RSAsioAudioClientServiceBase(RSAsioAudioClient& asioAudioClient, bool isOutput)
 	: m_AsioAudioClient(asioAudioClient)
+	, m_NewBufferWaiting(isOutput) // output can immediately fill the backbuffer, input needs to wait for new buffer
 {
 
 }

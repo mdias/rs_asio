@@ -480,6 +480,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	std::lock_guard<std::mutex> g(m_bufferMutex);
 
 	const bool isOutput = m_AsioDevice.GetConfig().isOutput;
+	const bool isInput = !isOutput;
 
 	if (!m_IsStarted)
 	{
@@ -584,34 +585,37 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 		}
 	}
 
-	if (m_CaptureClient)
+	if (m_IsStarted)
 	{
-		m_CaptureClient->NotifyNewBuffer();
-	}
-	if (m_RenderClient)
-	{
-		m_RenderClient->NotifyNewBuffer();
-	}
+		if (m_CaptureClient)
+		{
+			m_CaptureClient->NotifyNewBuffer();
+		}
+		if (m_RenderClient)
+		{
+			m_RenderClient->NotifyNewBuffer();
+		}
 
-	if (m_IsStarted && m_dbgNumBufferSwitches < 3)
-	{
-		++m_dbgNumBufferSwitches;
-	}
+		if (m_dbgNumBufferSwitches < 3)
+		{
+			++m_dbgNumBufferSwitches;
+		}
 
-	// NOTE(1): we cannot notify the application multiple times otherwise it will ask for all those
-	// buffers and since we don't save old buffers, it will eventually error out. Some interfaces
-	// will trigger this behavior quickly.
-	// NOTE(2): for input we want to force signal the app for the first incoming buffer.
-	const bool signalApplicationAboutNewBuffer = isOutput ? m_BuffersWereSwapped : (m_IsFirstBuffer || m_BuffersWereSwapped);
+		// NOTE(1): we cannot notify the application multiple times otherwise it will ask for all those
+		// buffers and since we don't save old buffers, it will eventually error out. Some interfaces
+		// will trigger this behavior quickly.
+		// NOTE(2): for input we want to force signal the app for the first incoming buffer.
+		const bool signalApplicationAboutNewBuffer = m_BuffersWereSwapped || (isInput && m_IsFirstBuffer);
 
-	m_BuffersWereSwapped = false;
-	m_IsFirstBuffer = false;
+		m_BuffersWereSwapped = false;
+		m_IsFirstBuffer = false;
 
-	// notifying the host application should be the last thing we do
-	const bool signalEvent = (m_UsingEventHandle && m_EventHandle && signalApplicationAboutNewBuffer);
-	if (signalEvent)
-	{
-		SetEvent(m_EventHandle);
+		// notifying the host application should be the last thing we do
+		const bool signalEvent = (m_UsingEventHandle && m_EventHandle && signalApplicationAboutNewBuffer);
+		if (signalEvent)
+		{
+			SetEvent(m_EventHandle);
+		}
 	}
 }
 

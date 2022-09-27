@@ -4,7 +4,7 @@
 #include "RSAsioDevice.h"
 
 RSAsioAudioCaptureClient::RSAsioAudioCaptureClient(RSAsioAudioClient& asioAudioClient)
-	: RSAsioAudioClientServiceBase<IAudioCaptureClient>(asioAudioClient)
+	: RSAsioAudioClientServiceBase<IAudioCaptureClient>(asioAudioClient, /*isOutput =*/false)
 {
 }
 

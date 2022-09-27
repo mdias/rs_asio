@@ -4,7 +4,7 @@
 #include "RSAsioDevice.h"
 
 RSAsioAudioRenderClient::RSAsioAudioRenderClient(RSAsioAudioClient& asioAudioClient)
-	: RSAsioAudioClientServiceBase<IAudioRenderClient>(asioAudioClient)
+	: RSAsioAudioClientServiceBase<IAudioRenderClient>(asioAudioClient, /*isOutput =*/true)
 {
 }
 
