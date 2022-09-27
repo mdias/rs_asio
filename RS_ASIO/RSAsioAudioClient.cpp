@@ -328,13 +328,16 @@ HRESULT RSAsioAudioClient::Start()
 	if (m_IsStarted)
 		return AUDCLNT_E_NOT_STOPPED;
 
-	// start ASIO streaming
-	if (m_AsioSharedHost.Start() != ASE_OK)
-		return E_FAIL;
-
 	m_IsStarted = true;
 	m_IsFirstBuffer = true;
 	m_dbgNumBufferSwitches = 0;
+
+	// start ASIO streaming
+	if (m_AsioSharedHost.Start() != ASE_OK)
+	{
+		m_IsStarted = false;
+		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -477,6 +480,10 @@ void RSAsioAudioClient::SwapBuffers()
 
 void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 {
+	// NOTE: we shouldn't need to lock the m_controlMutex to read stuff like m_IsStarted
+	// because calls to Start() should have these members set already, and calls to Stop()
+	// should have the driver wait for any pending call to OnAsioBufferSwitch anyway.
+
 	std::lock_guard<std::mutex> g(m_bufferMutex);
 
 	const bool isOutput = m_AsioDevice.GetConfig().isOutput;
