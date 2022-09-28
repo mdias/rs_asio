@@ -21,16 +21,12 @@ RSAsioAudioClient::RSAsioAudioClient(RSAsioDevice& asioDevice)
 
 RSAsioAudioClient::~RSAsioAudioClient()
 {
+	rslog::info_ts() << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << std::endl;
+
 	m_MyUnknown->Release();
 
+	Stop();
 	m_AsioSharedHost.RemoveBufferSwitchListener(this);
-
-	std::lock_guard<std::mutex> g(m_bufferMutex);
-
-	if (m_IsStarted)
-	{
-		m_AsioSharedHost.Stop();
-	}
 
 	if (m_RenderClient)
 	{
@@ -354,6 +350,9 @@ HRESULT RSAsioAudioClient::Stop()
 		m_AsioSharedHost.Stop();
 	}
 
+	// just in case calls to SwapBufers are still pending etc...
+	std::lock_guard<std::mutex> g2(m_bufferMutex);
+
 	m_IsStarted = false;
 
 	return S_OK;
@@ -484,7 +483,13 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 	// because calls to Start() should have these members set already, and calls to Stop()
 	// should have the driver wait for any pending call to OnAsioBufferSwitch anyway.
 
-	std::lock_guard<std::mutex> g(m_bufferMutex);
+	if (!m_bufferMutex.try_lock())
+	{
+		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - failed to get lock first time. This might be harmless, but if we freeze here this is likely related" << std::endl;
+		m_bufferMutex.lock();
+	}
+
+	std::lock_guard<std::mutex> g(m_bufferMutex, std::adopt_lock);
 
 	const bool isOutput = m_AsioDevice.GetConfig().isOutput;
 	const bool isInput = !isOutput;

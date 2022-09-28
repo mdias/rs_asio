@@ -40,7 +40,7 @@ void RSAsioAudioClientServiceBase<TBaseClientService>::NotifyNewBuffer()
 	{
 		if (m_NumSequentialDiscontinuities >= 2)
 		{
-			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " NotifyNewBuffer() - recovered from " << std::dec << m_NumSequentialDiscontinuities << " discontinuities. Ignoring for some time." << std::endl;
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " recovered from " << std::dec << m_NumSequentialDiscontinuities << " consecutive xruns. Ignoring for some time." << std::endl;
 			m_IgnoreDiscontinuityLoggingCountdown = 1000;
 		}
 		m_NumSequentialDiscontinuities = 0;
@@ -50,11 +50,11 @@ void RSAsioAudioClientServiceBase<TBaseClientService>::NotifyNewBuffer()
 	{
 		if (m_NumSequentialDiscontinuities == 1)
 		{
-			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " NotifyNewBuffer() - data discontinuity" << std::endl;
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " xrun" << std::endl;
 		}
 		else if (m_NumSequentialDiscontinuities == 100)
 		{
-			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " NotifyNewBuffer() - data discontinuity x" << std::dec << m_NumSequentialDiscontinuities << ". Not showing any more." << std::endl;
+			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " " << std::dec << m_NumSequentialDiscontinuities << " consecute xruns. Ignoring the next ones." << std::endl;
 		}
 	}
 	else

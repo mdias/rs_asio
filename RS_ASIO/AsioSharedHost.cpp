@@ -351,7 +351,7 @@ void AsioSharedHost::Reset()
 
 ASIOError AsioSharedHost::Start()
 {
-	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
+	rslog::info_ts() << __FUNCTION__ " - enter startCount: " << m_StartCount << std::endl;
 
 	if (!IsValid() || !m_IsSetup)
 		return ASE_NotPresent;
@@ -372,14 +372,22 @@ ASIOError AsioSharedHost::Start()
 
 	++m_StartCount;
 
+	rslog::info_ts() << __FUNCTION__ " - leave startCount: " << m_StartCount << std::endl;
+
 	return ASE_OK;
 }
 
 void AsioSharedHost::Stop()
 {
-	std::lock_guard<std::mutex> guard(m_AsioMutex);
+	if (!m_AsioMutex.try_lock())
+	{
+		rslog::info_ts() << m_DriverName << " " __FUNCTION__ " - failed to get lock first time. This might be harmless, but if we freeze here this is likely related" << std::endl;
+		m_AsioMutex.lock();
+	}
 
-	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
+	std::lock_guard<std::mutex> guard(m_AsioMutex, std::adopt_lock);
+
+	rslog::info_ts() << __FUNCTION__ " - enter startCount: " << m_StartCount << std::endl;
 
 	if (m_StartCount == 0)
 	{
@@ -397,6 +405,8 @@ void AsioSharedHost::Stop()
 	}
 
 	--m_StartCount;
+
+	rslog::info_ts() << __FUNCTION__ " - leave startCount: " << m_StartCount << std::endl;
 }
 
 bool AsioSharedHost::GetPreferredBufferSize(DWORD& outBufferSizeFrames) const

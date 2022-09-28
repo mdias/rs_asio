@@ -32,19 +32,19 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetCount(DWORD *cProp
 	HRESULT hr = m_RealPropertyStore.GetCount(cProps);
 
 	DEBUG_PRINT_HR(hr);
-	/*
+	
 	if (SUCCEEDED(hr) && cProps)
 	{
 		rslog::info_ts() << "  *cProps: " << std::dec << *cProps << std::endl;
 	}
-	*/
 
 	return hr;
 }
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetAt(DWORD iProp, PROPERTYKEY *pkey)
 {
-	rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " - iProp: " << std::dec << iProp << std::endl;
+	// NOTE: this log entry gets too noisy on WASAPI devices...
+	//rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " - iProp: " << std::dec << iProp << std::endl;
 
 	HRESULT hr = m_RealPropertyStore.GetAt(iProp, pkey);
 	DEBUG_PRINT_HR(hr);
