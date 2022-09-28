@@ -396,7 +396,7 @@ void AsioSharedHost::Stop()
 	}
 	else if (m_StartCount == 1)
 	{
-		rslog::info_ts() << __FUNCTION__ "  stopping ASIO stream" << std::endl;
+		rslog::info_ts() << __FUNCTION__ " - stopping ASIO stream" << std::endl;
 		if (m_Driver->stop() != ASE_OK)
 		{
 			rslog::error_ts() << "  Failed to stop ASIO stream" << std::endl;
