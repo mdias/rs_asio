@@ -38,7 +38,7 @@ void RSAsioAudioClientServiceBase<TBaseClientService>::NotifyNewBuffer()
 	}
 	else
 	{
-		if (m_NumSequentialDiscontinuities >= 2)
+		if (m_NumSequentialDiscontinuities >= 2 && m_IgnoreDiscontinuityLoggingCountdown == 0)
 		{
 			rslog::info_ts() << m_AsioAudioClient.GetAsioDevice().GetIdRef() << " recovered from " << std::dec << m_NumSequentialDiscontinuities << " consecutive xruns. Ignoring for some time." << std::endl;
 			m_IgnoreDiscontinuityLoggingCountdown = 1000;
