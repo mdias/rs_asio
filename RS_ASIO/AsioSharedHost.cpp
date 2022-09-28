@@ -599,7 +599,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		// format check
 		if (wfe.SubFormat != KSDATAFORMAT_SUBTYPE_PCM && wfe.SubFormat != KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
 		{
-			rslog::error_ts() << "  compressed formats are not supported" << std::endl;
+			rslog::info_ts() << "  compressed formats are not supported" << std::endl;
 			return false;
 		}
 
@@ -607,7 +607,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		{
 			if (sampleType != ASIOSTFloat32LSB && sampleType != ASIOSTFloat64LSB)
 			{
-				rslog::error_ts() << "  rejecting IEEE Float as it's incompatible with current ASIO sample type " << sampleType << std::endl;
+				rslog::info_ts() << "  rejecting IEEE Float as it's incompatible with current ASIO sample type " << sampleType << std::endl;
 				return false;
 			}
 		}
@@ -615,7 +615,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		// check bit depth
 		if (wfe.Format.wBitsPerSample < wfe.Samples.wValidBitsPerSample)
 		{
-			rslog::error_ts() << "  wBitsPerSample: " << wfe.Format.wBitsPerSample << " is smaller than wValidBitsPerSample: " << wfe.Samples.wValidBitsPerSample << std::endl;
+			rslog::info_ts() << "  wBitsPerSample: " << wfe.Format.wBitsPerSample << " is smaller than wValidBitsPerSample: " << wfe.Samples.wValidBitsPerSample << std::endl;
 			return false;
 		}
 		bitsPerSample = wfe.Samples.wValidBitsPerSample;

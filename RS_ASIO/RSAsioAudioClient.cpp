@@ -258,7 +258,7 @@ HRESULT RSAsioAudioClient::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const 
 	// check compatibility with asio host
 	if (!m_AsioSharedHost.IsWaveFormatSupported(*pFormat, m_AsioDevice.GetConfig().isOutput, m_AsioDevice.GetConfig().baseAsioChannelNumber, m_AsioDevice.GetConfig().numAsioChannels))
 	{
-		rslog::error_ts() << "  failed to initialize asio driver with requested format" << std::endl;
+		rslog::info_ts() << "  requested format is not supported" << std::endl;
 		return AUDCLNT_E_UNSUPPORTED_FORMAT;
 	}
 
