@@ -21,19 +21,21 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::GetBuffer(UINT32 NumFramesReq
 	if (m_WaitingForBufferRelease)
 		return AUDCLNT_E_OUT_OF_ORDER;
 
-	if (!m_NewBufferWaiting)
+	if (NumFramesRequested != m_AsioAudioClient.GetBufferNumFrames())
+		return AUDCLNT_E_BUFFER_SIZE_ERROR;
+
+	bool isDiscontinuity = true;
+	UINT64 backbufferTimestamp = 0;
+	BYTE* backbuffer = GetBackbufferIfPending(true, &backbufferTimestamp, &isDiscontinuity);
+
+	if (!backbuffer)
 	{
 		*ppData = nullptr;
 		return AUDCLNT_E_BUFFER_ERROR;
 	}
 
-	std::vector<BYTE>& buffer = m_AsioAudioClient.GetBackBuffer();
-	if (NumFramesRequested != m_AsioAudioClient.GetBufferNumFrames())
-		return AUDCLNT_E_BUFFER_SIZE_ERROR;
-
-	*ppData = buffer.data();
+	*ppData = backbuffer;
 	m_WaitingForBufferRelease = true;
-	m_NewBufferWaiting = false;
 
 	return S_OK;
 }
@@ -56,7 +58,6 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioRenderClient::ReleaseBuffer(UINT32 NumFrame
 		return AUDCLNT_E_BUFFER_SIZE_ERROR;
 
 	m_WaitingForBufferRelease = false;
-	m_DataDiscontinuityFlag = false;
 
 	// move the data we've put in the backbuffer to the frontbuffer for output
 	m_AsioAudioClient.SwapBuffers();

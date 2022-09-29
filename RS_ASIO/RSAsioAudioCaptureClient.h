@@ -15,4 +15,6 @@ public:
 
 private:
 	bool m_WaitingForBufferRelease = false;
+
+	std::mutex m_mutex;
 };

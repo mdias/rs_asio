@@ -20,7 +20,7 @@ RSAsioAudioClientServiceBase<TBaseClientService>::~RSAsioAudioClientServiceBase(
 template<typename TBaseClientService>
 void RSAsioAudioClientServiceBase<TBaseClientService>::NotifyNewBuffer()
 {
-	std::lock_guard<std::mutex> g(m_mutex);
+	std::lock_guard<std::mutex> g(m_bufferMutex);
 
 	LARGE_INTEGER li;
 
@@ -66,9 +66,44 @@ void RSAsioAudioClientServiceBase<TBaseClientService>::NotifyNewBuffer()
 template<typename TBaseClientService>
 bool RSAsioAudioClientServiceBase<TBaseClientService>::HasNewBufferWaiting() const
 {
-	std::lock_guard<std::mutex> g(m_mutex);
+	std::lock_guard<std::mutex> g(m_bufferMutex);
 
 	return m_NewBufferWaiting;
+}
+
+template<typename TBaseClientService>
+BYTE* RSAsioAudioClientServiceBase<TBaseClientService>::GetBackbufferIfPending(bool resetPendingFlag, UINT64* outOptionalPerfCounter, bool* outOptionalIsDiscontinuity)
+{
+	std::lock_guard<std::mutex> g(m_bufferMutex);
+	if (!m_NewBufferWaiting)
+	{
+		if (outOptionalPerfCounter)
+		{
+			*outOptionalPerfCounter = 0;
+		}
+		if (outOptionalIsDiscontinuity)
+		{
+			*outOptionalIsDiscontinuity = true;
+		}
+
+		return nullptr;
+	}
+
+	std::vector<BYTE>& buffer = m_AsioAudioClient.GetBackBuffer();
+	if (outOptionalPerfCounter)
+	{
+		*outOptionalPerfCounter = m_NewBufferPerfCounter;
+	}
+	if (outOptionalIsDiscontinuity)
+	{
+		*outOptionalIsDiscontinuity = m_DataDiscontinuityFlag;
+	}
+	if (resetPendingFlag)
+	{
+		m_NewBufferWaiting = false;
+		m_DataDiscontinuityFlag = false;
+	}
+	return buffer.data();
 }
 
 

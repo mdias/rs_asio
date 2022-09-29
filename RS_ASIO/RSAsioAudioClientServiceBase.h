@@ -18,6 +18,12 @@ public:
 
 protected:
 	RSAsioAudioClient& m_AsioAudioClient;
+
+	BYTE* GetBackbufferIfPending(bool resetPendingFlag, UINT64* outOptionalPerfCounter, bool* outOptionalIsDiscontinuity);
+
+private:
+	mutable std::mutex m_bufferMutex;
+
 	bool m_NewBufferWaiting; // set in ctor
 	UINT64 m_NewBufferPerfCounter = 0;
 
@@ -25,6 +31,4 @@ protected:
 
 	unsigned m_NumSequentialDiscontinuities = 0;
 	unsigned m_IgnoreDiscontinuityLoggingCountdown = 0;
-
-	mutable std::mutex m_mutex;
 };

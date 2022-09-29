@@ -24,21 +24,23 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UIN
 	// put the newest input data on the backbuffer
 	m_AsioAudioClient.SwapBuffers();
 
-	std::vector<BYTE>& buffer = m_AsioAudioClient.GetBackBuffer();
+	bool isDiscontinuity = true;
+	UINT64 backbufferTimestamp = 0;
+	BYTE* backbuffer = GetBackbufferIfPending(true, &backbufferTimestamp, &isDiscontinuity);
 
-	*ppData = buffer.data();
-	*pNumFramesToRead = m_NewBufferWaiting ? m_AsioAudioClient.GetBufferNumFrames() : 0;
+	*ppData = backbuffer;
+	*pNumFramesToRead = backbuffer ? m_AsioAudioClient.GetBufferNumFrames() : 0;
 
 	DWORD dwOutFlags = 0;
-	if (m_NewBufferPerfCounter == 0)
+	if (backbufferTimestamp == 0)
 	{
 		dwOutFlags |= AUDCLNT_BUFFERFLAGS_TIMESTAMP_ERROR;
 	}
-	if (!m_NewBufferWaiting)
+	if (!backbuffer)
 	{
 		dwOutFlags |= AUDCLNT_BUFFERFLAGS_SILENT;
 	}
-	if (m_DataDiscontinuityFlag)
+	if (isDiscontinuity)
 	{
 		dwOutFlags |= AUDCLNT_BUFFERFLAGS_DATA_DISCONTINUITY;
 	}
@@ -52,11 +54,10 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UIN
 
 	if (pu64QPCPosition)
 	{
-		*pu64QPCPosition = m_NewBufferPerfCounter;
+		*pu64QPCPosition = backbufferTimestamp;
 	}
 
 	m_WaitingForBufferRelease = true;
-	m_NewBufferWaiting = false;
 
 	return S_OK;
 }
@@ -69,7 +70,6 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::ReleaseBuffer(UINT32 NumFram
 		return AUDCLNT_E_OUT_OF_ORDER;
 
 	m_WaitingForBufferRelease = false;
-	m_DataDiscontinuityFlag = false;
 
 	return S_OK;
 }
