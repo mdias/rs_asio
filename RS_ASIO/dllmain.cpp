@@ -19,7 +19,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		DisableThreadLibraryCalls(hModule);
 
 		rslog::InitLog();
-		rslog::info_ts() << " - Wrapper DLL loaded (v0.6.2)" << std::endl;
+		rslog::info_ts() << " - Wrapper DLL loaded (v0.6.3)" << std::endl;
 		PatchOriginalCode();
 		break;
 	case DLL_PROCESS_DETACH:
