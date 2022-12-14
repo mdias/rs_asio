@@ -62,7 +62,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Focusrite Clarett 8Pre USB](https://github.com/mdias/rs_asio/issues/158)
 - [Focusrite Saffire 6 USB 2.0](https://github.com/mdias/rs_asio/issues/116)
 - Focusrite Saffire Pro 40
-- Focusrite Scarlett 2i2 1st Gen [(Known issues)](#known-issues)
+- [Focusrite Scarlett 2i2 1st Gen](https://github.com/mdias/rs_asio/issues/330) [(Known issues)](#known-issues)
 - [Focusrite Scarlett 2i2 2nd Gen](https://github.com/mdias/rs_asio/issues/126) [(Known issues)](#known-issues)
 - [Focusrite Scarlett 2i2 3rd Gen](https://github.com/mdias/rs_asio/issues/208) [(Known issues)](#known-issues)
 - [Focusrite Scarlett 2i4 1st Gen](https://github.com/mdias/rs_asio/issues/133) [(Known issues)](#known-issues)
