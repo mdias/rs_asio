@@ -144,7 +144,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Zoom H6](https://github.com/mdias/rs_asio/issues/198)
 - Zoom R24
 - [Zoom U-22](https://github.com/mdias/rs_asio/issues/179)
-- Zoom U-44
+- [Zoom U-44](https://github.com/mdias/rs_asio/issues/334)
 - Zoom UAC-2
 
 ### Basic configuration guide
