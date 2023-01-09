@@ -130,6 +130,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
 - Sound Devices MixPre-6 II
 - [Steinberg CI1](https://github.com/mdias/rs_asio/issues/268)
+- [Steinberg UR12](https://github.com/mdias/rs_asio/issues/340)
 - [Steinberg UR22C](https://github.com/mdias/rs_asio/issues/124)
 - [Steinberg UR44C](https://github.com/mdias/rs_asio/issues/130)
 - [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
