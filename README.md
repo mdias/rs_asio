@@ -132,7 +132,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Steinberg CI1](https://github.com/mdias/rs_asio/issues/268)
 - [Steinberg UR12](https://github.com/mdias/rs_asio/issues/340)
 - [Steinberg UR22C](https://github.com/mdias/rs_asio/issues/124)
-- [Steinberg UR24C](https://github.com/mdias/rs_asio/issues/314)
+- [Steinberg UR24C](https://github.com/mdias/rs_asio/issues/341)
 - [Steinberg UR44C](https://github.com/mdias/rs_asio/issues/130)
 - [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - [SuZhou UTECK's Guitar-Cube Chord A](https://github.com/mdias/rs_asio/issues/92)
