@@ -173,7 +173,7 @@
 1. 重复下述步骤直至你听到的音频中没有破音。你应当在没有破音的前提下尽可能设置为更小的值。找到最小的LatencyBuffer然后设置buffer size直至没有破音。
     1. 修改Rocksmith.ini中的LatencyBuffer（尝试4、3、2、1）
     1. 在ASIO驱动控制面板或者RS_ASIO.ini中的CustomBufferSize选项修改buffersize。要注意buffer size应当为32的整数倍。
-    1. 运行
+    1. 运行Rocksmith
     1. 如果遇到问题，检查`RS_ASIO-log.txt`中的日志
 
 ### 已知问题
