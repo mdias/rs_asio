@@ -1,37 +1,39 @@
 # RS ASIO
 
-This project aims to add ASIO support to `Rocksmith 2014 Edition - Remastered` in order to avoid issues with some WASAPI drivers.
-It patches game code at runtime to allow intervening in the process of WASAPI device enumeration so that we can inject our own fake WASAPI devices which internally use ASIO audio API.
+此项目旨在为`Rocksmith 2014 Edition - Remastered`（摇滚史密斯2014 - 重制版）提供ASIO驱动支持并避开WASAPI驱动带来的相关问题。
 
-## Other Languages
-[简体中文](README_CN.md)
+这会在游戏运行时修正代码以干预搜索WASAPI驱动设备的过程，并注入使用ASIO音频API的虚假WASAPI设备。
 
-## How to use
 
-- Copy the contents (`avrt.dll`, `RS_ASIO.dll`, `RS_ASIO.ini`) of [latest release](https://github.com/mdias/rs_asio/releases/latest) (zip archive release-xxx.zip) to the game folder.
-  - Only the Steam version of Rocksmith is currently supported. You can find local folder of a game by right clicking on a Rocksmith in your Steam library, and selecting menu "Manage" -> "Browse local files"
-- Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
-- Look into [basic configuration guide](#basic-configuration-guide)
-- Make sure Rocksmith.ini is set to run with `ExclusiveMode=1` and `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
-- Make sure your game is set to use the RTC input instead of the microphone one. ([See this](https://github.com/mdias/rs_asio/issues/275#issuecomment-1120386256))
-- Make sure your interface clock is set to 48kHz. RS ASIO will try to request 48kHz mode, but your drivers may or may not allow this, so it might help setting it manually.
-- Make sure you're NOT using the NoCableLauncher or similar otherwise your instruments may not be detected properly.
-- Extra: An RS_ASIO-log.txt file is generated inside the game directory which may help discover your ASIO driver name and diagnose issues.
-- Look into [list of knows issues](#known-issues) if you experience any problems
+## 其他语言
+[English](README.md)
 
-### How to remove/uninstall
+## 使用方式
 
-- Remove the custom DLL files from the game folder.
+- 将[latest release](https://github.com/mdias/rs_asio/releases/latest) (zip archive release-xxx.zip)内的全部内容复制到游戏根目录下
+  - 当前仅支持Steam版本的Rocksmith。你可以通过右键Steam游戏库中的Rocksmith，选择“管理”->“浏览本地文件”来打开游戏的根目录
+- 修改RS_ASIO.ini来配置使用ASIO音频驱动的设备及其通道等
+- 查看[基础配置指南](#基础配置指南)
+- 确保Rocksmith.ini设置`ExclusiveMode=1`以及`Win32UltraLowLatencyMode=1`，如果有疑问的话，使用默认配置即可
+- 请使用RTC（Real Tone Cable官方专用连接线）而非麦克风（[原因](https://github.com/mdias/rs_asio/issues/275#issuecomment-1120386256)）
+- 确保你的音频时钟（采样频率）设置为48kHz，RS ASIO会请求使用48kHz模式。你的驱动设备可能并不支持，如果有问题可以尝试手动设置
+- 确保你没有使用“NoCableLauncher”（第三方的绕过RTC检查的游戏启动器）或者类似的软件，这可能会导致你的乐器无法被正常检测到
+- 另外，游戏根目录下会生成一个日志文件RS_ASIO-log.txt，这可以帮助你找到你的ASIO驱动设备名称或者诊断问题
+- 如果你遇到了问题，可以尝试查看[已知问题](#已知问题)来解决
 
-### Streaming while using RS ASIO
+### 如何移除/卸载
 
-Check out [this guide](docs/streaming/README.md).
+- 移除游戏根目录下与本项目相关的所有DLL文件即可
 
-### Using RS ASIO on linux
+### 在使用RS ASIO的情况下使用流式传输
 
-Some people have had success using RS ASIO with [wineasio](https://www.wineasio.org/) on linux. You can check out [this issue](https://github.com/mdias/rs_asio/issues/99) for more information.
+查看[这篇指南](docs/streaming/README_CN.md)
 
-## Audio Interfaces reported to work well
+### 在Linux系统上使用RS ASIO
+
+有些人成功地通过[wineasio](https://www.wineasio.org/)来在Linux上使用RS ASIO。你可以查看[这个issue](https://github.com/mdias/rs_asio/issues/99)来获取更多信息
+
+## 已知可以正常工作的声卡
 
 - [Alesis Core 1](https://github.com/mdias/rs_asio/issues/115)
 - [Antelope Audio Zen Tour](https://github.com/mdias/rs_asio/issues/294)
@@ -152,11 +154,11 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Zoom U-44](https://github.com/mdias/rs_asio/issues/334)
 - Zoom UAC-2
 
-### Basic configuration guide
+### 基础配置指南
 
-1. Follow installation steps, described [above](#how-to-use)
-1. Run Rocksmith for the first time.
-1. Look into `RS_ASIO-log.txt`, you will see names of drivers
+1. 跟着[上面](#使用方式)的步骤来配置
+1. 首次运行Rocksmith
+1. 打开`RS_ASIO-log.txt`，你可以在这里找到你的ASIO驱动设备列表
 
 ```txt
 0.456 [INFO]  AsioHelpers::FindDrivers
@@ -166,24 +168,24 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 0.457 [INFO]    ZOOM R16_R24 ASIO Driver
 ```
 
-4. Copy name of the corresponding driver to the [Asio...] block of the RS_ASIO.ini
-1. Run Rocksmith again
-1. Repeat until there is no cracks in audio. Your goal is to have smallest possible values without cracks. Find smallest possible LatencyBuffer and then gradually set buffer size until there is no cracks.
-    1. Modify LatencyBuffer (try values 4,3,2,1)
-    1. Modify buffersize either in ASIO driver control panel or in CustomBufferSize option in the RS_ASIO.ini file. For the beginning follow rule of thumb that buffer size should be divisible to 32
-    1. Run Rocksmith
-    1. Look into `RS_ASIO-log.txt` if you experience any issues
+4. 复制对应的驱动名称到RS_ASIO.ini的[Asio...]部分的Driver选项
+1. 再次运行Rocksmith
+1. 重复下述步骤直至你听到的音频中没有破音。你应当在没有破音的前提下尽可能设置为更小的值。找到最小的LatencyBuffer然后设置buffer size直至没有破音。
+    1. 修改Rocksmith.ini中的LatencyBuffer（尝试4、3、2、1）
+    1. 在ASIO驱动控制面板或者RS_ASIO.ini中的CustomBufferSize选项修改buffersize。要注意buffer size应当为32的整数倍。
+    1. 运行Rocksmith
+    1. 如果遇到问题，检查`RS_ASIO-log.txt`中的日志
 
-### Known issues
+### 已知问题
 
-- Your interface MUST support 48kHz playback
-- Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
-- Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
-- Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
-- Some ESI ASIO drivers appear to get stuck when quitting Rocksmith, requiring unplugging the USB and plugging it again to be playable again.
-- Hardware hotplugging while the game is running won't be noticed by the game.
-- Game sometimes crash on exit with ASIO4ALL
+- 你的声卡**必须**支持48kHz的采样率
+- 本项目并不提供打开ASIO控制面板的方式，你可能需要自行找到在哪里配置你的声卡
+- 在游戏运行过程中修改ASIO设置需要重启游戏来应用（如修改采样频率、采样方式等）
+- 某些Focusrite（福克斯特）的声卡设备可能仅会在ASIO的buffer设置为48、96或者192时才能正常输出音频。你可以在RS_ASIO.ini中修改buffer size
+- 某些ESI声卡可能会在退出Rocksmith时卡住，需要将声卡的连接线拔出并重新插入
+- 在游戏运行过程中热插拔硬件并不会被游戏识别到
+- 在使用ASIO4ALL时游戏有时会崩溃
 
-## Donating
+## 捐赠
 
-If you wish to donate to the developer of this project, you can do so through [paypal.me/mdiasdonations](https://paypal.me/mdiasdonations). However opening an issue to say "thanks" would be enough.
+你可以在[paypal.me/mdiasdonations](https://paypal.me/mdiasdonations)捐赠这个项目的开发者，不过实际上在issue里说一句“Thanks”就已经足够了。
