@@ -27,7 +27,7 @@
 
 ### 在使用RS ASIO的情况下使用流式传输
 
-查看[这篇指南](docs/streaming/README.md)
+查看[这篇指南](docs/streaming/README_CN.md)
 
 ### 在Linux系统上使用RS ASIO
 
@@ -168,7 +168,7 @@
 0.457 [INFO]    ZOOM R16_R24 ASIO Driver
 ```
 
-4. 复制对应的驱动名称到的RS_ASIO.ini的[Asio...]Driver下
+4. 复制对应的驱动名称到RS_ASIO.ini的[Asio...]部分的Driver选项
 1. 再次运行Rocksmith
 1. 重复下述步骤直至你听到的音频中没有破音。你应当在没有破音的前提下尽可能设置为更小的值。找到最小的LatencyBuffer然后设置buffer size直至没有破音。
     1. 修改Rocksmith.ini中的LatencyBuffer（尝试4、3、2、1）
