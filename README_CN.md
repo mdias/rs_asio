@@ -80,6 +80,7 @@
 - Focusrite Scarlett 18i20 2nd Gen [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 2nd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 3rd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
+- [Fractal Audio AXE FX III](https://github.com/mdias/rs_asio/issues/347)
 - Hotone Jogg
 - [IK Multimedia AXE I/O](https://github.com/mdias/rs_asio/issues/147)
 - [IK Multimedia iRig](https://github.com/mdias/rs_asio/issues/164), using ASIO4ALL
