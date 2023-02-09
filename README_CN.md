@@ -15,7 +15,7 @@
 - 修改RS_ASIO.ini来配置使用ASIO音频驱动的设备及其通道等
 - 查看[基础配置指南](#基础配置指南)
 - 确保Rocksmith.ini设置`ExclusiveMode=1`以及`Win32UltraLowLatencyMode=1`，如果有疑问的话，使用默认配置即可
-- 请使用RTC（Real Tone Cable官方专用连接线）而非麦克风（[原因](https://github.com/mdias/rs_asio/issues/275#issuecomment-1120386256)）
+- 确保你的游戏模式设置为RTC（Real Tone Cable —— 官方专用连接线）而非麦克风模式（[原因](https://github.com/mdias/rs_asio/issues/275#issuecomment-1120386256)）
 - 确保你的音频时钟（采样频率）设置为48kHz，RS ASIO会请求使用48kHz模式。你的驱动设备可能并不支持，如果有问题可以尝试手动设置
 - 确保你没有使用“NoCableLauncher”（第三方的绕过RTC检查的游戏启动器）或者类似的软件，这可能会导致你的乐器无法被正常检测到
 - 另外，游戏根目录下会生成一个日志文件RS_ASIO-log.txt，这可以帮助你找到你的ASIO驱动设备名称或者诊断问题
