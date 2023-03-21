@@ -103,6 +103,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Mackie Onyx 1620i](https://github.com/mdias/rs_asio/issues/239)
 - [Mackie Onyx Producer 2x2](https://github.com/mdias/rs_asio/issues/211)
 - [MIDIPLUS Studio S](docs/midiplus_studio_s/README.md)
+- [Monoprice Stage Right STi12](https://github.com/mdias/rs_asio/issues/357)
 - MOTU 2408 mk3
 - [MOTU M2](https://github.com/mdias/rs_asio/issues/151)
 - [MOTU M4](https://github.com/mdias/rs_asio/issues/240)
