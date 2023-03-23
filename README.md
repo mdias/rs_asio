@@ -54,6 +54,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Behringer XENIX Q502USB](https://github.com/mdias/rs_asio/issues/132) **IMPORTANT: needs legacy ASIO driver**
 - [Behringer XR18](https://github.com/mdias/rs_asio/issues/72)
 - BOSS GT-1
+- [BOSS Katana-Air](https://github.com/mdias/rs_asio/issues/359)
 - [BOSS Katana MkII](docs/katana_mk2/README.md)
 - [Creative Sound Blaster Z](https://github.com/mdias/rs_asio/issues/191)
 - [Darkglass Element](https://github.com/mdias/rs_asio/issues/258)
