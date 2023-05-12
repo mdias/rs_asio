@@ -118,6 +118,7 @@
 - Native Instruments Komplete Audio 6
 - [Native Instruments Rig Kontrol 2](https://github.com/mdias/rs_asio/issues/214)
 - [Neural DSP Quad Cortex](https://github.com/mdias/rs_asio/issues/294)
+- [NUX Mighty Air](https://github.com/mdias/rs_asio/issues/364)
 - [NUX Mighty Plug](https://github.com/mdias/rs_asio/issues/117)
 - [PositiveGrid Spark 40](https://github.com/mdias/rs_asio/issues/218)
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
@@ -133,6 +134,7 @@
 - [Roland UA-1G](https://github.com/mdias/rs_asio/issues/291#issuecomment-1179084242)
 - [Roland ua55](docs/roland_ua_55/README.md)
 - [Roland V-Studio 100](https://github.com/mdias/rs_asio/issues/91)
+- [Solid State Logic SSL12](https://github.com/mdias/rs_asio/issues/167)
 - [Solid State Logic SSL2+](https://github.com/mdias/rs_asio/issues/167)
 - [SoundCraft Notepad-8FX](https://github.com/mdias/rs_asio/issues/86)
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
