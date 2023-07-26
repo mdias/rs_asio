@@ -49,8 +49,7 @@ void SetupDeviceEnumerator(RSAggregatorDeviceEnum& rsEnum)
 
 	if (!config.enableWasapiOutputs.has_value())
 	{
-		HWND gameWindow = FindWindowA("Rocksmith 2014", "Rocksmith 2014");
-		if (IDYES == MessageBoxA(gameWindow, "Use WASAPI output only?", "RS ASIO", MB_YESNO | MB_ICONQUESTION | MB_SYSTEMMODAL | MB_SETFOREGROUND))
+		if (IDYES == MessageBoxA(GetGameWindow(), "Use WASAPI output only?", "RS ASIO", MB_YESNO | MB_ICONQUESTION | MB_SYSTEMMODAL | MB_SETFOREGROUND))
 		{
 			config.enableWasapiOutputs = true;
 			config.enableAsioOutput = false;

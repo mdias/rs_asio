@@ -462,3 +462,8 @@ bool IsWaveFormatSame(const WAVEFORMATEX& fmt_a, const WAVEFORMATEX& fmt_b)
 
 	return true;
 }
+
+HWND GetGameWindow()
+{
+	return FindWindowA("Rocksmith 2014", "Rocksmith 2014");
+}

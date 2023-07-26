@@ -53,3 +53,5 @@ bool AsioSampleTypeFromFormat(ASIOSampleType* out, WORD bitsPerSample, bool isFl
 WORD GetAsioSampleTypeNumBytes(ASIOSampleType sampleType);
 
 bool IsWaveFormatSame(const WAVEFORMATEX& fmt_a, const WAVEFORMATEX& fmt_b);
+
+HWND GetGameWindow();

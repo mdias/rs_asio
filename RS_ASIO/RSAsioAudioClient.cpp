@@ -69,13 +69,24 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 {
 	std::lock_guard<std::mutex> g(m_controlMutex);
 
+	const bool useEventCallback = StreamFlags & AUDCLNT_STREAMFLAGS_EVENTCALLBACK;
+
+	static bool isFirstTimeCalled = true;
+	if (isFirstTimeCalled)
+	{
+		if (!useEventCallback)
+		{
+			MessageBox(GetGameWindow(), TEXT("Tried to initialize audio without using an event callback.\nDid you set Win32UltraLowLatencyMode=1 in Rocksmith.ini?"), TEXT("RS-ASIO Error"), MB_OK | MB_ICONERROR);
+		}
+		isFirstTimeCalled = false;
+	}
+
 	if (!pFormat)
 		return E_POINTER;
 
 	if (m_IsInitialized)
 		return AUDCLNT_E_ALREADY_INITIALIZED;
 
-	const bool useEventCallback = StreamFlags & AUDCLNT_STREAMFLAGS_EVENTCALLBACK;
 	if (useEventCallback && hnsBufferDuration != hnsPeriodicity)
 		return AUDCLNT_E_BUFDURATION_PERIOD_NOT_EQUAL;
 
@@ -235,6 +246,16 @@ HRESULT RSAsioAudioClient::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const 
 
 	if (!m_AsioSharedHost.IsValid())
 		return AUDCLNT_E_DEVICE_INVALIDATED;
+
+	static bool isFirstTimeCalled = true;
+	if (isFirstTimeCalled)
+	{
+		if (ShareMode != AUDCLNT_SHAREMODE_EXCLUSIVE)
+		{
+			MessageBox(GetGameWindow(), TEXT("Tried to initialize audio without exclusivity.\nDid you set ExclusiveMode=1 in Rocksmith.ini?"), TEXT("RS-ASIO Error"), MB_OK | MB_ICONERROR);
+		}
+		isFirstTimeCalled = false;
+	}
 
 	// we only support exclusive mode
 	if (ShareMode != AUDCLNT_SHAREMODE_EXCLUSIVE)
