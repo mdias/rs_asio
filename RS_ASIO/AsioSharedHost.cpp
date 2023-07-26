@@ -53,6 +53,18 @@ AsioSharedHost::AsioSharedHost(const CLSID& clsid, const std::string& asioDllPat
 					m_Driver = nullptr;
 				}
 			}
+			else
+			{
+				rslog::error_ts() << "Failed to create instance of ASIO driver " << clsid << " "
+					<< m_AsioDllPath << std::endl << "\tBad ASIO driver?" << std::endl;
+				return;
+			}
+		}
+		else
+		{
+			rslog::error_ts() << "Failed to get class factory " << clsid << " from ASIO driver "
+				<< m_AsioDllPath << std::endl << "\tBad ASIO driver?" << std::endl;
+			return;
 		}
 		
 		std::string pathLowercase = asioDllPath;
