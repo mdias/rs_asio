@@ -29,6 +29,8 @@ Check out [this guide](docs/streaming/README.md).
 
 ### Using RS ASIO on linux
 
+If you're using Ubuntu 12.04 LTS check [this page](docs/linux/ubuntu_1204_lts.md).
+
 Some people have had success using RS ASIO with [wineasio](https://www.wineasio.org/) on linux. You can check out [this issue](https://github.com/mdias/rs_asio/issues/99) for more information.
 
 ## Audio Interfaces reported to work well
