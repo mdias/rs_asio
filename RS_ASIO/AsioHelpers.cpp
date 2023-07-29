@@ -164,8 +164,54 @@ static bool GetRegistryDriverInfo(AsioHelpers::DriverInfo& outInfo, HKEY hKey, c
 	return result;
 }
 
+static std::optional<AsioHelpers::DriverInfo> GetWineAsioInfo()
+{
+	static std::optional<AsioHelpers::DriverInfo> result;
+
+	static bool isFirstCall = true;
+	if (isFirstCall)
+	{
+		isFirstCall = false;
+
+		rslog::info_ts() << __FUNCTION__ << " - Looking for wineasio.dll... " << std::endl;
+		HMODULE hWineAsio = LoadLibraryExA("wineasio.dll", nullptr, DONT_RESOLVE_DLL_REFERENCES);
+		if (hWineAsio)
+		{
+			rslog::info_ts() << "  loaded" << std::endl;
+
+			char path[MAX_PATH] = {};
+			if (GetModuleFileNameA(hWineAsio, path, sizeof(path) - 1))
+			{
+				rslog::info_ts() << "  path: " << path << std::endl;
+
+				AsioHelpers::DriverInfo info;
+				info.Clsid = { 0x48d0c522, 0xbfcc, 0x45cc, { 0x8b, 0x84, 0x17, 0xf2, 0x5f, 0x33, 0xe6, 0xe8 } };
+				info.Description = "Auto-detected wineasio.dll";
+				info.DllPath = path;
+				info.Name = "wineasio-rsasio";
+
+				rslog::info_ts() << "  name: " << info.Name.c_str() << std::endl;
+				result = info;
+			}
+			else
+			{
+				rslog::info_ts() << "  Failed to find module name for wineasio.dll" << std::endl;
+			}
+			FreeLibrary(hWineAsio);
+		}
+		else
+		{
+			rslog::info_ts() << "  Failed to load wineasio.dll or file not found" << std::endl;
+		}
+	}
+
+	return result;
+}
+
 std::vector<AsioHelpers::DriverInfo> AsioHelpers::FindDrivers()
 {
+	static std::optional<AsioHelpers::DriverInfo> WineAsioInfo = GetWineAsioInfo();
+
 	rslog::info_ts() << __FUNCTION__ << std::endl;
 
 	std::vector<AsioHelpers::DriverInfo> result;
@@ -188,6 +234,12 @@ std::vector<AsioHelpers::DriverInfo> AsioHelpers::FindDrivers()
 		}
 
 		RegCloseKey(hkEnum);
+	}
+
+	if (WineAsioInfo.has_value())
+	{
+		rslog::info_ts() << "  " << (*WineAsioInfo).Name.c_str() << std::endl;
+		result.push_back(*WineAsioInfo);
 	}
 
 	return result;
