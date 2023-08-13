@@ -141,11 +141,11 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Sound Devices MixPre-6 II
 - [Steinberg CI1](https://github.com/mdias/rs_asio/issues/268)
 - [Steinberg UR12](docs/steinberg_ur12/README.md)
+- [Steinberg UR22](docs/steinberg_ur12/README.md)
+- [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - [Steinberg UR22C](https://github.com/mdias/rs_asio/issues/124)
 - [Steinberg UR24C](https://github.com/mdias/rs_asio/issues/341)
 - [Steinberg UR44C](https://github.com/mdias/rs_asio/issues/130)
-- [Steinberg UR22](docs/steinberg_ur12/README.md)
-- [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - [SuZhou UTECK's Guitar-Cube Chord A](https://github.com/mdias/rs_asio/issues/92)
 - Swissonic UA-2x2
 - [TASCAM US-1x2](https://github.com/mdias/rs_asio/issues/266)
