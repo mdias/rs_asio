@@ -1,4 +1,4 @@
-# Steinberg UR12
+# Steinberg UR12, UR22, UR22mkII
 
 ## Config files - Guitar plugged into 1/4in (input 2) jack on the interface
 
