@@ -103,6 +103,7 @@
 - [M-Audio M-Track Duo](https://github.com/mdias/rs_asio/issues/207)
 - [M-Audio MobilePre mkII](https://github.com/mdias/rs_asio/issues/15)
 - [M-Audio ProFire 2626](https://github.com/mdias/rs_asio/issues/212#issuecomment-917706302)
+- [Mackie Big Knob Studio+](https://github.com/mdias/rs_asio/issues/385)
 - [Mackie Onyx 1620i](https://github.com/mdias/rs_asio/issues/239)
 - [Mackie Onyx Producer 2x2](https://github.com/mdias/rs_asio/issues/211)
 - [MIDIPLUS Studio S](docs/midiplus_studio_s/README.md)
@@ -140,11 +141,12 @@
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
 - Sound Devices MixPre-6 II
 - [Steinberg CI1](https://github.com/mdias/rs_asio/issues/268)
-- [Steinberg UR12](https://github.com/mdias/rs_asio/issues/340)
+- [Steinberg UR12](docs/steinberg_ur12/README.md)
+- [Steinberg UR22](docs/steinberg_ur12/README.md)
+- [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - [Steinberg UR22C](https://github.com/mdias/rs_asio/issues/124)
 - [Steinberg UR24C](https://github.com/mdias/rs_asio/issues/341)
 - [Steinberg UR44C](https://github.com/mdias/rs_asio/issues/130)
-- [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
 - [SuZhou UTECK's Guitar-Cube Chord A](https://github.com/mdias/rs_asio/issues/92)
 - Swissonic UA-2x2
 - [TASCAM US-1x2](https://github.com/mdias/rs_asio/issues/266)
