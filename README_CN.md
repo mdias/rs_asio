@@ -71,6 +71,7 @@
 - [Focusrite Scarlett 2i2 1st Gen](https://github.com/mdias/rs_asio/issues/330) [(Known issues)](#known-issues)
 - [Focusrite Scarlett 2i2 2nd Gen](https://github.com/mdias/rs_asio/issues/126) [(Known issues)](#known-issues)
 - [Focusrite Scarlett 2i2 3rd Gen](https://github.com/mdias/rs_asio/issues/208) [(Known issues)](#known-issues)
+- [Focusrite Scarlett 2i2 4th Gen](https://github.com/mdias/rs_asio/issues/405#issuecomment-1876314996) [(Known issues)](#known-issues)
 - [Focusrite Scarlett 2i4 1st Gen](https://github.com/mdias/rs_asio/issues/133) [(Known issues)](#known-issues)
 - Focusrite Scarlett 2i4 2nd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 4i4 3rd Gen [(Known issues)](#known-issues)
