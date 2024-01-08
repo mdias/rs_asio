@@ -197,6 +197,7 @@
 - 本项目并不提供打开ASIO控制面板的方式，你可能需要自行找到在哪里配置你的声卡
 - 在游戏运行过程中修改ASIO设置需要重启游戏来应用（如修改采样频率、采样方式等）
 - 某些Focusrite（福克斯特）的声卡设备可能仅会在ASIO的buffer设置为48、96或者192时才能正常输出音频。你可以在RS_ASIO.ini中修改buffer size
+    - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
 - 某些ESI声卡可能会在退出Rocksmith时卡住，需要将声卡的连接线拔出并重新插入
 - 在游戏运行过程中热插拔硬件并不会被游戏识别到
 - 在使用ASIO4ALL时游戏有时会崩溃

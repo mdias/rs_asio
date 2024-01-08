@@ -197,6 +197,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
+    - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
 - Some ESI ASIO drivers appear to get stuck when quitting Rocksmith, requiring unplugging the USB and plugging it again to be playable again.
 - Hardware hotplugging while the game is running won't be noticed by the game.
 - Game sometimes crash on exit with ASIO4ALL
