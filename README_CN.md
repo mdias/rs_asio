@@ -58,6 +58,7 @@
 - BOSS GT-1
 - [BOSS Katana-Air](https://github.com/mdias/rs_asio/issues/359)
 - [BOSS Katana MkII](docs/katana_mk2/README.md)
+- [Creative Live! Audio A3](https://github.com/mdias/rs_asio/issues/412)
 - [Creative Sound Blaster Z](https://github.com/mdias/rs_asio/issues/191)
 - [Darkglass Element](https://github.com/mdias/rs_asio/issues/258)
 - ESI MAYA22 USB
