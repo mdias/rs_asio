@@ -42,6 +42,7 @@
 - [Arturia MiniFuse 2](https://github.com/mdias/rs_asio/issues/282)
 - [Asus Strix Soar](docs/asus_strix_soar/README.md)
 - [Audient Evo 4](docs/audient_evo_4/README.md)
+- [Audient Evo 16](docs/audient_evo_4/README.md)
 - [Audient iD4](https://github.com/mdias/rs_asio/issues/295)
 - Audient iD22
 - [Behringer GUITAR 2 USB](https://github.com/mdias/rs_asio/issues/246), using ASIO4All
@@ -55,6 +56,7 @@
 - [Behringer UMC404HD](https://github.com/mdias/rs_asio/issues/13)
 - [Behringer XENIX Q502USB](https://github.com/mdias/rs_asio/issues/132) **IMPORTANT: needs legacy ASIO driver**
 - [Behringer XR18](https://github.com/mdias/rs_asio/issues/72)
+- [BOSS Gigcaster (GCS-8)](docs/boss_gcs_8/README.md)
 - BOSS GT-1
 - [BOSS Katana-Air](https://github.com/mdias/rs_asio/issues/359)
 - [BOSS Katana MkII](docs/katana_mk2/README.md)

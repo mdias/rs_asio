@@ -1,4 +1,4 @@
-# Audient Evo v4
+# Audient Evo 4 / Evo 16
 
 ## About
 
