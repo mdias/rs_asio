@@ -173,35 +173,50 @@ static std::optional<AsioHelpers::DriverInfo> GetWineAsioInfo()
 	{
 		isFirstCall = false;
 
-		rslog::info_ts() << __FUNCTION__ << " - Looking for wineasio.dll... " << std::endl;
-		HMODULE hWineAsio = LoadLibraryExA("wineasio.dll", nullptr, DONT_RESOLVE_DLL_REFERENCES);
-		if (hWineAsio)
+		std::array possibleDllNames = {
+			"wineasio32.dll",
+			"wineasio.dll"
+		};
+
+		bool keepLooking = true;
+
+		for (const char* dllToFind : possibleDllNames)
 		{
-			rslog::info_ts() << "  loaded" << std::endl;
-
-			char path[MAX_PATH] = {};
-			if (GetModuleFileNameA(hWineAsio, path, sizeof(path) - 1))
+			if (!keepLooking)
 			{
-				rslog::info_ts() << "  path: " << path << std::endl;
+				break;
+			}
 
-				AsioHelpers::DriverInfo info;
-				info.Clsid = { 0x48d0c522, 0xbfcc, 0x45cc, { 0x8b, 0x84, 0x17, 0xf2, 0x5f, 0x33, 0xe6, 0xe8 } };
-				info.Description = "Auto-detected wineasio.dll";
-				info.DllPath = path;
-				info.Name = "wineasio-rsasio";
+			rslog::info_ts() << __FUNCTION__ << " - Looking for \"" << dllToFind << "\"...";
 
-				rslog::info_ts() << "  name: " << info.Name.c_str() << std::endl;
-				result = info;
+			HMODULE hWineAsio = LoadLibraryExA(dllToFind, nullptr, DONT_RESOLVE_DLL_REFERENCES);
+			if (hWineAsio)
+			{
+				char path[512] = {};
+				if (GetModuleFileNameA(hWineAsio, path, sizeof(path) - 1))
+				{
+					rslog::info << "  Loaded and found at \"" << path << "\"." << std::endl;
+
+					AsioHelpers::DriverInfo info;
+					info.Clsid = { 0x48d0c522, 0xbfcc, 0x45cc, { 0x8b, 0x84, 0x17, 0xf2, 0x5f, 0x33, 0xe6, 0xe8 } };
+					info.Description = "Auto-detected wineasio dll";
+					info.DllPath = path;
+					info.Name = "wineasio-rsasio";
+
+					rslog::info_ts() << "  name: " << info.Name.c_str() << std::endl;
+					result = info;
+					keepLooking = false;
+				}
+				else
+				{
+					rslog::info_ts() << "  Loaded but could not get path." << std::endl;
+				}
+				FreeLibrary(hWineAsio);
 			}
 			else
 			{
-				rslog::info_ts() << "  Failed to find module name for wineasio.dll" << std::endl;
+				rslog::info << "  Not found." << std::endl;
 			}
-			FreeLibrary(hWineAsio);
-		}
-		else
-		{
-			rslog::info_ts() << "  Failed to load wineasio.dll or file not found" << std::endl;
 		}
 	}
 
