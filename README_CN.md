@@ -90,6 +90,7 @@
 - [IK Multimedia AXE I/O](https://github.com/mdias/rs_asio/issues/147)
 - [IK Multimedia iRig](https://github.com/mdias/rs_asio/issues/164), using ASIO4ALL
 - [IK Multimedia iRig HD 2](https://github.com/mdias/rs_asio/issues/117)
+- [IK Multimedia iRig HD X](https://github.com/mdias/rs_asio/issues/435)
 - [IK Multimedia iRig Pro Duo I/O](docs/irig_pro_duo_io/README.md)
 - [JackRouter ASIO driver](https://github.com/mdias/rs_asio/issues/303)
 - Juli@ XTe
