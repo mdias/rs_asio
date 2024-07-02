@@ -19,6 +19,7 @@
 - 确保你的音频时钟（采样频率）设置为48kHz，RS ASIO会请求使用48kHz模式。你的驱动设备可能并不支持，如果有问题可以尝试手动设置
 - 确保你没有使用“NoCableLauncher”（第三方的绕过RTC检查的游戏启动器）或者类似的软件，这可能会导致你的乐器无法被正常检测到
 - 另外，游戏根目录下会生成一个日志文件RS_ASIO-log.txt，这可以帮助你找到你的ASIO驱动设备名称或者诊断问题
+    - IMPORTANT: Only 32-bit ASIO drivers will be detected!
 - 如果你遇到了问题，可以尝试查看[已知问题](#已知问题)来解决
 
 ### 如何移除/卸载
@@ -206,6 +207,7 @@
 - 在游戏运行过程中修改ASIO设置需要重启游戏来应用（如修改采样频率、采样方式等）
 - 某些Focusrite（福克斯特）的声卡设备可能仅会在ASIO的buffer设置为48、96或者192时才能正常输出音频。你可以在RS_ASIO.ini中修改buffer size
     - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
+- [According to reports](https://github.com/mdias/rs_asio/issues?q=label%3A%22focusrite+asio+driver%22+), newer Focusrite driver releases (after 4.102.4) no longer include 32 bit ASIO drivers required by RS ASIO. You can work around this by using software like voicemeeter to reroute audio to the normal 64 bit drivers.
 - 某些ESI声卡可能会在退出Rocksmith时卡住，需要将声卡的连接线拔出并重新插入
 - 在游戏运行过程中热插拔硬件并不会被游戏识别到
 - 在使用ASIO4ALL时游戏有时会崩溃

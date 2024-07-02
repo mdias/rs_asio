@@ -17,6 +17,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Make sure your interface clock is set to 48kHz. RS ASIO will try to request 48kHz mode, but your drivers may or may not allow this, so it might help setting it manually.
 - Make sure you're NOT using the NoCableLauncher or similar otherwise your instruments may not be detected properly.
 - Extra: An RS_ASIO-log.txt file is generated inside the game directory which may help discover your ASIO driver name and diagnose issues.
+    - IMPORTANT: Only 32-bit ASIO drivers will be detected!
 - Look into [list of knows issues](#known-issues) if you experience any problems
 
 ### How to remove/uninstall
@@ -206,6 +207,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
     - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
+- [According to reports](https://github.com/mdias/rs_asio/issues?q=label%3A%22focusrite+asio+driver%22+), newer Focusrite driver releases (after 4.102.4) no longer include 32 bit ASIO drivers required by RS ASIO. You can work around this by using software like voicemeeter to reroute audio to the normal 64 bit drivers.
 - Some ESI ASIO drivers appear to get stuck when quitting Rocksmith, requiring unplugging the USB and plugging it again to be playable again.
 - Hardware hotplugging while the game is running won't be noticed by the game.
 - Game sometimes crash on exit with ASIO4ALL
