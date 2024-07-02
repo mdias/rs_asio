@@ -86,6 +86,7 @@
 - [Focusrite Scarlett Solo 2nd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 3rd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - [Fractal Audio AXE FX III](https://github.com/mdias/rs_asio/issues/347)
+- [Hotone Ampero II Stage](https://github.com/mdias/rs_asio/issues/444)
 - Hotone Jogg
 - [IK Multimedia AXE I/O](https://github.com/mdias/rs_asio/issues/147)
 - [IK Multimedia iRig](https://github.com/mdias/rs_asio/issues/164), using ASIO4ALL
@@ -125,6 +126,7 @@
 - [Native Instruments Rig Kontrol 2](https://github.com/mdias/rs_asio/issues/214)
 - [Neural DSP Quad Cortex](https://github.com/mdias/rs_asio/issues/294)
 - [NUX Mighty Air](https://github.com/mdias/rs_asio/issues/364)
+- [NUX Mighty Lite BT MKII](https://github.com/mdias/rs_asio/issues/446)
 - [NUX Mighty Plug](https://github.com/mdias/rs_asio/issues/117)
 - [PositiveGrid Spark 40](https://github.com/mdias/rs_asio/issues/218)
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
