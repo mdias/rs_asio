@@ -37,6 +37,7 @@
 ## 已知可以正常工作的声卡
 
 - [Alesis Core 1](https://github.com/mdias/rs_asio/issues/115)
+- [Antelope Audio Zen Go](https://github.com/mdias/rs_asio/issues/294#issuecomment-2212061137)
 - [Antelope Audio Zen Tour](https://github.com/mdias/rs_asio/issues/294)
 - [Arturia AudioFuse](https://github.com/mdias/rs_asio/issues/114)
 - [Arturia MiniFuse 1](https://github.com/mdias/rs_asio/issues/287)
@@ -150,6 +151,7 @@
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
 - Sound Devices MixPre-6 II
 - [Steinberg CI1](https://github.com/mdias/rs_asio/issues/268)
+- [Steinberg MR816 CSX](https://github.com/mdias/rs_asio/issues/448)
 - [Steinberg UR12](docs/steinberg_ur12/README.md)
 - [Steinberg UR22](docs/steinberg_ur12/README.md)
 - [Steinberg UR22mkII](docs/steinberg_ur12/README.md)
