@@ -1,0 +1,3 @@
+LIBRARY RS_ASIO
+EXPORTS
+	Patched_CoCreateInstance
