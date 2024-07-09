@@ -1,13 +1,20 @@
 name: Build
+
 on: [push, pull_request]
 
 jobs:
   build:
     runs-on: windows-2019
+
     steps:
-    - name: Checkout current build target
-      uses: actions/checkout@v2
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.0.2
-    - name: Build with MSBuild
-      run: msbuild  '.\RS_ASIO.sln'
+      - name: Checkout current build target
+        uses: actions/checkout@v2
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v1.10
+
+      - name: Configure CMake
+        run: cmake -S . -B build
+
+      - name: Build with CMake
+        run: cmake --build build --config Release
