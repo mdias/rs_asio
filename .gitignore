@@ -14,6 +14,7 @@
 *.userprefs
 
 .idea/
+cmake-build*/
 
 # Mono auto generated files
 mono_crash.*

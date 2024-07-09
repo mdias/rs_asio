@@ -1,43 +1,50 @@
 #include "stdafx.h"
+#include "Utils.h"
 
 #define LOG_TO_CONSOLE 0
+#define LOG_FILENAME "ASIODriverRefresher.log"
 
 #if !LOG_TO_CONSOLE
 static std::filebuf logFileBuffer;
 #endif
-static TimeStamp initTimeStamp;
 
-namespace rslog
-{
+namespace logging {
 #if !LOG_TO_CONSOLE
-	std::ostream info(&logFileBuffer);
-	std::ostream error(&logFileBuffer);
+    std::ostream info(&logFileBuffer);
+    std::ostream error(&logFileBuffer);
 #else
 	std::ostream info(std::cout.rdbuf());
 	std::ostream error(std::cerr.rdbuf());
 #endif
 
-	std::ostream& info_ts()
-	{
-		char tmp[16];
-		snprintf(tmp, sizeof(tmp), "%0.3lf", (TimeStamp() - initTimeStamp).GetSeconds());
+    std::ostream &info_ts() {
+        return info <<  GetTimestamp() << " [INFO]  ";
+    }
 
-		return info << tmp << " [INFO]  ";
-	}
+    std::ostream &error_ts() {
 
-	std::ostream& error_ts()
-	{
-		char tmp[16];
-		snprintf(tmp, sizeof(tmp), "%0.3lf", (TimeStamp() - initTimeStamp).GetSeconds());
+        return error <<  GetTimestamp() << " [ERROR]  ";
+    }
 
-		return error << tmp << " [ERROR]  ";
-	}
 
-	void InitLog()
-	{
+    void InitLog() {
 #if !LOG_TO_CONSOLE
-		logFileBuffer.open("AsioDriverRefresher-log.txt", std::ios_base::out | std::ios_base::trunc);
-		initTimeStamp = TimeStamp();
+
+        std::string logFilePath = fh::GetFilePath(LOG_FILENAME);
+
+
+        std::uintmax_t fileSize = fh::getFileSize(LOG_FILENAME);
+
+        // Calculate 1 MB in bytes (1 MB = 1024 * 1024 bytes)
+        constexpr std::uintmax_t ONE_MB = 1024 * 1024;
+
+
+        if (fileSize > ONE_MB) {
+            fh::deleteFileIfExists(LOG_FILENAME);
+        }
+
+        // Open log file in append mode
+        logFileBuffer.open(logFilePath, std::ios_base::out | std::ios_base::app);
 #else
 		AllocConsole();
 		AttachConsole(GetCurrentProcessId());
@@ -50,13 +57,13 @@ namespace rslog
 		info.set_rdbuf(std::cout.rdbuf());
 		error.set_rdbuf(std::cerr.rdbuf());
 #endif
-	}
+    }
 
-	void CleanupLog()
-	{
+
+    void CleanupLog() {
 #if !LOG_TO_CONSOLE
-		logFileBuffer.close();
+        logFileBuffer.close();
 #else
 #endif
-	}
+    }
 }

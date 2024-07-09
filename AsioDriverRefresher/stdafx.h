@@ -17,6 +17,7 @@
 #include <Audioclient.h>
 #include <endpointvolume.h>
 #include <functiondiscoverykeys_devpkey.h>
+#include <cmath>
 
 
 
@@ -36,4 +37,5 @@
 #include "asio.h"
 #include "Utils.h"
 #include "Log.h"
-#include "TrampolineToMethod.h"
+#include "FileHelper.h"
+#include "Config.h"

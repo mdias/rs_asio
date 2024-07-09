@@ -1,4 +1,9 @@
 #pragma once
+#include <vector>
+#include <iostream>
+#include "stdafx.h"
+
+
 
 class AsioSharedHost;
 

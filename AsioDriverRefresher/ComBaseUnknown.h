@@ -1,9 +1,14 @@
 #pragma once
 
+#include <windows.h>
+#include <unknwn.h>
+#include "stdafx.h"
+
 template <class TBase>
 class ComBaseUnknown : public TBase
 {
 	static_assert(std::is_base_of<IUnknown, TBase>::value, "TBase is not a subclass of IUnknown");
+
 public:
 	virtual ~ComBaseUnknown() = default;
 
@@ -14,12 +19,12 @@ public:
 
 		if (riid == __uuidof(IUnknown))
 		{
-			*ppvObject = this;
+			*ppvObject = static_cast<IUnknown*>(this);
 			this->AddRef();
 			return S_OK;
 		}
 
-		rslog::error_ts() << __FUNCTION__ << " - interface not found; riid: " << riid << std::endl;
+		logging::error_ts() << __FUNCTION__ << " - interface not found; riid: " << riid << std::endl;
 
 		return E_NOINTERFACE;
 	}

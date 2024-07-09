@@ -1,6 +1,5 @@
 #pragma once
-
-namespace rslog
+namespace logging
 {
 	extern std::ostream info;
 	extern std::ostream error;
