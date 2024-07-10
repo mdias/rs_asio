@@ -173,6 +173,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Yamaha THR30IIW](https://github.com/mdias/rs_asio/issues/210)
 - [Zoom G2.1NU](https://github.com/mdias/rs_asio/issues/400)
 - [Zoom G2.1DM](https://github.com/mdias/rs_asio/issues/400)
+- Zoom H2N
 - [Zoom H6](https://github.com/mdias/rs_asio/issues/198)
 - Zoom R24
 - [Zoom U-22](https://github.com/mdias/rs_asio/issues/179)
