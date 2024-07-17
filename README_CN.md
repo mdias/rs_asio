@@ -130,7 +130,7 @@
 - [NUX Mighty Air](https://github.com/mdias/rs_asio/issues/364)
 - [NUX Mighty Lite BT MKII](https://github.com/mdias/rs_asio/issues/446)
 - [NUX Mighty Plug](https://github.com/mdias/rs_asio/issues/117)
-- [PositiveGrid Spark 40](https://github.com/mdias/rs_asio/issues/218)
+- [PositiveGrid Spark 40](https://github.com/mdias/rs_asio/issues/218) (issue reported with limited sample rate support in 2024/07; see linked issue)
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
 - [Presonus AudioBox USB 96](https://github.com/mdias/rs_asio/issues/140)
 - Presonus Quantum 2
