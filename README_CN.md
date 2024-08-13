@@ -67,6 +67,7 @@
 - [Darkglass Element](https://github.com/mdias/rs_asio/issues/258)
 - ESI MAYA22 USB
 - [ESI MAYA44 eX](https://github.com/mdias/rs_asio/issues/134) [(Known issues)](#known-issues)
+- [ESI U22 XT](https://github.com/mdias/rs_asio/issues/458)
 - [ESI UGM96](https://github.com/mdias/rs_asio/issues/250) [(Known issues)](#known-issues)
 - [Focusrite Clarett 2Pre Thunderbolt](https://github.com/mdias/rs_asio/issues/146)
 - [Focusrite Clarett 4Pre USB](https://github.com/mdias/rs_asio/issues/42)
