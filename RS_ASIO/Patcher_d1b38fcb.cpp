@@ -51,14 +51,21 @@ static const BYTE originalBytes_call_UnmarshalStreamComPointers[]{
 	0xe8, 0x71, 0xe3, 0xff, 0xff // call (to another uninteresting function)
 };
 
-static const BYTE originalBytes_TwoRealToneCablesMessageBox[]{
-	//	0x8b, 0x75, 0x8c, // mov esi, ....
-		0xe8, 0x7c, 0x22, 0xe2, 0xff, // call
-		0x84, 0xc0, // test al, al
-		0x74, 0x6b, // jz ...
-		0xba, 0x34, 0xfe, 0x1c, 0x01, // mov edx, offset "TooManyGuitarInputs"
-		0x8d, 0xb3, 0x4c, 0x01, 0x00, 0x00, // lea esi, [ebx+0x14C]
-		0xe8, 0xd8, 0xd8, 0xc4, 0xff // call
+static const BYTE originalBytes_TwoRealToneCablesMessageBoxStarting[]{
+//	0x8b, 0x75, 0x8c, // mov esi, ....
+//	0xe8, 0x7c, 0x22, 0xe2, 0xff, // call
+//	0x84, 0xc0, // test al, al
+	0x74, 0x6b, // jz ...
+	0xba, 0x34, 0xfe, 0x1c, 0x01, // mov edx, offset "TooManyGuitarInputs"
+	0x8d, 0xb3, 0x4c, 0x01, 0x00, 0x00, // lea esi, [ebx+0x14C]
+	0xe8, 0xd8, 0xd8, 0xc4, 0xff // call
+};
+
+static const BYTE originalBytes_TwoRealToneCablesMessageBoxMainMenu[]{
+	// 0x80, 0xbb, 0x4a, 0x01, 0x00, 0x00, 0x00 // cmp byte ptr [ebx+0x14A], 0
+	0x0f, 0x84, 0x95, 0x00, 0x00, 0x00, // jz ...
+	0xba, 0x48, 0xfe, 0x1c, 0x01, // mov edx, offset "$[34872]Warning! Two Rocksmith Real Ton..."
+	0x8d, 0x75, 0xb0, // lea esi, [ebp+...]
 };
 
 template<typename T>
@@ -84,7 +91,8 @@ void PatchOriginalCode_d1b38fcb()
 	std::vector<void*> offsets_PaMarshalPointers = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));
 	std::vector<void*> offsets_PaUnmarshalPointers = FindBytesOffsets(originalBytes_call_UnmarshalStreamComPointers, sizeof(originalBytes_call_UnmarshalStreamComPointers));
 
-	std::vector<void*> offsets_TwoRealToneCablesMessageBox = FindBytesOffsets(originalBytes_TwoRealToneCablesMessageBox, sizeof(originalBytes_TwoRealToneCablesMessageBox));
+	std::vector<void*> offsets_TwoRealToneCablesMessageBoxStarting = FindBytesOffsets(originalBytes_TwoRealToneCablesMessageBoxStarting, sizeof(originalBytes_TwoRealToneCablesMessageBoxStarting));
+	std::vector<void*> offsets_TwoRealToneCablesMessageBoxMainMenu = FindBytesOffsets(originalBytes_TwoRealToneCablesMessageBoxMainMenu, sizeof(originalBytes_TwoRealToneCablesMessageBoxMainMenu));
 
 	if (offsets_CoCreateInstanceAbs.size() == 0 && offsets_PaMarshalPointers.size() == 0 && offsets_PaUnmarshalPointers.size() == 0)
 	{
@@ -106,11 +114,27 @@ void PatchOriginalCode_d1b38fcb()
 		Patch_CallRelativeAddress(offsets_PaUnmarshalPointers, &Patched_PortAudio_UnmarshalStreamComPointers);
 
 		// patch two guitar cables connected message in single-player
-		rslog::info_ts() << "Patching Two Guitar Tones Connected Message Box (num locations: " << offsets_TwoRealToneCablesMessageBox.size() << ")" << std::endl;
-		for (void* offset : offsets_TwoRealToneCablesMessageBox)
+		rslog::info_ts() << "Patching Two Guitar Tones Connected Message Box (starting menu) (num locations: " << offsets_TwoRealToneCablesMessageBoxStarting.size() << ")" << std::endl;
+		for (void* offset : offsets_TwoRealToneCablesMessageBoxStarting)
 		{
+			const BYTE replaceBytes[]
+			{
+				0xeb, // jmp rel8
+			};
 			rslog::info_ts() << "Patching bytes at " << offset << std::endl;
-			Patch_ReplaceWithNops(offset, sizeof(originalBytes_TwoRealToneCablesMessageBox));
+			Patch_ReplaceWithBytes(offset, sizeof(replaceBytes), replaceBytes);
+		}
+
+		rslog::info_ts() << "Patching Two Guitar Tones Connected Message Box (main menu) (num locations: " << offsets_TwoRealToneCablesMessageBoxMainMenu.size() << ")" << std::endl;
+		for (void* offset : offsets_TwoRealToneCablesMessageBoxMainMenu)
+		{
+			const BYTE replaceBytes[]
+			{
+				0x90, // original instruction at this point is 6 byte wide, we only need 5 bytes, so put a nop here
+				0xe9, // jmp rel32
+			};
+			rslog::info_ts() << "Patching bytes at " << offset << std::endl;
+			Patch_ReplaceWithBytes(offset, sizeof(replaceBytes), replaceBytes);
 		}
 	}
 }

@@ -150,6 +150,29 @@ void Patch_ReplaceWithNops(void* offset, size_t numBytes)
 	}
 }
 
+void Patch_ReplaceWithBytes(void* offset, size_t numBytes, const BYTE* replaceBytes)
+{
+	DWORD oldProtectFlags = 0;
+	if (!VirtualProtect(offset, numBytes, PAGE_WRITECOPY, &oldProtectFlags))
+	{
+		rslog::error_ts() << "Failed to change memory protection" << std::endl;
+	}
+	else
+	{
+		BYTE* byte = (BYTE*)offset;
+		for (size_t i = 0; i < numBytes; ++i)
+		{
+			byte[i] = replaceBytes[i];
+		}
+
+		FlushInstructionCache(GetCurrentProcess(), offset, numBytes);
+		if (!VirtualProtect(offset, numBytes, oldProtectFlags, &oldProtectFlags))
+		{
+			rslog::error_ts() << "Failed to restore memory protection" << std::endl;
+		}
+	}
+}
+
 void PatchOriginalCode()
 {
 	rslog::info_ts() << __FUNCTION__ << std::endl;
