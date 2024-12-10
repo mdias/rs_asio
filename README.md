@@ -83,6 +83,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Focusrite Scarlett 4i4 3rd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 6i6 2nd Gen [(Known issues)](#known-issues)
 - [Focusrite Scarlett 8i6 3rd Gen](https://github.com/mdias/rs_asio/issues/208) [(Known issues)](#known-issues)
+- [Focusrite Scarlett 16i16 4th Gen](https://github.com/mdias/rs_asio/issues/405#issuecomment-2527560680) [(Known issues)](#known-issues)
 - [Focusrite Scarlett 18i8 2nd Gen](docs/focusrite_scarlett_18i8_2nd_gen_OR_asio_link_pro/README.md) [(Known issues)](#known-issues)
 - Focusrite Scarlett 18i8 3rd Gen [(Known issues)](#known-issues)
 - Focusrite Scarlett 18i20 2nd Gen [(Known issues)](#known-issues)
