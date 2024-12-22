@@ -47,6 +47,7 @@
 - [Audient Evo 16](docs/audient_evo_4/README.md)
 - [Audient iD4](https://github.com/mdias/rs_asio/issues/295)
 - Audient iD22
+- [Avid Mbox Studio](https://github.com/mdias/rs_asio/issues/467)
 - [Behringer GUITAR 2 USB](https://github.com/mdias/rs_asio/issues/246), using ASIO4All
 - [Behringer MIC2 USB](docs/behringer_mic2usb/README.md), using ASIO4All
 - Behringer U-Phoria UM2  [(see this for more details)](https://github.com/mdias/rs_asio/issues/7) **IMPORTANT: needs legacy ASIO driver**
