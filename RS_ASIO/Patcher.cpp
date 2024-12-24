@@ -2,6 +2,19 @@
 #include "dllmain.h"
 #include "crc32.h"
 
+EXTERN_C ULONG NtProtectVirtualMemory(
+	IN HANDLE ProcessHandle,
+	IN OUT PVOID* BaseAddress,
+	IN OUT PSIZE_T RegionSize,
+	IN ULONG NewProtect,
+	OUT PULONG OldProtect
+);
+
+bool VirtualProtectSyscall(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect)
+{
+	return NtProtectVirtualMemory(GetCurrentProcess(), &lpAddress, &dwSize, flNewProtect, lpflOldProtect) == 0;
+}
+
 DWORD GetImageCrc32()
 {
 	char exePath[MAX_PATH]{};
@@ -20,6 +33,7 @@ DWORD GetImageCrc32()
 
 void PatchOriginalCode_d1b38fcb();
 void PatchOriginalCode_21a8959a();
+void PatchOriginalCode_6ea6d1ba();
 
 std::vector<void*> FindBytesOffsets(const BYTE* bytes, size_t numBytes)
 {
@@ -57,7 +71,7 @@ std::vector<void*> FindBytesOffsets(const BYTE* bytes, size_t numBytes)
 	return result;
 }
 
-void Patch_CallAbsoluteIndirectAddress(const std::vector<void*>& offsets, void* TargetFn)
+void Patch_CallAbsoluteIndirectAddress(const std::vector<void*>& offsets, void* TargetFn, size_t numNopsFollowing)
 {
 	rslog::info_ts() << __FUNCTION__ " - num locations: " << offsets.size() << std::endl;
 
@@ -70,7 +84,7 @@ void Patch_CallAbsoluteIndirectAddress(const std::vector<void*>& offsets, void* 
 		BYTE* bytes = (BYTE*)offset;
 
 		DWORD oldProtectFlags = 0;
-		if (!VirtualProtect(offset, 6, PAGE_WRITECOPY, &oldProtectFlags))
+		if (!VirtualProtectSyscall(offset, 6, PAGE_WRITECOPY, &oldProtectFlags))
 		{
 			rslog::error_ts() << "Failed to change memory protection" << std::endl;
 		}
@@ -79,10 +93,13 @@ void Patch_CallAbsoluteIndirectAddress(const std::vector<void*>& offsets, void* 
 			bytes[0] = 0xe8;
 			void** callAddress = (void**)(bytes + 1);
 			*callAddress = (void*)targetRelAddress;
-			bytes[5] = 0x90;
+			for (size_t i = 0; i < numNopsFollowing; ++i)
+			{
+				bytes[5+i] = 0x90;
+			}
 
-			FlushInstructionCache(GetCurrentProcess(), offset, 6);
-			if (!VirtualProtect(offset, 6, oldProtectFlags, &oldProtectFlags))
+			FlushInstructionCache(GetCurrentProcess(), offset, 5+numNopsFollowing);
+			if (!VirtualProtectSyscall(offset, 5 + numNopsFollowing, oldProtectFlags, &oldProtectFlags))
 			{
 				rslog::error_ts() << "Failed to restore memory protection" << std::endl;
 			}
@@ -106,7 +123,7 @@ void Patch_CallRelativeAddress(const std::vector<void*>& offsets, void* TargetFn
 		bytes += 5 + relOffset;
 
 		DWORD oldProtectFlags = 0;
-		if (!VirtualProtect(bytes, 6, PAGE_WRITECOPY, &oldProtectFlags))
+		if (!VirtualProtectSyscall(bytes, 6, PAGE_WRITECOPY, &oldProtectFlags))
 		{
 			rslog::error_ts() << "Failed to change memory protection" << std::endl;
 		}
@@ -119,7 +136,7 @@ void Patch_CallRelativeAddress(const std::vector<void*>& offsets, void* TargetFn
 			// ret
 			bytes[5] = 0xc3;
 
-			if (!VirtualProtect(bytes, 6, oldProtectFlags, &oldProtectFlags))
+			if (!VirtualProtectSyscall(bytes, 6, oldProtectFlags, &oldProtectFlags))
 			{
 				rslog::error_ts() << "Failed to restore memory protection" << std::endl;
 			}
@@ -130,7 +147,7 @@ void Patch_CallRelativeAddress(const std::vector<void*>& offsets, void* TargetFn
 void Patch_ReplaceWithNops(void* offset, size_t numBytes)
 {
 	DWORD oldProtectFlags = 0;
-	if (!VirtualProtect(offset, numBytes, PAGE_WRITECOPY, &oldProtectFlags))
+	if (!VirtualProtectSyscall(offset, numBytes, PAGE_WRITECOPY, &oldProtectFlags))
 	{
 		rslog::error_ts() << "Failed to change memory protection" << std::endl;
 	}
@@ -143,7 +160,7 @@ void Patch_ReplaceWithNops(void* offset, size_t numBytes)
 		}
 
 		FlushInstructionCache(GetCurrentProcess(), offset, numBytes);
-		if (!VirtualProtect(offset, numBytes, oldProtectFlags, &oldProtectFlags))
+		if (!VirtualProtectSyscall(offset, numBytes, oldProtectFlags, &oldProtectFlags))
 		{
 			rslog::error_ts() << "Failed to restore memory protection" << std::endl;
 		}
@@ -153,7 +170,7 @@ void Patch_ReplaceWithNops(void* offset, size_t numBytes)
 void Patch_ReplaceWithBytes(void* offset, size_t numBytes, const BYTE* replaceBytes)
 {
 	DWORD oldProtectFlags = 0;
-	if (!VirtualProtect(offset, numBytes, PAGE_WRITECOPY, &oldProtectFlags))
+	if (!VirtualProtectSyscall(offset, numBytes, PAGE_WRITECOPY, &oldProtectFlags))
 	{
 		rslog::error_ts() << "Failed to change memory protection" << std::endl;
 	}
@@ -166,7 +183,7 @@ void Patch_ReplaceWithBytes(void* offset, size_t numBytes, const BYTE* replaceBy
 		}
 
 		FlushInstructionCache(GetCurrentProcess(), offset, numBytes);
-		if (!VirtualProtect(offset, numBytes, oldProtectFlags, &oldProtectFlags))
+		if (!VirtualProtectSyscall(offset, numBytes, oldProtectFlags, &oldProtectFlags))
 		{
 			rslog::error_ts() << "Failed to restore memory protection" << std::endl;
 		}
@@ -191,6 +208,9 @@ void PatchOriginalCode()
 			break;
 		case 0x21a8959a:
 			PatchOriginalCode_21a8959a();
+			break;
+		case 0x6ea6d1ba:
+			PatchOriginalCode_6ea6d1ba();
 			break;
 		default:
 			rslog::error_ts() << "Unknown game version" << std::endl;

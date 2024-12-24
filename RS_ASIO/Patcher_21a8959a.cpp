@@ -68,7 +68,7 @@ void PatchOriginalCode_21a8959a()
 	{
 		// patch CoCreateInstance calls
 		rslog::info_ts() << "Patching CoCreateInstance" << std::endl;
-		Patch_CallAbsoluteIndirectAddress(offsets_CoCreateInstance, &Patched_CoCreateInstance);
+		Patch_CallAbsoluteIndirectAddress(offsets_CoCreateInstance, &Patched_CoCreateInstance, 1);
 
 		// patch PortAudio MarshalStreamComPointers
 		rslog::info_ts() << "Patching PortAudio MarshalStreamComPointers" << std::endl;
