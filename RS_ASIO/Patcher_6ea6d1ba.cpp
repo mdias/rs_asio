@@ -25,14 +25,17 @@ static const BYTE originalBytes_call_UnmarshalStreamComPointers[]{
 };
 
 static const BYTE originalBytes_TwoRealToneCablesMessageBoxStarting[]{
+	0x84, 0xc0, // test al, al
 	0x74, 0x6b, // jz ...
-	0xba, 0x5c, 0x16, 0x8b, 0x01 // mov edx, offset "TooManyGuitarInputs"
+	0xba //... mov edx, offset "TooManyGuitarInputs"
+	// NOTE: cannot specify the whole "mov" as the offset of the string changes
 };
 
 static const BYTE originalBytes_TwoRealToneCablesMessageBoxMainMenu[]{
+	0x80, 0xbb, 0x4a, 0x01, 0x00, 0x00, 0x00, // // cmp ...
 	0x0f, 0x84, 0x95, 0x00, 0x00, 0x00, // jz ...
-	0xba, 0x70, 0x16, 0x8b, 0x01, // mov edx, offset "$[34872]Warning! Two Rocksmith Real Ton..."
-	0x8d, 0x75, 0xb0 // lea esi, [ebp+...]
+	0xba //... mov edx, offset "$[34872]Warning! Two Rocksmith Real Ton..."
+	// NOTE: cannot specify the whole "mov" as the offset of the string changes
 };
 
 template<typename T>
@@ -76,6 +79,7 @@ void PatchOriginalCode_6ea6d1ba()
 		rslog::info_ts() << "Patching Two Guitar Tones Connected Message Box (starting menu) (num locations: " << offsets_TwoRealToneCablesMessageBoxStarting.size() << ")" << std::endl;
 		for (void* offset : offsets_TwoRealToneCablesMessageBoxStarting)
 		{
+			offset = ((BYTE*)offset) + 2;
 			const BYTE replaceBytes[]
 			{
 				0xeb, // jmp rel8
@@ -87,6 +91,7 @@ void PatchOriginalCode_6ea6d1ba()
 		rslog::info_ts() << "Patching Two Guitar Tones Connected Message Box (main menu) (num locations: " << offsets_TwoRealToneCablesMessageBoxMainMenu.size() << ")" << std::endl;
 		for (void* offset : offsets_TwoRealToneCablesMessageBoxMainMenu)
 		{
+			offset = ((BYTE*)offset) + 7;
 			const BYTE replaceBytes[]
 			{
 				0x90, // original instruction at this point is 6 byte wide, we only need 5 bytes, so put a nop here
