@@ -47,8 +47,75 @@ void vector_append(std::vector<T>& inOut, const std::vector<T>& source)
 	}
 }
 
+// the game had modified the first instruction of NtProtectVirtualMemory from "mov" to a
+// jump/call that does custom stuff.
+// to workaround this we generate a new function with the "mov" from the original data
+// and then jump to the instruction after the game-modified mov so that we resume normal
+// execution at the correct address.
+// the reason we copy the original data instead of just generating the correct "mov" is so
+// that both in windows and on linux (with proton) it will still work, as the proton
+// NtProtectVirtualMemory version is very similar to the windows one, but the first "mov"
+// movs a different value.
+static void* GenerateFixedProtectVirtualMemoryFn(void* originalFnPtr)
+{
+	constexpr unsigned numBytes = 10;
+
+	rslog::info_ts() << "Generating function to patch memory" << std::endl;
+
+	std::vector<unsigned char> origBytes = GetUntouchedVirtualProtectBytes(5);
+	if (origBytes.size() == 0)
+	{
+		rslog::error_ts() << "Failed get original data for patch memory function" << std::endl;
+		return nullptr;
+	}
+	if (origBytes[0] != 0xb8)
+	{
+		char tmp[8];
+		snprintf(tmp, 4, "%02x", origBytes[0]);
+
+		rslog::error_ts() << "Unexpected instruction in original data of patch memory function: " << tmp << std::endl;
+		return nullptr;
+	}
+
+	const long absDstJumpToOriginal = ((long)(BYTE*)originalFnPtr) + 5; // we want to jump to the instruction following the first "mov"
+
+	BYTE* fnBytes = (BYTE*)VirtualAlloc(NULL, numBytes, MEM_COMMIT, PAGE_READWRITE);
+	if (!fnBytes)
+	{
+		rslog::error_ts() << "Failed to allocate memory for new function" << std::endl;
+		return nullptr;
+	}
+	BYTE* cursorBytes = fnBytes;
+
+	memcpy(cursorBytes, origBytes.data(), 5);
+	cursorBytes += 5;
+
+	const long offset = (long)cursorBytes;
+	*cursorBytes = 0xe9;
+	++cursorBytes;
+
+	const long targetRelAddress = absDstJumpToOriginal - ((long)offset + 5);
+
+	*((long*)cursorBytes) = targetRelAddress;
+
+	DWORD oldProtect = 0;
+	if (!VirtualProtect(fnBytes, numBytes, PAGE_EXECUTE, &oldProtect))
+	{
+		VirtualFree(fnBytes, numBytes, MEM_RELEASE);
+		fnBytes = nullptr;
+	}
+
+	return fnBytes;
+}
+
 void PatchOriginalCode_6ea6d1ba()
 {
+	void* fnFixedProtectVirtualMemory = GenerateFixedProtectVirtualMemoryFn(GetVirtualProtectFnPtr());
+	if (fnFixedProtectVirtualMemory)
+	{
+		SetVirtualProtectFnPtr(fnFixedProtectVirtualMemory);
+	}
+
 	std::vector<void*> offsets_CoCreateInstanceAbs = FindBytesOffsets(originalBytes_call_CoCreateInstance, sizeof(originalBytes_call_CoCreateInstance));
 
 	std::vector<void*> offsets_PaMarshalPointers = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));

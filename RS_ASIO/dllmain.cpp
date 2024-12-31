@@ -20,9 +20,11 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 		rslog::InitLog();
 		rslog::info_ts() << " - Wrapper DLL loaded (v0.7.2)" << std::endl;
+		InitPatcher();
 		PatchOriginalCode();
 		break;
 	case DLL_PROCESS_DETACH:
+		DeinitPatcher();
 		rslog::info_ts() << " - Wrapper DLL unloaded" << std::endl;
 		rslog::CleanupLog();
 		break;
