@@ -55,3 +55,5 @@ WORD GetAsioSampleTypeNumBytes(ASIOSampleType sampleType);
 bool IsWaveFormatSame(const WAVEFORMATEX& fmt_a, const WAVEFORMATEX& fmt_b);
 
 HWND GetGameWindow();
+
+const std::wstring& GetGamePath();

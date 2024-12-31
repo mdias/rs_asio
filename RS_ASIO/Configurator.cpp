@@ -74,29 +74,9 @@ static const std::wstring& GetConfigFilePath()
 
 	if (!pathComputed)
 	{
-		wchar_t exePath[MAX_PATH]{};
-		DWORD exePathSize = GetModuleFileNameW(NULL, exePath, MAX_PATH);
-		if (exePathSize > 0)
-		{
-			int slashPos = -1;
-			// find last slash and truncate the path there
-			for (int i = (int)exePathSize - 1; i >= 0; --i)
-			{
-				const wchar_t c = exePath[i];
-				if (c == '\\' || c == '/')
-				{
-					slashPos = i;
-					break;
-				}
-			}
-
-			if (slashPos > 0)
-			{
-				exePath[slashPos + 1] = '\0';
-				path = exePath;
-				path += L"RS_ASIO.ini";
-			}
-		}
+		path = GetGamePath();
+		path += L"RS_ASIO.ini";
+		pathComputed = true;
 	}
 
 	return path;
