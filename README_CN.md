@@ -95,6 +95,7 @@
 - [Hotone Ampero II Stomp](https://github.com/mdias/rs_asio/issues/444)
 - Hotone Jogg
 - [IK Multimedia AXE I/O](https://github.com/mdias/rs_asio/issues/147)
+- [IK Multimedia AXE I/O ONE](https://github.com/mdias/rs_asio/issues/490)
 - [IK Multimedia iRig](https://github.com/mdias/rs_asio/issues/164), using ASIO4ALL
 - [IK Multimedia iRig HD 2](https://github.com/mdias/rs_asio/issues/117)
 - [IK Multimedia iRig HD X](https://github.com/mdias/rs_asio/issues/435)
