@@ -32,6 +32,11 @@ static const BYTE patchedBytes_TwoRealToneCablesMessageBox[]{
 	0x90 // nop
 };
 
+static const BYTE originalBytes_UnknownCrash[]{
+	0x8b, 0x8d, 0xc4, 0xfd, 0xff, 0xff,
+	0x8b, 0x1c, 0x81
+};
+
 /// <summary>
 /// Write x86 ASM (HEX) to static address.
 /// </summary>
@@ -60,6 +65,8 @@ void PatchOriginalCode_21a8959a()
 	std::vector<void*> offsets_PaMarshalPointers = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));
 	std::vector<void*> offsets_PaUnmarshalPointers = FindBytesOffsets(originalBytes_call_UnmarshalStreamComPointers, sizeof(originalBytes_call_UnmarshalStreamComPointers));
 
+	std::vector<void*> offsets_UnknownCrash = FindBytesOffsets(originalBytes_UnknownCrash, sizeof(originalBytes_UnknownCrash));
+
 	if (offsets_CoCreateInstance.size() == 0 && offsets_PaMarshalPointers.size() == 0 && offsets_PaUnmarshalPointers.size() == 0)
 	{
 		rslog::error_ts() << "No valid locations for patching were found. Make sure you're trying this on the right game version." << std::endl;
@@ -79,5 +86,19 @@ void PatchOriginalCode_21a8959a()
 		Patch_CallRelativeAddress(offsets_PaUnmarshalPointers, &Patched_PortAudio_UnmarshalStreamComPointers);
 
 		Patch_ReplaceAssembly((LPVOID)location_TwoRealToneCablesMessageBox, (LPVOID)patchedBytes_TwoRealToneCablesMessageBox, sizeof(patchedBytes_TwoRealToneCablesMessageBox));
+
+		// patch weird crash (this crash happens even without rs-asio) when certain audio devices are present (like voicemeeter modern versions)
+		rslog::info_ts() << "Patching unknown crash when certain audio devices are found (num locations: " << offsets_UnknownCrash.size() << ")" << std::endl;
+		for (void* offset : offsets_UnknownCrash)
+		{
+			const BYTE replaceBytes[]
+			{
+				0x90, 0x90, 0x90, 0x90, 0x90, // nops...
+				0x31, 0xc9, // xor ecx, ecx
+				0x31, 0xdb, // xor ebx, ebx
+			};
+			rslog::info_ts() << "Patching bytes at " << offset << std::endl;
+			Patch_ReplaceWithBytes(offset, sizeof(replaceBytes), replaceBytes);
+		}
 	}
 }

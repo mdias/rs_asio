@@ -38,6 +38,11 @@ static const BYTE originalBytes_TwoRealToneCablesMessageBoxMainMenu[]{
 	// NOTE: cannot specify the whole "mov" as the offset of the string changes
 };
 
+static const BYTE originalBytes_UnknownCrash[]{
+	0x8b, 0x8d, 0xc4, 0xfd, 0xff, 0xff,
+	0x8b, 0x1c, 0x81
+};
+
 template<typename T>
 void vector_append(std::vector<T>& inOut, const std::vector<T>& source)
 {
@@ -124,6 +129,8 @@ void PatchOriginalCode_6ea6d1ba()
 	std::vector<void*> offsets_TwoRealToneCablesMessageBoxStarting = FindBytesOffsets(originalBytes_TwoRealToneCablesMessageBoxStarting, sizeof(originalBytes_TwoRealToneCablesMessageBoxStarting));
 	std::vector<void*> offsets_TwoRealToneCablesMessageBoxMainMenu = FindBytesOffsets(originalBytes_TwoRealToneCablesMessageBoxMainMenu, sizeof(originalBytes_TwoRealToneCablesMessageBoxMainMenu));
 
+	std::vector<void*> offsets_UnknownCrash = FindBytesOffsets(originalBytes_UnknownCrash, sizeof(originalBytes_UnknownCrash));
+
 	if (offsets_CoCreateInstanceAbs.size() == 0 && offsets_PaMarshalPointers.size() == 0 && offsets_PaUnmarshalPointers.size() == 0)
 	{
 		rslog::error_ts() << "No valid locations for patching were found. Make sure you're trying this on the right game version." << std::endl;
@@ -163,6 +170,20 @@ void PatchOriginalCode_6ea6d1ba()
 			{
 				0x90, // original instruction at this point is 6 byte wide, we only need 5 bytes, so put a nop here
 				0xe9, // jmp rel32
+			};
+			rslog::info_ts() << "Patching bytes at " << offset << std::endl;
+			Patch_ReplaceWithBytes(offset, sizeof(replaceBytes), replaceBytes);
+		}
+
+		// patch weird crash (this crash happens even without rs-asio) when certain audio devices are present (like voicemeeter modern versions)
+		rslog::info_ts() << "Patching unknown crash when certain audio devices are found (num locations: " << offsets_UnknownCrash.size() << ")" << std::endl;
+		for (void* offset : offsets_UnknownCrash)
+		{
+			const BYTE replaceBytes[]
+			{
+				0x90, 0x90, 0x90, 0x90, 0x90, // nops...
+				0x31, 0xc9, // xor ecx, ecx
+				0x31, 0xdb, // xor ebx, ebx
 			};
 			rslog::info_ts() << "Patching bytes at " << offset << std::endl;
 			Patch_ReplaceWithBytes(offset, sizeof(replaceBytes), replaceBytes);
