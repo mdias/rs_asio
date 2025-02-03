@@ -140,6 +140,7 @@
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
 - [Presonus AudioBox USB 96](https://github.com/mdias/rs_asio/issues/140)
 - Presonus Quantum 2
+- [Presonus Quantum ES 4](https://github.com/mdias/rs_asio/issues/496)
 - [Presonus Studio 24c](https://github.com/mdias/rs_asio/issues/280)
 - [Presonus StudioLive AR12c](https://github.com/mdias/rs_asio/issues/196)
 - ReaRoute ASIO (Reaper virtual ASIO router)
@@ -151,6 +152,7 @@
 - [Roland UA-1G](https://github.com/mdias/rs_asio/issues/291#issuecomment-1179084242)
 - [Roland ua55](docs/roland_ua_55/README.md)
 - [Roland V-Studio 100](https://github.com/mdias/rs_asio/issues/91)
+- [Røde AI-1](https://github.com/mdias/rs_asio/issues/339)
 - [Solid State Logic SSL12](https://github.com/mdias/rs_asio/issues/167)
 - [Solid State Logic SSL2+](https://github.com/mdias/rs_asio/issues/167)
 - [SoundCraft Notepad-8FX](https://github.com/mdias/rs_asio/issues/86)
@@ -158,6 +160,7 @@
 - [SoundCraft Ui24R](https://github.com/mdias/rs_asio/issues/86)
 - Sound Devices MixPre-6 II
 - [Steinberg CI1](https://github.com/mdias/rs_asio/issues/268)
+- [Steinberg IXO12](https://github.com/mdias/rs_asio/issues/495)
 - [Steinberg MR816 CSX](https://github.com/mdias/rs_asio/issues/448)
 - [Steinberg UR12](docs/steinberg_ur12/README.md)
 - [Steinberg UR22](docs/steinberg_ur12/README.md)
@@ -181,6 +184,7 @@
 - [Yamaha THR30IIW](https://github.com/mdias/rs_asio/issues/210)
 - [Zoom G2.1NU](https://github.com/mdias/rs_asio/issues/400)
 - [Zoom G2.1DM](https://github.com/mdias/rs_asio/issues/400)
+- Zoom H2N
 - [Zoom H6](https://github.com/mdias/rs_asio/issues/198)
 - Zoom R24
 - [Zoom U-22](https://github.com/mdias/rs_asio/issues/179)

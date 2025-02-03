@@ -140,6 +140,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
 - [Presonus AudioBox USB 96](https://github.com/mdias/rs_asio/issues/140)
 - Presonus Quantum 2
+- [Presonus Quantum ES 4](https://github.com/mdias/rs_asio/issues/496)
 - [Presonus Studio 24c](https://github.com/mdias/rs_asio/issues/280)
 - [Presonus StudioLive AR12c](https://github.com/mdias/rs_asio/issues/196)
 - ReaRoute ASIO (Reaper virtual ASIO router)
@@ -159,6 +160,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [SoundCraft Ui24R](https://github.com/mdias/rs_asio/issues/86)
 - Sound Devices MixPre-6 II
 - [Steinberg CI1](https://github.com/mdias/rs_asio/issues/268)
+- [Steinberg IXO12](https://github.com/mdias/rs_asio/issues/495)
 - [Steinberg MR816 CSX](https://github.com/mdias/rs_asio/issues/448)
 - [Steinberg UR12](docs/steinberg_ur12/README.md)
 - [Steinberg UR22](docs/steinberg_ur12/README.md)
