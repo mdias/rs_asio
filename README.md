@@ -178,7 +178,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Universal Audio Apollo Twin USB](https://github.com/mdias/rs_asio/issues/307) (requires older driver)
 - [Universal Audio Volt 1](docs/universal_audio_volt1/README.md)
 - [Universal Audio Volt 2 USB](https://github.com/mdias/rs_asio/issues/462)
-- [Universal Audio Volt 276] (docs/universal_audio_volt_276/README.md)
+- [Universal Audio Volt 276](docs/universal_audio_volt_276/README.md)
 - [XTONE Smart Stomp](docs/xtone_smartstomp/README.md), using ASIO4All
 - [Yamaha AG06 USB Mixing Console](https://github.com/mdias/rs_asio/issues/81)
 - [Yamaha THR10II](https://github.com/mdias/rs_asio/issues/210)
