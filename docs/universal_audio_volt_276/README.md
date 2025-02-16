@@ -59,7 +59,7 @@ SoftwareMasterVolumePercent=100
 EnableRefCountHack=
 
 ;[Asio.Input.Mic]
-;Driver=ASIO4ALL v2
+;Driver=
 ;Channel=1
 ;EnableSoftwareEndpointVolumeControl=1
 ;EnableSoftwareMasterVolumeControl=1
