@@ -121,6 +121,7 @@
 - [Mackie Onyx Artist 1x2](https://github.com/mdias/rs_asio/issues/211)
 - [Mackie Onyx Producer 2x2](https://github.com/mdias/rs_asio/issues/211)
 - [MIDIPLUS Studio S](docs/midiplus_studio_s/README.md)
+- [Miditech AUDIOLINK III](https://github.com/mdias/rs_asio/issues/512), using ASIO4ALL
 - [Monoprice Stage Right STi12](https://github.com/mdias/rs_asio/issues/357)
 - MOTU 2408 mk3
 - [MOTU M2](https://github.com/mdias/rs_asio/issues/151)
@@ -178,6 +179,7 @@
 - [Universal Audio Apollo Twin USB](https://github.com/mdias/rs_asio/issues/307) (requires older driver)
 - [Universal Audio Volt 1](docs/universal_audio_volt1/README.md)
 - [Universal Audio Volt 2 USB](https://github.com/mdias/rs_asio/issues/462)
+- [Universal Audio Volt 276](docs/universal_audio_volt_276/README.md)
 - [XTONE Smart Stomp](docs/xtone_smartstomp/README.md), using ASIO4All
 - [Yamaha AG06 USB Mixing Console](https://github.com/mdias/rs_asio/issues/81)
 - [Yamaha THR10II](https://github.com/mdias/rs_asio/issues/210)
