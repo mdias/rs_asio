@@ -66,6 +66,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Creative Live! Audio A3](https://github.com/mdias/rs_asio/issues/412)
 - [Creative Sound Blaster Z](https://github.com/mdias/rs_asio/issues/191)
 - [Darkglass Element](https://github.com/mdias/rs_asio/issues/258)
+- [Devine Centro 2i2o](https://github.com/mdias/rs_asio/issues/513#issuecomment-2733642765)
 - ESI MAYA22 USB
 - [ESI MAYA44 eX](https://github.com/mdias/rs_asio/issues/134) [(Known issues)](#known-issues)
 - [ESI U22 XT](https://github.com/mdias/rs_asio/issues/458)
