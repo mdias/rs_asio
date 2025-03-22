@@ -157,6 +157,7 @@
 - [Røde AI-1](https://github.com/mdias/rs_asio/issues/339)
 - [Solid State Logic SSL12](https://github.com/mdias/rs_asio/issues/167)
 - [Solid State Logic SSL2+](https://github.com/mdias/rs_asio/issues/167)
+- Sonicake Sonic Cube(使用 channel 1 作为输入)
 - [SoundCraft Notepad-8FX](https://github.com/mdias/rs_asio/issues/86)
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
 - [SoundCraft Ui24R](https://github.com/mdias/rs_asio/issues/86)
