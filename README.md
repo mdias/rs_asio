@@ -4,6 +4,7 @@ This project aims to add ASIO support to `Rocksmith 2014 Edition - Remastered` i
 It patches game code at runtime to allow intervening in the process of WASAPI device enumeration so that we can inject our own fake WASAPI devices which internally use ASIO audio API.
 
 ## Other Languages
+
 [简体中文](README_CN.md)
 
 ## How to use
@@ -17,7 +18,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 - Make sure your interface clock is set to 48kHz. RS ASIO will try to request 48kHz mode, but your drivers may or may not allow this, so it might help setting it manually.
 - Make sure you're NOT using the NoCableLauncher or similar otherwise your instruments may not be detected properly.
 - Extra: An RS_ASIO-log.txt file is generated inside the game directory which may help discover your ASIO driver name and diagnose issues.
-    - IMPORTANT: Only 32-bit ASIO drivers will be detected!
+  - IMPORTANT: Only 32-bit ASIO drivers will be detected!
 - Look into [list of knows issues](#known-issues) if you experience any problems
 
 ### How to remove/uninstall
@@ -50,8 +51,8 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Avid Mbox Studio](https://github.com/mdias/rs_asio/issues/467)
 - [Behringer GUITAR 2 USB](https://github.com/mdias/rs_asio/issues/246), using ASIO4All
 - [Behringer MIC2 USB](docs/behringer_mic2usb/README.md), using ASIO4All
-- Behringer U-Phoria UM2  [(see this for more details)](https://github.com/mdias/rs_asio/issues/7) **IMPORTANT: needs legacy ASIO driver**
-- [Behringer UMC22](https://github.com/mdias/rs_asio/issues/326)  **IMPORTANT: needs legacy ASIO driver**
+- Behringer U-Phoria UM2 [(see this for more details)](https://github.com/mdias/rs_asio/issues/7) **IMPORTANT: needs legacy ASIO driver**
+- [Behringer UMC22](https://github.com/mdias/rs_asio/issues/326) **IMPORTANT: needs legacy ASIO driver**
 - Behringer UMC1820
 - Behringer UMC202HD
 - [Behringer UMC204](https://github.com/mdias/rs_asio/issues/156)
@@ -157,6 +158,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Røde AI-1](https://github.com/mdias/rs_asio/issues/339)
 - [Solid State Logic SSL12](https://github.com/mdias/rs_asio/issues/167)
 - [Solid State Logic SSL2+](https://github.com/mdias/rs_asio/issues/167)
+- Sonicake Sonic Cube(Use channel 1 for input)
 - [SoundCraft Notepad-8FX](https://github.com/mdias/rs_asio/issues/86)
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
 - [SoundCraft Ui24R](https://github.com/mdias/rs_asio/issues/86)
@@ -212,10 +214,10 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 4. Copy name of the corresponding driver to the [Asio...] block of the RS_ASIO.ini
 1. Run Rocksmith again
 1. Repeat until there is no cracks in audio. Your goal is to have smallest possible values without cracks. Find smallest possible LatencyBuffer and then gradually set buffer size until there is no cracks.
-    1. Modify LatencyBuffer (try values 4,3,2,1)
-    1. Modify buffersize either in ASIO driver control panel or in CustomBufferSize option in the RS_ASIO.ini file. For the beginning follow rule of thumb that buffer size should be divisible to 32
-    1. Run Rocksmith
-    1. Look into `RS_ASIO-log.txt` if you experience any issues
+   1. Modify LatencyBuffer (try values 4,3,2,1)
+   1. Modify buffersize either in ASIO driver control panel or in CustomBufferSize option in the RS_ASIO.ini file. For the beginning follow rule of thumb that buffer size should be divisible to 32
+   1. Run Rocksmith
+   1. Look into `RS_ASIO-log.txt` if you experience any issues
 
 ### Known issues
 
@@ -223,7 +225,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
-    - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
+  - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
 - [According to reports](https://github.com/mdias/rs_asio/issues?q=label%3A%22focusrite+asio+driver%22+), newer Focusrite driver releases (after 4.102.4) no longer include 32 bit ASIO drivers required by RS ASIO. You can work around this by using software like voicemeeter to reroute audio to the normal 64 bit drivers.
 - Some ESI ASIO drivers appear to get stuck when quitting Rocksmith, requiring unplugging the USB and plugging it again to be playable again.
 - Hardware hotplugging while the game is running won't be noticed by the game.

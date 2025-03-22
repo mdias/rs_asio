@@ -1,38 +1,38 @@
 # RS ASIO
 
-此项目旨在为`Rocksmith 2014 Edition - Remastered`（摇滚史密斯2014 - 重制版）提供ASIO驱动支持并避开WASAPI驱动带来的相关问题。
+此项目旨在为`Rocksmith 2014 Edition - Remastered`（摇滚史密斯 2014 - 重制版）提供 ASIO 驱动支持并避开 WASAPI 驱动带来的相关问题。
 
-这会在游戏运行时修正代码以干预搜索WASAPI驱动设备的过程，并注入使用ASIO音频API的虚假WASAPI设备。
-
+这会在游戏运行时修正代码以干预搜索 WASAPI 驱动设备的过程，并注入使用 ASIO 音频 API 的虚假 WASAPI 设备。
 
 ## 其他语言
+
 [English](README.md)
 
 ## 使用方式
 
 - 将[latest release](https://github.com/mdias/rs_asio/releases/latest) (zip archive release-xxx.zip)内的全部内容复制到游戏根目录下
-  - 当前仅支持Steam版本的Rocksmith。你可以通过右键Steam游戏库中的Rocksmith，选择“管理”->“浏览本地文件”来打开游戏的根目录
-- 修改RS_ASIO.ini来配置使用ASIO音频驱动的设备及其通道等
+  - 当前仅支持 Steam 版本的 Rocksmith。你可以通过右键 Steam 游戏库中的 Rocksmith，选择“管理”->“浏览本地文件”来打开游戏的根目录
+- 修改 RS_ASIO.ini 来配置使用 ASIO 音频驱动的设备及其通道等
 - 查看[基础配置指南](#基础配置指南)
-- 确保Rocksmith.ini设置`ExclusiveMode=1`以及`Win32UltraLowLatencyMode=1`，如果有疑问的话，使用默认配置即可
-- 确保你的游戏模式设置为RTC（Real Tone Cable —— 官方专用连接线）而非麦克风模式（[原因](https://github.com/mdias/rs_asio/issues/275#issuecomment-1120386256)）
-- 确保你的音频时钟（采样频率）设置为48kHz，RS ASIO会请求使用48kHz模式。你的驱动设备可能并不支持，如果有问题可以尝试手动设置
-- 确保你没有使用“NoCableLauncher”（第三方的绕过RTC检查的游戏启动器）或者类似的软件，这可能会导致你的乐器无法被正常检测到
-- 另外，游戏根目录下会生成一个日志文件RS_ASIO-log.txt，这可以帮助你找到你的ASIO驱动设备名称或者诊断问题
-    - IMPORTANT: Only 32-bit ASIO drivers will be detected!
+- 确保 Rocksmith.ini 设置`ExclusiveMode=1`以及`Win32UltraLowLatencyMode=1`，如果有疑问的话，使用默认配置即可
+- 确保你的游戏模式设置为 RTC（Real Tone Cable —— 官方专用连接线）而非麦克风模式（[原因](https://github.com/mdias/rs_asio/issues/275#issuecomment-1120386256)）
+- 确保你的音频时钟（采样频率）设置为 48kHz，RS ASIO 会请求使用 48kHz 模式。你的驱动设备可能并不支持，如果有问题可以尝试手动设置
+- 确保你没有使用“NoCableLauncher”（第三方的绕过 RTC 检查的游戏启动器）或者类似的软件，这可能会导致你的乐器无法被正常检测到
+- 另外，游戏根目录下会生成一个日志文件 RS_ASIO-log.txt，这可以帮助你找到你的 ASIO 驱动设备名称或者诊断问题
+  - IMPORTANT: Only 32-bit ASIO drivers will be detected!
 - 如果你遇到了问题，可以尝试查看[已知问题](#已知问题)来解决
 
 ### 如何移除/卸载
 
-- 移除游戏根目录下与本项目相关的所有DLL文件即可
+- 移除游戏根目录下与本项目相关的所有 DLL 文件即可
 
-### 在使用RS ASIO的情况下使用流式传输
+### 在使用 RS ASIO 的情况下使用流式传输
 
 查看[这篇指南](docs/streaming/README_CN.md)
 
-### 在Linux系统上使用RS ASIO
+### 在 Linux 系统上使用 RS ASIO
 
-有些人成功地通过[wineasio](https://www.wineasio.org/)来在Linux上使用RS ASIO。你可以查看[这个issue](https://github.com/mdias/rs_asio/issues/99)来获取更多信息
+有些人成功地通过[wineasio](https://www.wineasio.org/)来在 Linux 上使用 RS ASIO。你可以查看[这个 issue](https://github.com/mdias/rs_asio/issues/99)来获取更多信息
 
 ## 已知可以正常工作的声卡
 
@@ -50,8 +50,8 @@
 - [Avid Mbox Studio](https://github.com/mdias/rs_asio/issues/467)
 - [Behringer GUITAR 2 USB](https://github.com/mdias/rs_asio/issues/246), using ASIO4All
 - [Behringer MIC2 USB](docs/behringer_mic2usb/README.md), using ASIO4All
-- Behringer U-Phoria UM2  [(see this for more details)](https://github.com/mdias/rs_asio/issues/7) **IMPORTANT: needs legacy ASIO driver**
-- [Behringer UMC22](https://github.com/mdias/rs_asio/issues/326)  **IMPORTANT: needs legacy ASIO driver**
+- Behringer U-Phoria UM2 [(see this for more details)](https://github.com/mdias/rs_asio/issues/7) **IMPORTANT: needs legacy ASIO driver**
+- [Behringer UMC22](https://github.com/mdias/rs_asio/issues/326) **IMPORTANT: needs legacy ASIO driver**
 - Behringer UMC1820
 - Behringer UMC202HD
 - [Behringer UMC204](https://github.com/mdias/rs_asio/issues/156)
@@ -157,6 +157,7 @@
 - [Røde AI-1](https://github.com/mdias/rs_asio/issues/339)
 - [Solid State Logic SSL12](https://github.com/mdias/rs_asio/issues/167)
 - [Solid State Logic SSL2+](https://github.com/mdias/rs_asio/issues/167)
+- Sonicake Sonic Cube(使用 channel 1 作为输入)
 - [SoundCraft Notepad-8FX](https://github.com/mdias/rs_asio/issues/86)
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
 - [SoundCraft Ui24R](https://github.com/mdias/rs_asio/issues/86)
@@ -198,8 +199,8 @@
 ### 基础配置指南
 
 1. 跟着[上面](#使用方式)的步骤来配置
-1. 首次运行Rocksmith
-1. 打开`RS_ASIO-log.txt`，你可以在这里找到你的ASIO驱动设备列表
+1. 首次运行 Rocksmith
+1. 打开`RS_ASIO-log.txt`，你可以在这里找到你的 ASIO 驱动设备列表
 
 ```txt
 0.456 [INFO]  AsioHelpers::FindDrivers
@@ -209,26 +210,26 @@
 0.457 [INFO]    ZOOM R16_R24 ASIO Driver
 ```
 
-4. 复制对应的驱动名称到RS_ASIO.ini的[Asio...]部分的Driver选项
-1. 再次运行Rocksmith
-1. 重复下述步骤直至你听到的音频中没有破音。你应当在没有破音的前提下尽可能设置为更小的值。找到最小的LatencyBuffer然后设置buffer size直至没有破音。
-    1. 修改Rocksmith.ini中的LatencyBuffer（尝试4、3、2、1）
-    1. 在ASIO驱动控制面板或者RS_ASIO.ini中的CustomBufferSize选项修改buffersize。要注意buffer size应当为32的整数倍。
-    1. 运行Rocksmith
-    1. 如果遇到问题，检查`RS_ASIO-log.txt`中的日志
+4. 复制对应的驱动名称到 RS_ASIO.ini 的[Asio...]部分的 Driver 选项
+1. 再次运行 Rocksmith
+1. 重复下述步骤直至你听到的音频中没有破音。你应当在没有破音的前提下尽可能设置为更小的值。找到最小的 LatencyBuffer 然后设置 buffer size 直至没有破音。
+   1. 修改 Rocksmith.ini 中的 LatencyBuffer（尝试 4、3、2、1）
+   1. 在 ASIO 驱动控制面板或者 RS_ASIO.ini 中的 CustomBufferSize 选项修改 buffersize。要注意 buffer size 应当为 32 的整数倍。
+   1. 运行 Rocksmith
+   1. 如果遇到问题，检查`RS_ASIO-log.txt`中的日志
 
 ### 已知问题
 
-- 你的声卡**必须**支持48kHz的采样率
-- 本项目并不提供打开ASIO控制面板的方式，你可能需要自行找到在哪里配置你的声卡
-- 在游戏运行过程中修改ASIO设置需要重启游戏来应用（如修改采样频率、采样方式等）
-- 某些Focusrite（福克斯特）的声卡设备可能仅会在ASIO的buffer设置为48、96或者192时才能正常输出音频。你可以在RS_ASIO.ini中修改buffer size
-    - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
+- 你的声卡**必须**支持 48kHz 的采样率
+- 本项目并不提供打开 ASIO 控制面板的方式，你可能需要自行找到在哪里配置你的声卡
+- 在游戏运行过程中修改 ASIO 设置需要重启游戏来应用（如修改采样频率、采样方式等）
+- 某些 Focusrite（福克斯特）的声卡设备可能仅会在 ASIO 的 buffer 设置为 48、96 或者 192 时才能正常输出音频。你可以在 RS_ASIO.ini 中修改 buffer size
+  - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
 - [According to reports](https://github.com/mdias/rs_asio/issues?q=label%3A%22focusrite+asio+driver%22+), newer Focusrite driver releases (after 4.102.4) no longer include 32 bit ASIO drivers required by RS ASIO. You can work around this by using software like voicemeeter to reroute audio to the normal 64 bit drivers.
-- 某些ESI声卡可能会在退出Rocksmith时卡住，需要将声卡的连接线拔出并重新插入
+- 某些 ESI 声卡可能会在退出 Rocksmith 时卡住，需要将声卡的连接线拔出并重新插入
 - 在游戏运行过程中热插拔硬件并不会被游戏识别到
-- 在使用ASIO4ALL时游戏有时会崩溃
+- 在使用 ASIO4ALL 时游戏有时会崩溃
 
 ## 捐赠
 
-你可以在[paypal.me/mdiasdonations](https://paypal.me/mdiasdonations)捐赠这个项目的开发者，不过实际上在issue里说一句“Thanks”就已经足够了。
+你可以在[paypal.me/mdiasdonations](https://paypal.me/mdiasdonations)捐赠这个项目的开发者，不过实际上在 issue 里说一句“Thanks”就已经足够了。
