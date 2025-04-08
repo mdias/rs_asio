@@ -186,6 +186,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Yamaha AG06 USB Mixing Console](https://github.com/mdias/rs_asio/issues/81)
 - [Yamaha THR10II](https://github.com/mdias/rs_asio/issues/210)
 - [Yamaha THR30IIW](https://github.com/mdias/rs_asio/issues/210)
+- [Zoom AMS-22](https://github.com/mdias/rs_asio/issues/518)
 - [Zoom G2.1NU](https://github.com/mdias/rs_asio/issues/400)
 - [Zoom G2.1DM](https://github.com/mdias/rs_asio/issues/400)
 - Zoom H2N
