@@ -135,6 +135,7 @@
 - [Native Instruments Komplete Audio 2](https://github.com/mdias/rs_asio/issues/120)
 - Native Instruments Komplete Audio 6
 - [Native Instruments Rig Kontrol 2](https://github.com/mdias/rs_asio/issues/214)
+- [Neural DSP Nano Cortex](https://github.com/mdias/rs_asio/issues/529)
 - [Neural DSP Quad Cortex](https://github.com/mdias/rs_asio/issues/294)
 - [NUX Mighty Air](https://github.com/mdias/rs_asio/issues/364)
 - [NUX Mighty Lite BT MKII](https://github.com/mdias/rs_asio/issues/446)
