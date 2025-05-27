@@ -162,7 +162,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Sonicake Sonic Cube(Use channel 1 for input)
 - [SoundCraft Notepad-8FX](https://github.com/mdias/rs_asio/issues/86)
 - [SoundCraft Notepad-12FX](https://github.com/mdias/rs_asio/issues/86)
-- [SoundCraft Ui24R](https://github.com/mdias/rs_asio/issues/86)
+- [SoundCraft Ui24R](https://github.com/mdias/rs_asio/issues/528)
 - Sound Devices MixPre-6 II
 - [Steinberg CI1](https://github.com/mdias/rs_asio/issues/268)
 - [Steinberg IXO12](https://github.com/mdias/rs_asio/issues/495)
