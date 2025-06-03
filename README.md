@@ -94,7 +94,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Fractal Audio AXE FX III](https://github.com/mdias/rs_asio/issues/347)
 - [Hotone Ampero II Stage](https://github.com/mdias/rs_asio/issues/444)
 - [Hotone Ampero II Stomp](https://github.com/mdias/rs_asio/issues/444)
-- Hotone Jogg
+- [Hotone Jogg](https://github.com/mdias/rs_asio/issues/533)
 - [IK Multimedia AXE I/O](https://github.com/mdias/rs_asio/issues/147)
 - [IK Multimedia AXE I/O ONE](https://github.com/mdias/rs_asio/issues/490)
 - [IK Multimedia iRig](https://github.com/mdias/rs_asio/issues/164), using ASIO4ALL
