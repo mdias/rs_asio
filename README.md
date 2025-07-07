@@ -144,6 +144,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [PositiveGrid Spark 40](https://github.com/mdias/rs_asio/issues/218) (issue reported with limited sample rate support in 2024/07; see linked issue)
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
 - [Presonus AudioBox USB 96](https://github.com/mdias/rs_asio/issues/140)
+- [Presonus ioStation 24c](https://github.com/mdias/rs_asio/issues/542)
 - Presonus Quantum 2
 - [Presonus Quantum ES 4](https://github.com/mdias/rs_asio/issues/496)
 - [Presonus Studio 24c](https://github.com/mdias/rs_asio/issues/280)
