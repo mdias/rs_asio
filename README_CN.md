@@ -45,6 +45,7 @@
 - [Asus Strix Soar](docs/asus_strix_soar/README.md)
 - [Audient Evo 4](docs/audient_evo_4/README.md)
 - [Audient Evo 16](docs/audient_evo_4/README.md)
+- [Audient iD14 Mk II](https://github.com/mdias/rs_asio/issues/553)
 - [Audient iD4](https://github.com/mdias/rs_asio/issues/295)
 - Audient iD22
 - [Avid Mbox Studio](https://github.com/mdias/rs_asio/issues/467)
