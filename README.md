@@ -72,6 +72,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [ESI MAYA44 eX](https://github.com/mdias/rs_asio/issues/134) [(Known issues)](#known-issues)
 - [ESI U22 XT](https://github.com/mdias/rs_asio/issues/458)
 - [ESI UGM96](https://github.com/mdias/rs_asio/issues/250) [(Known issues)](#known-issues)
+- [Fender Link I/O](https://github.com/mdias/rs_asio/issues/565)
 - [Fender Mustang Micro Plus](https://github.com/mdias/rs_asio/issues/558#issuecomment-3139856047)
 - [Focusrite Clarett 2Pre Thunderbolt](https://github.com/mdias/rs_asio/issues/146)
 - [Focusrite Clarett 4Pre USB](https://github.com/mdias/rs_asio/issues/42)
