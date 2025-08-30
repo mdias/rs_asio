@@ -219,11 +219,11 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 0.457 [INFO]    ZOOM R16_R24 ASIO Driver
 ```
 
-4. Copy name of the corresponding driver to the [Asio...] block of the RS_ASIO.ini
+4. Copy name of the corresponding driver for the given device (such as `MOOER USB Audio` or `Focusrite USB ASIO`) to the `Driver` property of the `[Asio.Output]`, `[Asio.Input.0]`, `[Asio.Input.1]` and `[Asio.Input.Mic]` blocks of the `RS_ASIO.ini`
 1. Run Rocksmith again
 1. Repeat until there is no cracks in audio. Your goal is to have smallest possible values without cracks. Find smallest possible LatencyBuffer and then gradually set buffer size until there is no cracks.
     1. Modify LatencyBuffer (try values 4,3,2,1)
-    1. Modify buffersize either in ASIO driver control panel or in CustomBufferSize option in the RS_ASIO.ini file. For the beginning follow rule of thumb that buffer size should be divisible to 32
+    1. Modify buffersize either in ASIO driver control panel or in `CustomBufferSize` option in the `RS_ASIO.ini` file. For the beginning follow rule of thumb that buffer size should be divisible to 32
     1. Run Rocksmith
     1. Look into `RS_ASIO-log.txt` if you experience any issues
 
@@ -232,7 +232,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Your interface MUST support 48kHz playback
 - Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
-- Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. You can use the custom buffer size setting on RS_ASIO.ini for this.
+- Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. When `BufferSizeMode` is set to `driver` in `RS_ASIO.ini`'s `[Asio]` block, this only has to be set in the Focusrite Settings. When `BufferSizeMode` is set to `custom`, set `CustomBufferSize` to the same value.
     - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
 - [According to reports](https://github.com/mdias/rs_asio/issues?q=label%3A%22focusrite+asio+driver%22+), newer Focusrite driver releases (after 4.102.4) no longer include 32 bit ASIO drivers required by RS ASIO. You can work around this by using software like voicemeeter to reroute audio to the normal 64 bit drivers.
 - Some ESI ASIO drivers appear to get stuck when quitting Rocksmith, requiring unplugging the USB and plugging it again to be playable again.
