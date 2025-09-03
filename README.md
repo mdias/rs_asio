@@ -36,6 +36,9 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 
 ## Audio Interfaces reported to work well
 
+<details>
+<summary>Click to expand</summary>
+
 - [Alesis Core 1](https://github.com/mdias/rs_asio/issues/115)
 - [Antelope Audio Zen Go](https://github.com/mdias/rs_asio/issues/294#issuecomment-2212061137)
 - [Antelope Audio Zen Tour](https://github.com/mdias/rs_asio/issues/294)
@@ -205,6 +208,8 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Zoom UAC-2
 - [ZOOM UAC-232](https://github.com/mdias/rs_asio/issues/431)
 
+</details>
+
 ### Basic configuration guide
 
 1. Follow installation steps, described [above](#how-to-use)
@@ -232,8 +237,9 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Your interface MUST support 48kHz playback
 - Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
-- Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192. When `BufferSizeMode` is set to `driver` in `RS_ASIO.ini`'s `[Asio]` block, this only has to be set in the Focusrite Settings. When `BufferSizeMode` is set to `custom`, set `CustomBufferSize` to the same value.
-    - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
+- Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192.
+  - When `BufferSizeMode` is set to `driver` in `RS_ASIO.ini`'s `[Asio]` block, this only has to be set in the Focusrite Settings. When `BufferSizeMode` is set to `custom`, set `CustomBufferSize` to the same value.
+  - Changing your windows audio settings to use `2-channel, 24 bit, 48000 Hz (Studio Quality)` format [seems to help with achieving lower buffer sizes](https://github.com/mdias/rs_asio/issues/411).
 - [According to reports](https://github.com/mdias/rs_asio/issues?q=label%3A%22focusrite+asio+driver%22+), newer Focusrite driver releases (after 4.102.4) no longer include 32 bit ASIO drivers required by RS ASIO. You can work around this by using software like voicemeeter to reroute audio to the normal 64 bit drivers.
 - Some ESI ASIO drivers appear to get stuck when quitting Rocksmith, requiring unplugging the USB and plugging it again to be playable again.
 - Hardware hotplugging while the game is running won't be noticed by the game.
