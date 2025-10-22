@@ -4,7 +4,7 @@ This project aims to add ASIO support to `Rocksmith 2014 Edition - Remastered` i
 It patches game code at runtime to allow intervening in the process of WASAPI device enumeration so that we can inject our own fake WASAPI devices which internally use ASIO audio API.
 
 ## Other Languages
-[简体中文](README_CN.md)
+[简体中文](README_CN.md) (Out of date)
 
 ## How to use
 
@@ -63,6 +63,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Behringer UMC404HD](https://github.com/mdias/rs_asio/issues/13)
 - [Behringer XENIX Q502USB](https://github.com/mdias/rs_asio/issues/132) **IMPORTANT: needs legacy ASIO driver**
 - [Behringer XR18](https://github.com/mdias/rs_asio/issues/72)
+- [Blackstar BEAM Solo](https://github.com/mdias/rs_asio/issues/575)
 - [BOSS Gigcaster (GCS-8)](docs/boss_gcs_8/README.md)
 - [BOSS GT-1](https://github.com/mdias/rs_asio/issues/494)
 - [BOSS Katana-Air](https://github.com/mdias/rs_asio/issues/359)
