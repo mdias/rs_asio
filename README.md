@@ -128,6 +128,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Mackie Onyx 1620i](https://github.com/mdias/rs_asio/issues/239)
 - [Mackie Onyx Artist 1x2](https://github.com/mdias/rs_asio/issues/211)
 - [Mackie Onyx Producer 2x2](https://github.com/mdias/rs_asio/issues/211)
+- [Merging Anubis](https://github.com/mdias/rs_asio/issues/578)
 - [MIDIPLUS Studio S](docs/midiplus_studio_s/README.md)
 - [Miditech AUDIOLINK III](https://github.com/mdias/rs_asio/issues/512), using ASIO4ALL
 - [Mooer Steep I](https://github.com/mdias/rs_asio/issues/524), using WineASIO (Steam Deck + Proton 9.0)
@@ -143,6 +144,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Native Instruments Komplete Audio 6
 - [Native Instruments Rig Kontrol 2](https://github.com/mdias/rs_asio/issues/214)
 - [Native Instruments Rig Kontrol 3](https://github.com/mdias/rs_asio/issues/536)
+- [Neumann MT 48](https://github.com/mdias/rs_asio/issues/578)
 - [Neural DSP Nano Cortex](https://github.com/mdias/rs_asio/issues/529)
 - [Neural DSP Quad Cortex](https://github.com/mdias/rs_asio/issues/294)
 - [NUX Mighty Air](https://github.com/mdias/rs_asio/issues/364)
