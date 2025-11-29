@@ -27,7 +27,7 @@ DebugWrapperDevicePropertyStore::~DebugWrapperDevicePropertyStore()
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetCount(DWORD *cProps)
 {
-	rslog::info_ts() << m_DeviceId << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealPropertyStore.GetCount(cProps);
 
@@ -88,7 +88,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetValue(REFPROPERTYK
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::SetValue(REFPROPERTYKEY key, REFPROPVARIANT propvar)
 {
-	rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " - key: " << key << std::endl;
+	rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " - key: " << key << std::endl;
 
 	HRESULT hr = m_RealPropertyStore.SetValue(key, propvar);
 	DEBUG_PRINT_HR(hr);
@@ -98,7 +98,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::SetValue(REFPROPERTYK
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::Commit()
 {
-	rslog::info_ts() << m_DeviceId << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealPropertyStore.Commit();
 	DEBUG_PRINT_HR(hr);

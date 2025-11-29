@@ -21,7 +21,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperCaptureClient::GetBuffer(BYTE **ppData, UI
 
 	if (m_GetCount < 3)
 	{
-		rslog::info_ts() << m_DeviceId << " " __FUNCTION__  << std::endl;
+		rslog::info_ts() << m_DeviceId << " " << __FUNCTION__  << std::endl;
 
 		hr = m_RealClient.GetBuffer(ppData, pNumFramesToRead, pdwFlags, pu64DevicePosition, pu64QPCPosition);
 	}
@@ -30,7 +30,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperCaptureClient::GetBuffer(BYTE **ppData, UI
 		hr = m_RealClient.GetBuffer(ppData, pNumFramesToRead, pdwFlags, pu64DevicePosition, pu64QPCPosition);
 		if (FAILED(hr))
 		{
-			rslog::info_ts() << m_DeviceId << " " __FUNCTION__ << std::endl;
+			rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << std::endl;
 		}
 	}
 
@@ -45,7 +45,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperCaptureClient::ReleaseBuffer(UINT32 NumFra
 	if (m_GetCount < 3)
 	{
 		++m_GetCount;
-		rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " NumFramesRead: " << NumFramesRead << std::endl;
+		rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " NumFramesRead: " << NumFramesRead << std::endl;
 		hr = m_RealClient.ReleaseBuffer(NumFramesRead);
 	}
 	else
@@ -53,7 +53,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperCaptureClient::ReleaseBuffer(UINT32 NumFra
 		hr = m_RealClient.ReleaseBuffer(NumFramesRead);
 		if (FAILED(hr))
 		{
-			rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " NumFramesRead: " << NumFramesRead << std::endl;
+			rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " NumFramesRead: " << NumFramesRead << std::endl;
 		}
 	}
 
@@ -68,7 +68,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperCaptureClient::GetNextPacketSize(UINT32 *p
 
 	if (m_GetCount < 3)
 	{
-		rslog::info_ts() << m_DeviceId << " " __FUNCTION__  << std::endl;
+		rslog::info_ts() << m_DeviceId << " " << __FUNCTION__  << std::endl;
 		hr = m_RealClient.GetNextPacketSize(pNumFramesInNextPacket);
 		if (SUCCEEDED(hr))
 		{
@@ -80,7 +80,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperCaptureClient::GetNextPacketSize(UINT32 *p
 		hr = m_RealClient.GetNextPacketSize(pNumFramesInNextPacket);
 		if (FAILED(hr))
 		{
-			rslog::info_ts() << m_DeviceId << " " __FUNCTION__ << std::endl;
+			rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << std::endl;
 		}
 	}
 

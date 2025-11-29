@@ -86,7 +86,7 @@ std::vector<void*> FindBytesOffsets(const BYTE* bytes, size_t numBytes)
 
 void Patch_CallAbsoluteIndirectAddress(const std::vector<void*>& offsets, void* TargetFn, size_t numNopsFollowing)
 {
-	rslog::info_ts() << __FUNCTION__ " - num locations: " << offsets.size() << std::endl;
+	rslog::info_ts() << __FUNCTION__ << " - num locations: " << offsets.size() << std::endl;
 
 	for (void* offset : offsets)
 	{
@@ -122,7 +122,7 @@ void Patch_CallAbsoluteIndirectAddress(const std::vector<void*>& offsets, void* 
 
 void Patch_CallRelativeAddress(const std::vector<void*>& offsets, void* TargetFn)
 {
-	rslog::info_ts() << __FUNCTION__ " - num locations: " << offsets.size() << std::endl;
+	rslog::info_ts() << __FUNCTION__ << " - num locations: " << offsets.size() << std::endl;
 
 	for (void* offset : offsets)
 	{
