@@ -185,7 +185,7 @@ static bool parseIntString(const std::string& s, int& out)
 
 static void LoadConfigIni(RSConfig& out)
 {
-	const std::wstring& cfgPath = GetConfigFilePath();
+	const std::string cfgPath = ConvertWStrToStr(GetConfigFilePath());
 	if (cfgPath.size() == 0)
 		return;
 

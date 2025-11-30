@@ -5,19 +5,24 @@
 
 #pragma once
 
+
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files
 #include <windows.h>
 #include <psapi.h>
-#include <initguid.h>
 #include <mmdeviceapi.h>
 #include <combaseapi.h>
-#include <Audioclient.h>
+#include <audioclient.h>
 #include <endpointvolume.h>
-#include <functiondiscoverykeys_devpkey.h>
+#include <ksmedia.h>
 
+#ifdef __GNUC__
+#include "FunctionDiscoveryKeys_devpkey.h"
+#else
+#include <functiondiscoverykeys_devpkey.h>
+#endif
 
 
 // reference additional headers your program requires here
@@ -33,6 +38,7 @@
 #include <functional>
 #include <mutex>
 #include <optional>
+
 #include "asio.h"
 #include "Utils.h"
 #include "Log.h"

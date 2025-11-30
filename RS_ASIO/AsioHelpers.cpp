@@ -26,7 +26,7 @@ static bool ReadRegistryStringA(std::string& out, HKEY hKey, const TCHAR* valueN
 #ifdef UNICODE
 	char converted[bufferSize];
 
-	if (WideCharToMultiByte(CP_ACP, 0, (wchar_t*)buffer, readSize / sizeof(wchar_t), converted, bufferSize, nullptr, nullptr) == 0)
+	if (WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)buffer, readSize / sizeof(wchar_t), converted, bufferSize, nullptr, nullptr) == 0)
 		return false;
 
 	out = converted;
@@ -125,6 +125,7 @@ static bool GetRegistryAsioDriverPath(std::string& out, const CLSID& clsid)
 	return result;
 }
 
+
 static bool GetRegistryDriverInfo(AsioHelpers::DriverInfo& outInfo, HKEY hKey, const TCHAR* keyName)
 {
 	bool result = false;
@@ -136,11 +137,7 @@ static bool GetRegistryDriverInfo(AsioHelpers::DriverInfo& outInfo, HKEY hKey, c
 		AsioHelpers::DriverInfo tmpInfo;
 
 		// set name
-#ifdef UNICODE
 		tmpInfo.Name = ConvertWStrToStr(keyName);
-#else
-		tmpInfo.Name = keyName;
-#endif
 
 		// read CLSID
 		result = ReadRegistryClsid(tmpInfo.Clsid, hksub, COM_CLSID);

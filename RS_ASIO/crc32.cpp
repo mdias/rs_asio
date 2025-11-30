@@ -55,8 +55,7 @@ static inline DWORD updateCRC32(unsigned char ch, DWORD crc)
 
 bool crc32file(char* name, DWORD& outCrc)
 {
-    FILE* f = nullptr;
-    fopen_s(&f, name, "rb");
+    FILE* f = fopen(name, "rb");
     if (!f)
         return false;
 

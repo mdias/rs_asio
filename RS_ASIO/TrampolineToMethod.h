@@ -80,7 +80,7 @@ private:
 	template<typename TClass, typename TMemberFunc, std::size_t... I>
 	void* GenerateFuncPtr_Impl(TClass* obj, std::index_sequence<I...>)
 	{
-		return (void*)&Redirector<TClass, TMemberFunc, std::tuple_element<I, function_traits<TFunc>::type_list>::type...>;
+		return (void*)&Redirector<TClass, TMemberFunc, typename std::tuple_element<I, typename function_traits<TFunc>::type_list>::type...>;
 	}
 
 	template<typename TClass, typename TMemberFunc, typename... Args>

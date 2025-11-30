@@ -30,6 +30,11 @@ private:
 };
 
 std::string ConvertWStrToStr(const std::wstring& wstr);
+// These overloads allow TCHAR to work both with and without unicode
+std::string ConvertWStrToStr(const wchar_t* keyName);
+std::string ConvertWStrToStr(const char* keyName);
+
+std::wstring ConvertToWstr(LPWSTR str);
 std::string IID2String(REFIID iid);
 const char* Dataflow2String(EDataFlow dataFlow);
 const char* Role2String(ERole role);

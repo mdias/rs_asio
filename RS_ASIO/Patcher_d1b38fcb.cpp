@@ -109,16 +109,16 @@ void PatchOriginalCode_d1b38fcb()
 	{
 		// patch CoCreateInstance calls
 		rslog::info_ts() << "Patching CoCreateInstance" << std::endl;
-		Patch_CallAbsoluteIndirectAddress(offsets_CoCreateInstanceAbs, &Patched_CoCreateInstance, 1);
+		Patch_CallAbsoluteIndirectAddress(offsets_CoCreateInstanceAbs, (void*)&Patched_CoCreateInstance, 1);
 		//Patch_CallRelativeAddress<(void*)&Patched_CoCreateInstance>(offsets_CoCreateInstanceRel);
 
 		// patch PortAudio MarshalStreamComPointers
 		rslog::info_ts() << "Patching PortAudio MarshalStreamComPointers" << std::endl;
-		Patch_CallRelativeAddress(offsets_PaMarshalPointers, &Patched_PortAudio_MarshalStreamComPointers);
+		Patch_CallRelativeAddress(offsets_PaMarshalPointers, (void*)&Patched_PortAudio_MarshalStreamComPointers);
 
 		// patch PortAudio UnmarshalStreamComPointers
 		rslog::info_ts() << "Patching PortAudio UnmarshalStreamComPointers" << std::endl;
-		Patch_CallRelativeAddress(offsets_PaUnmarshalPointers, &Patched_PortAudio_UnmarshalStreamComPointers);
+		Patch_CallRelativeAddress(offsets_PaUnmarshalPointers, (void*)&Patched_PortAudio_UnmarshalStreamComPointers);
 
 		// patch two guitar cables connected message in single-player
 		rslog::info_ts() << "Patching Two Guitar Tones Connected Message Box (starting menu) (num locations: " << offsets_TwoRealToneCablesMessageBoxStarting.size() << ")" << std::endl;

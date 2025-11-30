@@ -1,9 +1,11 @@
 #include "stdafx.h"
+
+#include <cmath>
+
 #include "RSAsioDevicePropertyStore.h"
 #include "RSAsioDevice.h"
 #include "AsioSharedHost.h"
 
-#include <functiondiscoverykeys_devpkey.h>
 
 RSAsioDevicePropertyStore::RSAsioDevicePropertyStore(RSAsioDevice& device)
 	: m_AsioDevice(device)
@@ -133,7 +135,7 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetValue(REFPROPERTYKEY key
 		else if (key == PKEY_AudioEndpoint_FormFactor)
 		{
 			pv->vt = VT_UI4;
-			pv->uintVal = m_AsioDevice.GetConfig().isMicrophone ? Microphone : LineLevel;
+			pv->ulVal = m_AsioDevice.GetConfig().isMicrophone ? Microphone : LineLevel;
 		}
 	}
 

@@ -141,7 +141,7 @@ IMMDevice* RSDeviceCollection::FindById(LPCWSTR id)
 		LPWSTR strId = nullptr;
 		if (SUCCEEDED(dev->GetId(&strId)))
 		{
-			bool match = (wcscmp(id, strId) == 0);
+			bool match = (lstrcmpW(id, strId) == 0);
 			CoTaskMemFree(strId);
 			if (match)
 			{

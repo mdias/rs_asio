@@ -2,6 +2,11 @@
 
 #include "ComBaseUnknown.h"
 
+#include <memory>
+#include <string>
+#include <mutex>
+#include <thread>
+
 class IAsioBufferSwitchListener
 {
 public:

@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include <cmath>
+
 #include "AsioSharedHost.h"
 #include "RSAsioDevice.h"
 #include "RSAsioAudioClient.h"

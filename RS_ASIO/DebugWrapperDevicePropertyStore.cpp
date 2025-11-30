@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "DebugWrapperDevicePropertyStore.h"
 
+// This changes DEFINE_PROPERTYKEY to declare (on top of defined)
+#include <initguid.h>
 #include <propkey.h>
-#include <functiondiscoverykeys_devpkey.h>
 
 // example: L"{1}.TUSBAUDIO_ENUM\\VID_1397&PID_0508&KS\\9&34A5FE73&4&4"
 DEFINE_PROPERTYKEY(PKEY_Device_DeviceIdHiddenKey1, 0xb3f8fa53, 0x0004, 0x438e, 0x90, 0x03, 0x51, 0xa4, 0x6e, 0x13, 0x9b, 0xfc, 2);

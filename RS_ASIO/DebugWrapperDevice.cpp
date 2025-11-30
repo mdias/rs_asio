@@ -14,7 +14,7 @@ DebugWrapperDevice::DebugWrapperDevice(IMMDevice& realDevice)
 
 	LPWSTR pStrId = NULL;
 	realDevice.GetId(&pStrId);
-	m_Id = pStrId;
+	m_Id = ConvertToWstr(pStrId);
 	CoTaskMemFree(pStrId);
 }
 

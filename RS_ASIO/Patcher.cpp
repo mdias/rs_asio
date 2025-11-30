@@ -219,8 +219,7 @@ static bool LoadNtDllFileContents(std::vector<char>& outBuffer)
 		return false;
 	}
 
-	FILE* file = nullptr;
-	fopen_s(&file, ntDllPath, "rb");
+	FILE* file = fopen(ntDllPath, "rb");
 	if (file == nullptr)
 	{
 		rslog::error_ts() << "Failed to open ntdll.dll for read" << std::endl;
@@ -310,7 +309,7 @@ void PatchOriginalCode()
 
 void* GetVirtualProtectFnPtr()
 {
-	return pfnNtProtectVirtualMemory;
+	return (void*)pfnNtProtectVirtualMemory;
 }
 
 void SetVirtualProtectFnPtr(void* fn)
@@ -368,7 +367,7 @@ std::vector<unsigned char> GetUntouchedVirtualProtectBytes(unsigned numBytes)
 
 	if (untouchedMod)
 	{
-		void* proc = GetProcAddress(untouchedMod, fnName);
+		void* proc = (void*)GetProcAddress(untouchedMod, fnName);
 		if (!proc)
 		{
 			rslog::error_ts() << "Failed to get " << fnName << " proc" << std::endl;

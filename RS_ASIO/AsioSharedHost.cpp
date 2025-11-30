@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include <cmath>
+
 #include "AsioSharedHost.h"
 
 #define TEST_OUTPUT_NOISE 0
