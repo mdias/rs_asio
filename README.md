@@ -150,6 +150,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [NUX Mighty Air](https://github.com/mdias/rs_asio/issues/364)
 - [NUX Mighty Lite BT MKII](https://github.com/mdias/rs_asio/issues/446)
 - [NUX Mighty Plug](https://github.com/mdias/rs_asio/issues/117)
+- [NUX Mighty Plug Pro](https://github.com/mdias/rs_asio/issues/117)
 - [PositiveGrid Spark 40](https://github.com/mdias/rs_asio/issues/218) (issue reported with limited sample rate support in 2024/07; see linked issue)
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
 - [Presonus AudioBox USB 96](https://github.com/mdias/rs_asio/issues/140)
@@ -206,6 +207,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Zoom G2.1DM](https://github.com/mdias/rs_asio/issues/400)
 - Zoom H2N
 - [Zoom H6](https://github.com/mdias/rs_asio/issues/198)
+- [Zoom LiveTrak L-8](https://github.com/mdias/rs_asio/issues/584)
 - Zoom R24
 - [Zoom U-22](https://github.com/mdias/rs_asio/issues/179)
 - [Zoom U-44](https://github.com/mdias/rs_asio/issues/334)
