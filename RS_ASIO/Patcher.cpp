@@ -219,8 +219,8 @@ static bool LoadNtDllFileContents(std::vector<char>& outBuffer)
 		return false;
 	}
 
-	FILE* file = fopen(ntDllPath, "rb");
-	if (file == nullptr)
+	HANDLE file = CreateFileA(ntDllPath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (file == INVALID_HANDLE_VALUE)
 	{
 		rslog::error_ts() << "Failed to open ntdll.dll for read" << std::endl;
 		return false;
@@ -228,22 +228,17 @@ static bool LoadNtDllFileContents(std::vector<char>& outBuffer)
 
 	bool result = false;
 
-	if (fseek(file, 0, SEEK_END) != 0)
 	{
-		rslog::error_ts() << "Failed to get ntdll.dll file size" << std::endl;
-	}
-	else
-	{
-		long fileSize = ftell(file);
+		long fileSize = GetFileSize(file, nullptr);
 		if (fileSize > 0)
 		{
 			outBuffer.resize(fileSize);
 
-			fseek(file, 0, SEEK_SET);
-
-			if (fread(outBuffer.data(), fileSize, 1, file) != 1)
+			DWORD numBytesRead = 0;
+			ReadFile(file, outBuffer.data(), fileSize, &numBytesRead, nullptr);
+			if (numBytesRead != fileSize)
 			{
-				rslog::error_ts() << "Failed to get ntdll.dll file size" << std::endl;
+				rslog::error_ts() << "Failed to read " << fileSize << " bytes from ntdll.dll" << std::endl;
 			}
 			else
 			{
@@ -252,8 +247,7 @@ static bool LoadNtDllFileContents(std::vector<char>& outBuffer)
 		}
 	}
 
-	fclose(file);
-	file = nullptr;
+	CloseHandle(file);
 
 	return result;
 }

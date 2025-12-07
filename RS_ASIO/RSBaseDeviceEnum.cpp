@@ -3,6 +3,8 @@
 
 RSBaseDeviceEnum::RSBaseDeviceEnum()
 {
+	m_DefaultRenderDevices.fill(nullptr);
+	m_DefaultCaptureDevices.fill(nullptr);
 }
 
 RSBaseDeviceEnum::~RSBaseDeviceEnum()
