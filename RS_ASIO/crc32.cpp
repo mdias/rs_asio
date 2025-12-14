@@ -55,9 +55,8 @@ static inline DWORD updateCRC32(unsigned char ch, DWORD crc)
 
 bool crc32file(char* name, DWORD& outCrc)
 {
-    FILE* f = nullptr;
-    fopen_s(&f, name, "rb");
-    if (!f)
+    HANDLE f = CreateFileA(name, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    if (f == INVALID_HANDLE_VALUE)
         return false;
 
     bool ret = true;
@@ -66,23 +65,24 @@ bool crc32file(char* name, DWORD& outCrc)
     outCrc = 0xffffffff;
     for(;;)
     {
-        const size_t numBytesRead = fread(buf, 1, sizeof(buf), f);
+        DWORD numBytesRead = 0;
+        auto re = ReadFile(f, buf, sizeof(buf), &numBytesRead, nullptr);
         for (size_t i = 0; i < numBytesRead; ++i)
         {
             outCrc = updateCRC32(buf[i], outCrc);
         }
 
-        if (feof(f))
+        if (re && (numBytesRead == 0))
             break;
 
-        if (ferror(f))
+        if (re != TRUE)
         {
             ret = false;
             break;
         }
     }
 
-    fclose(f);
+    CloseHandle(f);
     outCrc = ~outCrc;
 
     return ret;

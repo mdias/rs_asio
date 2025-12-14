@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include <cmath>
+
 #include "AsioSharedHost.h"
 #include "RSAsioDevice.h"
 #include "RSAsioAudioClient.h"
@@ -99,7 +102,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	if (m_AsioSharedHost.SetSamplerate(pFormat->nSamplesPerSec) != ASE_OK)
 		return E_FAIL;
 
-	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ " - host requested buffer duration: " << RefTimeToMilisecs(hnsBufferDuration) << "ms (" << std::dec << DurationToAudioFrames(hnsBufferDuration, pFormat->nSamplesPerSec) << " frames)" << std::endl;
+	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - host requested buffer duration: " << RefTimeToMilisecs(hnsBufferDuration) << "ms (" << std::dec << DurationToAudioFrames(hnsBufferDuration, pFormat->nSamplesPerSec) << " frames)" << std::endl;
 	rslog::info_ts() << m_AsioDevice.GetIdRef() << " " << (*pFormat);
 
 	// calculate buffer duration
@@ -133,7 +136,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 		}
 	}
 
-	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ " - actual buffer duration: " << RefTimeToMilisecs(AudioFramesToDuration(bufferDurationFrames, pFormat->nSamplesPerSec)) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
+	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - actual buffer duration: " << RefTimeToMilisecs(AudioFramesToDuration(bufferDurationFrames, pFormat->nSamplesPerSec)) << "ms (" << std::dec << bufferDurationFrames << " frames)" << std::endl;
 
 	// setup ASIO streaming
 	if (m_AsioSharedHost.Setup(*pFormat, bufferDurationFrames) != ASE_OK)
@@ -495,7 +498,7 @@ void RSAsioAudioClient::SwapBuffers()
 	m_BuffersWereSwapped = true;
 
 	if (m_dbgNumBufferSwitches < 3)
-		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ << std::endl;
+		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << std::endl;
 }
 
 void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
@@ -506,7 +509,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 	if (!m_bufferMutex.try_lock())
 	{
-		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " __FUNCTION__ " - failed to get lock first time. This might be harmless, but if we freeze here this is likely related" << std::endl;
+		rslog::info_ts() << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - failed to get lock first time. This might be harmless, but if we freeze here this is likely related" << std::endl;
 		m_bufferMutex.lock();
 	}
 

@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include <cmath>
+
 #include "AsioSharedHost.h"
 
 #define TEST_OUTPUT_NOISE 0
@@ -217,7 +220,7 @@ ASIOError AsioSharedHost::SetSamplerate(const DWORD rate)
 
 ASIOError AsioSharedHost::Setup(const WAVEFORMATEX& format, const DWORD bufferDurationFrames)
 {
-	rslog::info_ts() << __FUNCTION__ " - startCount: " << m_StartCount << std::endl;
+	rslog::info_ts() << __FUNCTION__ << " - startCount: " << m_StartCount << std::endl;
 
 	if (!IsValid())
 		return ASE_NotPresent;
@@ -363,7 +366,7 @@ void AsioSharedHost::Reset()
 
 ASIOError AsioSharedHost::Start()
 {
-	rslog::info_ts() << __FUNCTION__ " - enter startCount: " << m_StartCount << std::endl;
+	rslog::info_ts() << __FUNCTION__ << " - enter startCount: " << m_StartCount << std::endl;
 
 	if (!IsValid() || !m_IsSetup)
 		return ASE_NotPresent;
@@ -384,7 +387,7 @@ ASIOError AsioSharedHost::Start()
 
 	++m_StartCount;
 
-	rslog::info_ts() << __FUNCTION__ " - leave startCount: " << m_StartCount << std::endl;
+	rslog::info_ts() << __FUNCTION__ << " - leave startCount: " << m_StartCount << std::endl;
 
 	return ASE_OK;
 }
@@ -393,22 +396,22 @@ void AsioSharedHost::Stop()
 {
 	if (!m_AsioMutex.try_lock())
 	{
-		rslog::info_ts() << m_DriverName << " " __FUNCTION__ " - failed to get lock first time. This might be harmless, but if we freeze here this is likely related" << std::endl;
+		rslog::info_ts() << m_DriverName << " " << __FUNCTION__  << " - failed to get lock first time. This might be harmless, but if we freeze here this is likely related" << std::endl;
 		m_AsioMutex.lock();
 	}
 
 	std::lock_guard<std::mutex> guard(m_AsioMutex, std::adopt_lock);
 
-	rslog::info_ts() << __FUNCTION__ " - enter startCount: " << m_StartCount << std::endl;
+	rslog::info_ts() << __FUNCTION__ << " - enter startCount: " << m_StartCount << std::endl;
 
 	if (m_StartCount == 0)
 	{
-		rslog::error_ts() << __FUNCTION__ " - too many stop calls!" << std::endl;
+		rslog::error_ts() << __FUNCTION__ << " - too many stop calls!" << std::endl;
 		return;
 	}
 	else if (m_StartCount == 1)
 	{
-		rslog::info_ts() << __FUNCTION__ " - stopping ASIO stream" << std::endl;
+		rslog::info_ts() << __FUNCTION__ << " - stopping ASIO stream" << std::endl;
 		if (m_Driver->stop() != ASE_OK)
 		{
 			rslog::error_ts() << "  Failed to stop ASIO stream" << std::endl;
@@ -418,7 +421,7 @@ void AsioSharedHost::Stop()
 
 	--m_StartCount;
 
-	rslog::info_ts() << __FUNCTION__ " - leave startCount: " << m_StartCount << std::endl;
+	rslog::info_ts() << __FUNCTION__ << " - leave startCount: " << m_StartCount << std::endl;
 }
 
 bool AsioSharedHost::GetPreferredBufferSize(DWORD& outBufferSizeFrames) const
@@ -740,7 +743,7 @@ void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, AS
 {
 	if (!m_AsioMutex.try_lock())
 	{
-		rslog::info_ts() << m_DriverName << " " __FUNCTION__ " - aborting buffer switch handling as mutex is already locked." << std::endl;
+		rslog::info_ts() << m_DriverName << " " << __FUNCTION__ << " - aborting buffer switch handling as mutex is already locked." << std::endl;
 		return;
 	}
 
@@ -753,12 +756,12 @@ void __cdecl AsioSharedHost::AsioCalback_bufferSwitch(long doubleBufferIndex, AS
 	if (m_dbgNumBufferSwitches < 2)
 	{
 		++m_dbgNumBufferSwitches;
-		rslog::info_ts() << m_DriverName << " - " __FUNCTION__ " - buffer switch " << m_dbgNumBufferSwitches << std::endl;
+		rslog::info_ts() << m_DriverName << " - " << __FUNCTION__ << " - buffer switch " << m_dbgNumBufferSwitches << std::endl;
 	}
 	else if (m_dbgNumBufferSwitches == 2)
 	{
 		++m_dbgNumBufferSwitches;
-		rslog::info_ts() << m_DriverName << " - " __FUNCTION__ " - buffer switch " << m_dbgNumBufferSwitches << " (not logging upcoming switches)" << std::endl;
+		rslog::info_ts() << m_DriverName << " - " << __FUNCTION__ << " - buffer switch " << m_dbgNumBufferSwitches << " (not logging upcoming switches)" << std::endl;
 	}
 
 	// zero output
@@ -828,7 +831,7 @@ void __cdecl AsioSharedHost::AsioCalback_sampleRateDidChange(ASIOSampleRate sRat
 
 long __cdecl AsioSharedHost::AsioCalback_asioMessage(long selector, long value, void* message, double* opt)
 {
-	rslog::info_ts() << __FUNCTION__ " - selector: " << selector << " value: " << value << " | returning: ";
+	rslog::info_ts() << __FUNCTION__ << " - selector: " << selector << " value: " << value << " | returning: ";
 
 	long ret = 0;
 

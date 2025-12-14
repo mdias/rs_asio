@@ -21,7 +21,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperRenderClient::GetBuffer(UINT32 NumFramesRe
 
 	if (m_GetCount < 3)
 	{
-		rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " NumFramesRequested: " << NumFramesRequested << std::endl;
+		rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " NumFramesRequested: " << NumFramesRequested << std::endl;
 
 		hr = m_RealClient.GetBuffer(NumFramesRequested, ppData);
 	}
@@ -30,7 +30,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperRenderClient::GetBuffer(UINT32 NumFramesRe
 		hr = m_RealClient.GetBuffer(NumFramesRequested, ppData);
 		if (FAILED(hr))
 		{
-			rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " NumFramesRequested: " << NumFramesRequested << std::endl;
+			rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " NumFramesRequested: " << NumFramesRequested << std::endl;
 		}
 	}
 
@@ -45,7 +45,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperRenderClient::ReleaseBuffer(UINT32 NumFram
 	if (m_GetCount < 3)
 	{
 		++m_GetCount;
-		rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " NumFramesWritten: " << NumFramesWritten << std::endl;
+		rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " NumFramesWritten: " << NumFramesWritten << std::endl;
 		hr = m_RealClient.ReleaseBuffer(NumFramesWritten, dwFlags);
 	}
 	else
@@ -53,7 +53,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperRenderClient::ReleaseBuffer(UINT32 NumFram
 		hr = m_RealClient.ReleaseBuffer(NumFramesWritten, dwFlags);
 		if (FAILED(hr))
 		{
-			rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " NumFramesWritten: " << NumFramesWritten << std::endl;
+			rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " NumFramesWritten: " << NumFramesWritten << std::endl;
 		}
 	}
 

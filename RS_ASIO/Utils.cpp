@@ -66,6 +66,23 @@ std::string ConvertWStrToStr(const std::wstring& wstr)
 	return std::string();
 }
 
+
+std::string ConvertWStrToStr(const wchar_t* keyName)
+{
+	std::wstring ws(keyName);
+	return ConvertWStrToStr(ws);
+}
+
+std::string ConvertWStrToStr(const char* keyName)
+{
+	return std::string(keyName);
+}
+
+std::wstring ConvertToWstr(LPWSTR str)
+{
+	return std::wstring((const wchar_t*)str);
+}
+
 std::string IID2String(REFIID iid)
 {
 	std::string ret;
@@ -76,7 +93,7 @@ std::string IID2String(REFIID iid)
 	if (iidStr)
 	{
 #if defined(_WIN32) && !defined(OLE2ANSI)
-		std::wstring wStr = iidStr;
+		std::wstring wStr( (wchar_t*) iidStr);
 		ret = ConvertWStrToStr(wStr);
 #else
 		ret = iidStr;
@@ -160,7 +177,7 @@ std::ostream & operator<<(std::ostream & os, REFIID iid)
 			return os;
 		}
 
-		os << clsidStr;
+		os << reinterpret_cast<const wchar_t*>(clsidStr);
 
 		CoTaskMemFree(clsidStr);
 	}
@@ -193,7 +210,7 @@ std::ostream & operator<<(std::ostream & os, REFPROPERTYKEY key)
 	else
 	{
 		wchar_t propNameW[128];
-		HRESULT hr = PSStringFromPropertyKey(key, propNameW, 128);
+		HRESULT hr = PSStringFromPropertyKey(key, (WCHAR*)propNameW, 128);
 		if (SUCCEEDED(hr))
 		{
 			os << propNameW;

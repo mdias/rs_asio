@@ -17,7 +17,7 @@ DebugWrapperEndpoint::~DebugWrapperEndpoint()
 
 HRESULT STDMETHODCALLTYPE DebugWrapperEndpoint::QueryInterface(REFIID riid, void **ppvObject)
 {
-	rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " riid: " << riid << std::endl;
+	rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " riid: " << riid << std::endl;
 
 	HRESULT hr = m_RealEndpoint.QueryInterface(riid, ppvObject);
 	DEBUG_PRINT_HR(hr);
@@ -27,7 +27,7 @@ HRESULT STDMETHODCALLTYPE DebugWrapperEndpoint::QueryInterface(REFIID riid, void
 
 HRESULT STDMETHODCALLTYPE DebugWrapperEndpoint::GetDataFlow(EDataFlow *pDataFlow)
 {
-	rslog::info_ts() << m_DeviceId << " " __FUNCTION__ << std::endl;
+	rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << std::endl;
 
 	HRESULT hr = m_RealEndpoint.GetDataFlow(pDataFlow);
 	DEBUG_PRINT_HR(hr);

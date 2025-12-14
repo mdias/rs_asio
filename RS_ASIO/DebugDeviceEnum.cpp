@@ -32,7 +32,7 @@ HRESULT STDMETHODCALLTYPE DebugDeviceEnum::QueryInterface(REFIID riid, void **pp
 
 HRESULT STDMETHODCALLTYPE DebugDeviceEnum::EnumAudioEndpoints(EDataFlow dataFlow, DWORD dwStateMask, IMMDeviceCollection **ppDevices)
 {
-	rslog::info_ts() << __FUNCTION__ " - dataFlow: " << Dataflow2String(dataFlow) << " - dwStateMask: " << dwStateMask << std::endl;
+	rslog::info_ts() << __FUNCTION__ << " - dataFlow: " << Dataflow2String(dataFlow) << " - dwStateMask: " << dwStateMask << std::endl;
 	
 	HRESULT hr = RSBaseDeviceEnum::EnumAudioEndpoints(dataFlow, dwStateMask, ppDevices);
 	rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl;
@@ -46,7 +46,7 @@ HRESULT STDMETHODCALLTYPE DebugDeviceEnum::EnumAudioEndpoints(EDataFlow dataFlow
 
 HRESULT STDMETHODCALLTYPE DebugDeviceEnum::GetDefaultAudioEndpoint(EDataFlow dataFlow, ERole role, IMMDevice **ppEndpoint)
 {
-	rslog::info_ts() << __FUNCTION__ " - dataFlow: " << Dataflow2String(dataFlow) << " - role: " << Role2String(role) << std::endl;
+	rslog::info_ts() << __FUNCTION__ << " - dataFlow: " << Dataflow2String(dataFlow) << " - role: " << Role2String(role) << std::endl;
 
 	HRESULT hr = RSBaseDeviceEnum::GetDefaultAudioEndpoint(dataFlow, role, ppEndpoint);
 	rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl;

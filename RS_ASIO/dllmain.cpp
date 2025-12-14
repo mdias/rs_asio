@@ -8,6 +8,9 @@
 
 #define USE_STRUCTURED_PA 1
 
+
+extern "C" {
+
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -56,6 +59,8 @@ HRESULT STDAPICALLTYPE Patched_CoCreateInstance(REFCLSID rclsid, IUnknown *pUnkO
 
 	return CoCreateInstance(rclsid, pUnkOuter, dwClsContext, riid, ppOut);
 }
+
+
 
 #if USE_STRUCTURED_PA
 struct PaWasapiSubStream
@@ -307,3 +312,5 @@ HRESULT Patched_PortAudio_UnmarshalStreamComPointers(void* stream)
 	return S_OK;
 }
 #endif
+
+} // Extern "C"

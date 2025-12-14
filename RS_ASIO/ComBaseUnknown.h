@@ -1,5 +1,12 @@
 #pragma once
 
+#include <type_traits>
+#include <iostream>
+
+#include <unknwn.h>
+
+#include "Log.h"
+
 template <class TBase>
 class ComBaseUnknown : public TBase
 {
@@ -40,5 +47,5 @@ public:
 	}
 
 private:
-	ULONG m_RefCount = 1;
+	LONG m_RefCount = 1;
 };

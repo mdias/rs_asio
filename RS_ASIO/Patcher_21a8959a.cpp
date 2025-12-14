@@ -75,15 +75,15 @@ void PatchOriginalCode_21a8959a()
 	{
 		// patch CoCreateInstance calls
 		rslog::info_ts() << "Patching CoCreateInstance" << std::endl;
-		Patch_CallAbsoluteIndirectAddress(offsets_CoCreateInstance, &Patched_CoCreateInstance, 1);
+		Patch_CallAbsoluteIndirectAddress(offsets_CoCreateInstance, (void*)&Patched_CoCreateInstance, 1);
 
 		// patch PortAudio MarshalStreamComPointers
 		rslog::info_ts() << "Patching PortAudio MarshalStreamComPointers" << std::endl;
-		Patch_CallRelativeAddress(offsets_PaMarshalPointers, &Patched_PortAudio_MarshalStreamComPointers);
+		Patch_CallRelativeAddress(offsets_PaMarshalPointers, (void*)&Patched_PortAudio_MarshalStreamComPointers);
 
 		// patch PortAudio UnmarshalStreamComPointers
 		rslog::info_ts() << "Patching PortAudio UnmarshalStreamComPointers" << std::endl;
-		Patch_CallRelativeAddress(offsets_PaUnmarshalPointers, &Patched_PortAudio_UnmarshalStreamComPointers);
+		Patch_CallRelativeAddress(offsets_PaUnmarshalPointers, reinterpret_cast<void*>(&Patched_PortAudio_UnmarshalStreamComPointers));
 
 		Patch_ReplaceAssembly((LPVOID)location_TwoRealToneCablesMessageBox, (LPVOID)patchedBytes_TwoRealToneCablesMessageBox, sizeof(patchedBytes_TwoRealToneCablesMessageBox));
 
