@@ -189,6 +189,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [Sterling Harmony H224](https://github.com/mdias/rs_asio/issues/390)
 - [SuZhou UTECK's Guitar-Cube Chord A](https://github.com/mdias/rs_asio/issues/92)
 - Swissonic UA-2x2
+- [TASCAM US-1200](https://github.com/mdias/rs_asio/issues/590)
 - [TASCAM US-1x2](https://github.com/mdias/rs_asio/issues/266)
 - [TASCAM US-4x4HR](https://github.com/mdias/rs_asio/issues/402)
 - [TC HELICON Blender](https://github.com/mdias/rs_asio/issues/407)
