@@ -215,6 +215,7 @@
     <ClCompile Include="Patcher_6ea6d1ba.cpp" />
     <ClCompile Include="Patcher_d1b38fcb.cpp" />
     <ClCompile Include="Patcher_21a8959a.cpp" />
+    <ClCompile Include="Patcher_e0f686e0.cpp" />
     <ClCompile Include="RSAsioAudioCaptureClient.cpp" />
     <ClCompile Include="RSAsioAudioClient.cpp" />
     <ClCompile Include="RSAsioAudioClientServiceBase.cpp" />

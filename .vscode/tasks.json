@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build RS_ASIO (Release|Win32)",
+            "type": "process",
+            "command": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "RS_ASIO.sln",
+                "/p:Configuration=Release",
+                "/p:Platform=x86",
+                "/p:PlatformToolset=v143",
+                "/t:RS_ASIO;avrt",
+                "/m"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

@@ -47,6 +47,7 @@ DWORD GetImageCrc32()
 void PatchOriginalCode_d1b38fcb();
 void PatchOriginalCode_21a8959a();
 void PatchOriginalCode_6ea6d1ba();
+void PatchOriginalCode_e0f686e0();
 
 std::vector<void*> FindBytesOffsets(const BYTE* bytes, size_t numBytes)
 {
@@ -294,6 +295,9 @@ void PatchOriginalCode()
 			break;
 		case 0x6ea6d1ba:
 			PatchOriginalCode_6ea6d1ba();
+			break;
+		case 0xe0f686e0:
+			PatchOriginalCode_e0f686e0();
 			break;
 		default:
 			rslog::error_ts() << "Unknown game version" << std::endl;

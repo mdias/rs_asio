@@ -218,6 +218,9 @@
     <ClCompile Include="Patcher_6ea6d1ba.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Patcher_e0f686e0.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def">
