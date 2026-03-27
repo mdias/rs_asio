@@ -16,7 +16,10 @@ void RegisterWasapiRedirect(const std::wstring& wasapiDeviceSubId, IMMDevice* as
 	if (!asioDevice || wasapiDeviceSubId.empty())
 		return;
 	asioDevice->AddRef();
-	s_wasapiRedirects.push_back({ wasapiDeviceSubId, asioDevice });
+	// Pre-lowercase so GetWasapiRedirectDevice can compare with a simple find().
+	std::wstring lowerSubId = wasapiDeviceSubId;
+	std::transform(lowerSubId.begin(), lowerSubId.end(), lowerSubId.begin(), [](wchar_t c) { return (wchar_t)::towlower(c); });
+	s_wasapiRedirects.push_back({ lowerSubId, asioDevice });
 	rslog::info_ts() << "RegisterWasapiRedirect: " << wasapiDeviceSubId << std::endl;
 }
 
@@ -29,24 +32,23 @@ void ClearWasapiRedirects()
 
 IMMDevice* GetWasapiRedirectDevice(const std::wstring& deviceId, const std::wstring& deviceFriendlyName)
 {
+	if (s_wasapiRedirects.empty())
+		return nullptr;
+
+	// Lowercase once before the loop; entries already store pre-lowercased subIds.
+	auto toLower = [](std::wstring s) {
+		std::transform(s.begin(), s.end(), s.begin(), [](wchar_t c) { return (wchar_t)::towlower(c); });
+		return s;
+	};
+	const std::wstring lowerDeviceId = toLower(deviceId);
+	const std::wstring lowerFriendlyName = toLower(deviceFriendlyName);
+
 	for (auto& entry : s_wasapiRedirects)
 	{
-		// Case-insensitive substring match against both the device ID (GUID path) and friendly name.
-		// Convert both sides to lowercase to handle variations in how GUIDs and names are formatted.
-		auto caseInsensitiveFind = [](const std::wstring& haystack, const std::wstring& needle) -> bool
-		{
-			if (needle.empty() || haystack.empty()) return needle.empty();
-			std::wstring h = haystack;
-			std::wstring n = needle;
-			std::transform(h.begin(), h.end(), h.begin(), ::towlower);
-			std::transform(n.begin(), n.end(), n.begin(), ::towlower);
-			return h.find(n) != std::wstring::npos;
-		};
-
-		if (caseInsensitiveFind(deviceId, entry.subId))
+		if (lowerDeviceId.find(entry.subId) != std::wstring::npos)
 			return entry.device;
 
-		if (caseInsensitiveFind(deviceFriendlyName, entry.subId))
+		if (!lowerFriendlyName.empty() && lowerFriendlyName.find(entry.subId) != std::wstring::npos)
 			return entry.device;
 	}
 	return nullptr;

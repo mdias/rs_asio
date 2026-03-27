@@ -357,3 +357,5 @@ MigrationBackup/
 !bin/Win32/
 !bin/Win32/Release/
 !bin/Win32/Release/**
+
+misc/
