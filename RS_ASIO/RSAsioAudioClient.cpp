@@ -267,6 +267,24 @@ HRESULT RSAsioAudioClient::IsFormatSupported(AUDCLNT_SHAREMODE ShareMode, const 
 	if (!m_AsioSharedHost.IsValid())
 		return AUDCLNT_E_DEVICE_INVALIDATED;
 
+	// If the ASIO host is already set up (e.g. the output is already running), ensure the
+	// new format's effective type matches so that AsioSharedHost::Setup won't reject it.
+	if (m_AsioSharedHost.IsSetup())
+	{
+		auto effectiveTag = [](const WAVEFORMATEX* f) -> WORD {
+			if (f->wFormatTag == WAVE_FORMAT_EXTENSIBLE && f->cbSize >= 22)
+			{
+				const WAVEFORMATEXTENSIBLE* e = (const WAVEFORMATEXTENSIBLE*)f;
+				if (e->SubFormat == KSDATAFORMAT_SUBTYPE_PCM)        return WAVE_FORMAT_PCM;
+				if (e->SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)  return 3; // WAVE_FORMAT_IEEE_FLOAT
+			}
+			return f->wFormatTag;
+		};
+		const WAVEFORMATEX& curFmt = m_AsioSharedHost.GetCurrentWaveFormat();
+		if (effectiveTag(pFormat) != effectiveTag(&curFmt))
+			return AUDCLNT_E_UNSUPPORTED_FORMAT;
+	}
+
 	static bool isFirstTimeCalled = true;
 	if (isFirstTimeCalled)
 	{

@@ -26,7 +26,14 @@ struct RSAsioInputConfig
 	int softwareMasterVolumePercent = 100;
 	bool microphone = false;
 	std::optional<bool> enableRefCountHack;
+	std::string wasapiRedirectId; // if non-empty, redirect this WASAPI device ID (or sub-ID) to use this ASIO input
 };
+
+// Registry of WASAPI device ID → IMMDevice (ASIO-backed) for audio client redirect.
+// Populated by RSAsioDeviceEnum when WasapiDevice= is configured in RS_ASIO.ini.
+void RegisterWasapiRedirect(const std::wstring& wasapiDeviceSubId, IMMDevice* asioDevice);
+void ClearWasapiRedirects();
+IMMDevice* GetWasapiRedirectDevice(const std::wstring& wasapiDeviceId);
 
 struct RSAsioConfig
 {

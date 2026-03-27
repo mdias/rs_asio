@@ -446,6 +446,10 @@ static void LoadConfigIni(RSConfig& out)
 							asioInputConfig.enableRefCountHack = v;
 						}
 					}
+					else if (key == "wasapidevice")
+					{
+						asioInputConfig.wasapiRedirectId = val;
+					}
 				}
 			}
 		}

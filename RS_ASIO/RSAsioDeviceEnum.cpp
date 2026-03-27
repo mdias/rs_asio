@@ -4,6 +4,39 @@
 #include "AsioHelpers.h"
 #include "AsioSharedHost.h"
 
+// ---------------------------------------------------------------------------
+// WASAPI device ID → ASIO-backed IMMDevice redirect registry
+// Populated at startup when [Asio.InputN] WasapiDevice= is configured.
+// ---------------------------------------------------------------------------
+struct WasapiRedirectEntry { std::wstring subId; IMMDevice* device; };
+static std::vector<WasapiRedirectEntry> s_wasapiRedirects;
+
+void RegisterWasapiRedirect(const std::wstring& wasapiDeviceSubId, IMMDevice* asioDevice)
+{
+	if (!asioDevice || wasapiDeviceSubId.empty())
+		return;
+	asioDevice->AddRef();
+	s_wasapiRedirects.push_back({ wasapiDeviceSubId, asioDevice });
+	rslog::info_ts() << "RegisterWasapiRedirect: " << wasapiDeviceSubId << std::endl;
+}
+
+void ClearWasapiRedirects()
+{
+	for (auto& entry : s_wasapiRedirects)
+		entry.device->Release();
+	s_wasapiRedirects.clear();
+}
+
+IMMDevice* GetWasapiRedirectDevice(const std::wstring& wasapiDeviceId)
+{
+	for (auto& entry : s_wasapiRedirects)
+	{
+		if (wasapiDeviceId.find(entry.subId) != std::wstring::npos)
+			return entry.device;
+	}
+	return nullptr;
+}
+
 void RSAsioDeviceEnum::SetConfig(const RSAsioConfig& config)
 {
 	m_DeviceListNeedsUpdate = true;
@@ -13,6 +46,7 @@ void RSAsioDeviceEnum::SetConfig(const RSAsioConfig& config)
 void RSAsioDeviceEnum::UpdateAvailableDevices()
 {
 	m_DeviceListNeedsUpdate = false;
+	ClearWasapiRedirects();
 
 	ClearAll();
 
@@ -108,6 +142,14 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 
 				auto device = new RSAsioDevice(*host, id, config);
 				device->SetMasterVolumeLevelScalar((float)inputCfg.softwareMasterVolumePercent / 100.0f);
+
+				// Register WASAPI redirect if configured
+				if (!inputCfg.wasapiRedirectId.empty())
+				{
+					const std::wstring wRedirectId(inputCfg.wasapiRedirectId.begin(), inputCfg.wasapiRedirectId.end());
+					RegisterWasapiRedirect(wRedirectId, device);
+				}
+
 				m_CaptureDevices.AddDevice(device);
 				device->Release();
 				device = nullptr;

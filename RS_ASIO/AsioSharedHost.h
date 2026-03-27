@@ -22,6 +22,8 @@ public:
 	virtual ~AsioSharedHost();
 
 	bool IsValid() const;
+	bool IsSetup() const { return m_IsSetup; }
+	const WAVEFORMATEX& GetCurrentWaveFormat() const { return m_CurrentWaveFormat.Format; }
 	IAsioDriver* GetDriver() { return m_Driver; }
 	const bool GetIsAsio4All() const { return m_AsioDllIsAsio4all; }
 

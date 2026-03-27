@@ -4,6 +4,7 @@
 #include "DebugWrapperDevicePropertyStore.h"
 #include "DebugWrapperEndpoint.h"
 #include "DebugWrapperAudioEndpointVolume.h"
+#include "RSAsioDeviceEnum.h"
 
 #define DEBUG_PRINT_HR(hr) if(FAILED(hr)) rslog::info_ts() << "  hr: " << HResultToStr(hr) << std::endl;
 
@@ -55,6 +56,22 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevice::Activate(REFIID iid, DWORD dwClsCt
 	{
 		if (iid == __uuidof(IAudioClient) || iid == __uuidof(IAudioClient2) || iid == __uuidof(IAudioClient3))
 		{
+			// Check if this WASAPI device has been configured to route audio through an ASIO input device.
+			IMMDevice* asioRedirect = GetWasapiRedirectDevice(m_Id);
+			if (asioRedirect)
+			{
+				rslog::info_ts() << m_Id << " " << __FUNCTION__ << " - redirecting IAudioClient to ASIO input" << std::endl;
+				IAudioClient3* asioClient = nullptr;
+				hr = asioRedirect->Activate(__uuidof(IAudioClient3), dwClsCtx, pActivationParams, (void**)&asioClient);
+				if (SUCCEEDED(hr))
+				{
+					*ppInterface = new DebugWrapperAudioClient3(*asioClient, m_Id);
+					asioClient->Release();
+				}
+				DEBUG_PRINT_HR(hr);
+				return hr;
+			}
+
 			// first - attempt creating IAudioClient3
 			{
 				IAudioClient3* realAudioClient = nullptr;
