@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "dllmain.h"
 #include "Patcher.h"
+#include "RSAsioAudioClient.h"
 
 // Patch code for Rocksmith (2011), CRC32 0xe0f686e0
 //
@@ -76,21 +77,28 @@ static HRESULT STDAPICALLTYPE Patched_CoGetInterfaceAndReleaseStream(
 	rslog::info_ts() << "Patched_CoGetInterfaceAndReleaseStream called" << std::endl;
 	if (!ppv)
 		return E_POINTER;
-	// The "stream" is actually the interface pointer we stored above.
+	// The "stream" is actually the interface pointer stored by Patched_CoMarshalInterThreadInterfaceInStream.
+	// The real CoGetInterfaceAndReleaseStream deserializes and returns the pointer that was originally
+	// marshaled — it does NOT call QueryInterface on the result (the stream data already encodes the
+	// correct interface type). We replicate that: just hand back the stored pointer directly.
+	// The AddRef performed during marshal transfers to the caller; no additional AddRef or Release needed.
 	IUnknown* pUnk = reinterpret_cast<IUnknown*>(pStm);
 	if (!pUnk)
 	{
 		*ppv = nullptr;
 		return E_NOINTERFACE;
 	}
-	HRESULT hr = pUnk->QueryInterface(riid, ppv);
-	pUnk->Release(); // CoGetInterfaceAndReleaseStream always releases the stream
-	return hr;
+	*ppv = pUnk;
+	return S_OK;
 }
 
 void PatchOriginalCode_e0f686e0()
 {
 	rslog::info_ts() << __FUNCTION__ << " - patching Rocksmith 2011 via IAT" << std::endl;
+
+	// Rocksmith 2011 uses WASAPI in polling mode (no event callbacks, possibly shared mode).
+	// Tell RSAsioAudioClient to expect this so it doesn't show confusing RS2014 warning dialogs.
+	RSAsioAudioClient_SetPollingModeExpected(true);
 
 	bool ok = true;
 

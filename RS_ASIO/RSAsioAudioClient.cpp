@@ -3,6 +3,17 @@
 #include <cmath>
 
 #include "AsioSharedHost.h"
+
+// Set to true for games that use WASAPI in polling mode (e.g. Rocksmith 2011).
+// Rocksmith 2011 uses ExclusiveMode=1 but has no Win32UltraLowLatencyMode setting,
+// so it never passes AUDCLNT_STREAMFLAGS_EVENTCALLBACK. This suppresses the
+// misleading "Did you set Win32UltraLowLatencyMode=1?" warning dialog.
+static bool s_expectPollingMode = false;
+
+void RSAsioAudioClient_SetPollingModeExpected(bool expected)
+{
+	s_expectPollingMode = expected;
+}
 #include "RSAsioDevice.h"
 #include "RSAsioAudioClient.h"
 #include "RSAsioAudioRenderClient.h"
@@ -77,7 +88,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	static bool isFirstTimeCalled = true;
 	if (isFirstTimeCalled)
 	{
-		if (!useEventCallback)
+		if (!useEventCallback && !s_expectPollingMode)
 		{
 			MessageBox(GetGameWindow(), TEXT("Tried to initialize audio without using an event callback.\nDid you set Win32UltraLowLatencyMode=1 in Rocksmith.ini?"), TEXT("RS-ASIO Error"), MB_OK | MB_ICONERROR);
 		}
@@ -230,14 +241,20 @@ HRESULT RSAsioAudioClient::GetCurrentPadding(UINT32 *pNumPaddingFrames)
 	{
 		if (m_RenderClient)
 			isBufferWaiting = m_RenderClient->HasNewBufferWaiting();
+		// In polling mode the WASAPI convention is: padding=0 means the hardware has
+		// consumed the previous buffer and is ready for new data (available = bufferSize-0).
+		// In event mode the game uses events rather than polling GetCurrentPadding.
+		if (!m_UsingEventHandle)
+			*pNumPaddingFrames = isBufferWaiting ? 0 : m_bufferNumFrames;
+		else
+			*pNumPaddingFrames = isBufferWaiting ? m_bufferNumFrames : 0;
 	}
 	else
 	{
 		if (m_CaptureClient)
 			isBufferWaiting = m_CaptureClient->HasNewBufferWaiting();
+		*pNumPaddingFrames = isBufferWaiting ? m_bufferNumFrames : 0;
 	}
-
-	*pNumPaddingFrames = isBufferWaiting ? m_bufferNumFrames : 0;
 
 	return S_OK;
 }

@@ -87,3 +87,8 @@ private:
 	// this is used for ... hacks
 	MyUnknown* m_MyUnknown = nullptr;
 };
+
+// Set to true for games that use WASAPI in polling mode (e.g. Rocksmith 2011).
+// Suppresses the "Did you set Win32UltraLowLatencyMode=1?" warning dialog,
+// which is irrelevant for RS2011 (that setting doesn't exist in its ini).
+void RSAsioAudioClient_SetPollingModeExpected(bool expected);
