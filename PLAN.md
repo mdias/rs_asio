@@ -23,11 +23,17 @@ Steam Proton + WineASIO, mirroring what the original project achieves for Rocksm
 - Audio output: PortAudio compiled in statically, using the WASAPI backend
   → `MMDevAPI.dll` loads at runtime (WASAPI confirmed)
   → `avrt.dll` is probed from the game folder first → **same injection vector as RS2014**
-- Audio input (guitar): WinMM wave input (`waveInOpen`, `waveInAddBuffer`, etc.)
+- Audio input (guitar): **WASAPI exclusive mode**, not WinMM as initially suspected.
+  The game identifies the Real Tone Cable specifically among all WASAPI capture devices
+  by reading its property store, then opens it directly. The cable's native format is
+  48 kHz / 16-bit mono, but Wine/Proton rejects all formats for it in exclusive mode
+  under PipeWire. Solution: intercept the cable's `IMMDevice::Activate(IAudioClient)`
+  call and return an ASIO-backed `RSAsioAudioClient` instead.
 - COM imports (same PortAudio WASAPI pattern as RS2014):
   `CoCreateInstance`, `CoMarshalInterThreadInterfaceInStream`, `CoGetInterfaceAndReleaseStream`
-- `avrt.dll`, `WINMM.dll`, and `AUDIOSES.DLL` are all probed from the game folder with
-  result `NAME NOT FOUND` → all three are valid injection vectors
+- `avrt.dll` is probed from the game folder first → same injection vector as RS2014
+- RS2011 uses WASAPI in **polling mode** (no `AUDCLNT_STREAMFLAGS_EVENTCALLBACK`),
+  unlike RS2014 which uses event-driven mode.
 
 **Process Monitor log:** `tools/rocksmith-processmonitor-log.CSV`  
 **PE import inspector:** `tools/inspect_imports.ps1`  

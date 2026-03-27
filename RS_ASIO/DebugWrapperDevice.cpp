@@ -56,8 +56,25 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevice::Activate(REFIID iid, DWORD dwClsCt
 	{
 		if (iid == __uuidof(IAudioClient) || iid == __uuidof(IAudioClient2) || iid == __uuidof(IAudioClient3))
 		{
+			// Read friendly name for redirect matching and diagnostics.
+			// Users can put this name (or a substring of it) in WasapiDevice= instead of a GUID.
+			std::wstring friendlyName;
+			{
+				IPropertyStore* store = nullptr;
+				if (SUCCEEDED(m_RealDevice.OpenPropertyStore(STGM_READ, &store)))
+				{
+					PROPVARIANT pv;
+					PropVariantInit(&pv);
+					if (SUCCEEDED(store->GetValue(PKEY_Device_FriendlyName, &pv)) && pv.vt == VT_LPWSTR && pv.pwszVal)
+						friendlyName = pv.pwszVal;
+					PropVariantClear(&pv);
+					store->Release();
+				}
+			}
+			rslog::info_ts() << m_Id << " friendly name: \"" << friendlyName << "\"" << std::endl;
+
 			// Check if this WASAPI device has been configured to route audio through an ASIO input device.
-			IMMDevice* asioRedirect = GetWasapiRedirectDevice(m_Id);
+			IMMDevice* asioRedirect = GetWasapiRedirectDevice(m_Id, friendlyName);
 			if (asioRedirect)
 			{
 				rslog::info_ts() << m_Id << " " << __FUNCTION__ << " - redirecting IAudioClient to ASIO input" << std::endl;

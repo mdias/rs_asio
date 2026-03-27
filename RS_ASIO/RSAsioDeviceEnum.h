@@ -33,7 +33,11 @@ struct RSAsioInputConfig
 // Populated by RSAsioDeviceEnum when WasapiDevice= is configured in RS_ASIO.ini.
 void RegisterWasapiRedirect(const std::wstring& wasapiDeviceSubId, IMMDevice* asioDevice);
 void ClearWasapiRedirects();
-IMMDevice* GetWasapiRedirectDevice(const std::wstring& wasapiDeviceId);
+// Checks deviceId and (optionally) deviceFriendlyName against registered redirect patterns.
+// The WasapiDevice= INI value is matched as a case-insensitive substring against both the
+// full device ID string and the device friendly name, so users may specify either a GUID
+// fragment or a human-readable name (e.g. "Rocksmith USB Guitar Adapter").
+IMMDevice* GetWasapiRedirectDevice(const std::wstring& deviceId, const std::wstring& deviceFriendlyName = std::wstring());
 
 struct RSAsioConfig
 {

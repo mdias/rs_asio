@@ -27,11 +27,26 @@ void ClearWasapiRedirects()
 	s_wasapiRedirects.clear();
 }
 
-IMMDevice* GetWasapiRedirectDevice(const std::wstring& wasapiDeviceId)
+IMMDevice* GetWasapiRedirectDevice(const std::wstring& deviceId, const std::wstring& deviceFriendlyName)
 {
 	for (auto& entry : s_wasapiRedirects)
 	{
-		if (wasapiDeviceId.find(entry.subId) != std::wstring::npos)
+		// Case-insensitive substring match against both the device ID (GUID path) and friendly name.
+		// Convert both sides to lowercase to handle variations in how GUIDs and names are formatted.
+		auto caseInsensitiveFind = [](const std::wstring& haystack, const std::wstring& needle) -> bool
+		{
+			if (needle.empty() || haystack.empty()) return needle.empty();
+			std::wstring h = haystack;
+			std::wstring n = needle;
+			std::transform(h.begin(), h.end(), h.begin(), ::towlower);
+			std::transform(n.begin(), n.end(), n.begin(), ::towlower);
+			return h.find(n) != std::wstring::npos;
+		};
+
+		if (caseInsensitiveFind(deviceId, entry.subId))
+			return entry.device;
+
+		if (caseInsensitiveFind(deviceFriendlyName, entry.subId))
 			return entry.device;
 	}
 	return nullptr;
