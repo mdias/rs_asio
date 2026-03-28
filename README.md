@@ -12,7 +12,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
   - Only the Steam version of Rocksmith is currently supported. You can find local folder of a game by right clicking on a Rocksmith in your Steam library, and selecting menu "Manage" -> "Browse local files"
 - Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
 - Look into [basic configuration guide](#basic-configuration-guide)
-- Make sure Rocksmith.ini is set to run with `ExclusiveMode=1` and `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
+- Make sure Rocksmith.ini is set to run with `ExclusiveMode=1`. For Rocksmith 2014, the file must also include `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
 - Make sure your game is set to use the RTC input instead of the microphone one. ([See this](https://github.com/mdias/rs_asio/issues/275#issuecomment-1120386256))
 - Make sure your interface clock is set to 48kHz. RS ASIO will try to request 48kHz mode, but your drivers may or may not allow this, so it might help setting it manually.
 - Make sure you're NOT using the NoCableLauncher or similar otherwise your instruments may not be detected properly.
