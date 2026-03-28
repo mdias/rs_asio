@@ -3,9 +3,6 @@
 This guide covers running **Rocksmith 2011** on Linux via Steam/Proton with RS ASIO and WineASIO,
 using the Real Tone Cable for guitar/bass input.
 
-Support for Rocksmith 2011 was contributed by [ferabreu](https://github.com/ferabreu), developed
-with the assistance of GitHub Copilot (Claude Sonnet 4.6 and Claude Haiku 4.5).
-
 ---
 
 ## Requirements
@@ -75,11 +72,17 @@ RS2011's audio initialisation.
 
 **Game asks to connect the Real Tone Cable at the tuner screen**
 
-The WASAPI redirect did not activate. Check `RS_ASIO-log.txt` for a line reading:
+The WASAPI redirect did not activate. Check `RS_ASIO-log.txt` for a line containing:
 ```
-DebugWrapperDevice::Activate - redirecting IAudioClient to ASIO input
+redirecting IAudioClient to ASIO input
 ```
-If it is absent, the `WasapiDevice=` value did not match any enumerated capture device. See
+
+The full log line includes the device ID and function name, e.g.:
+```
+{0.0.1.00000000}.{21D5646C-...} Activate - redirecting IAudioClient to ASIO input
+```
+
+If this line is absent, the `WasapiDevice=` value did not match any enumerated capture device. See
 the [WasapiDevice matching](#wasapidevice-matching) section above.
 
 **No audio output**
@@ -138,3 +141,10 @@ The ASIO host is shared between output (already running for music playback) and 
 the same buffer size and sample rate. Only sample rate and buffer size are compared when the
 second client joins the shared host — format tag differences between output (PCM16) and input
 (float32 extensible) are intentionally ignored.
+
+---
+
+## Credits
+
+Support for Rocksmith 2011 was contributed by [ferabreu](https://github.com/ferabreu), developed
+with the assistance of GitHub Copilot, Claude Sonnet 4.6 and Claude Haiku 4.5.

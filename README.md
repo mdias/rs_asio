@@ -2,6 +2,7 @@
 
 This project aims to add ASIO support to `Rocksmith 2014 Edition - Remastered` in order to avoid issues with some WASAPI drivers.
 It patches game code at runtime to allow intervening in the process of WASAPI device enumeration so that we can inject our own fake WASAPI devices which internally use ASIO audio API.
+RS ASIO also supports Rocksmith 2011 when running on Linux via Steam/Proton and WineASIO, using the Real Tone Cable guitar input. See the [Rocksmith 2011 guide](docs/rocksmith_2011/README.md) for setup instructions, troubleshooting and specific details regarding the game.
 
 ## Other Languages
 [简体中文](README_CN.md) (Out of date)
@@ -9,7 +10,7 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 ## How to use
 
 - Copy the contents (`avrt.dll`, `RS_ASIO.dll`, `RS_ASIO.ini`) of [latest release](https://github.com/mdias/rs_asio/releases/latest) (zip archive release-xxx.zip) to the game folder.
-  - Only the Steam version of Rocksmith is currently supported. You can find local folder of a game by right clicking on a Rocksmith in your Steam library, and selecting menu "Manage" -> "Browse local files"
+  - Only the Steam version of both Rocksmith 2014 and Rocksmith 2011 is currently supported. You can find the local folder of a game by right clicking on it in your Steam library, and selecting menu "Manage" -> "Browse local files"
 - Modify the RS_ASIO.ini file to configure which ASIO driver to use, and which channels etc...
 - Look into [basic configuration guide](#basic-configuration-guide)
 - Make sure Rocksmith.ini is set to run with `ExclusiveMode=1`. For Rocksmith 2014, the file must also include `Win32UltraLowLatencyMode=1`. If in doubt, use default settings.
@@ -33,10 +34,6 @@ Check out [this guide](docs/streaming/README.md).
 If you're using Ubuntu 12.04 LTS check [this page](docs/linux/ubuntu_1204_lts.md).
 
 Some people have had success using RS ASIO with [wineasio](https://www.wineasio.org/) on linux. You can check out [this issue](https://github.com/mdias/rs_asio/issues/99) for more information.
-
-### Rocksmith 2011
-
-RS ASIO also supports **Rocksmith 2011** when running on Linux via Steam/Proton and WineASIO (including Real Tone Cable guitar input). See the [Rocksmith 2011 guide](docs/rocksmith_2011/README.md) for setup instructions.
 
 ## Audio Interfaces reported to work well
 
