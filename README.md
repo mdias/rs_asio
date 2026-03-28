@@ -34,6 +34,10 @@ If you're using Ubuntu 12.04 LTS check [this page](docs/linux/ubuntu_1204_lts.md
 
 Some people have had success using RS ASIO with [wineasio](https://www.wineasio.org/) on linux. You can check out [this issue](https://github.com/mdias/rs_asio/issues/99) for more information.
 
+### Rocksmith 2011
+
+RS ASIO also supports **Rocksmith 2011** when running on Linux via Steam/Proton and WineASIO (including Real Tone Cable guitar input). See the [Rocksmith 2011 guide](docs/rocksmith_2011/README.md) for setup instructions.
+
 ## Audio Interfaces reported to work well
 
 <details>
