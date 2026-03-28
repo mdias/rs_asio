@@ -12,7 +12,7 @@ with the assistance of GitHub Copilot (Claude Sonnet 4.6 and Claude Haiku 4.5).
 
 - Steam with Proton (tested with Proton 9+)
 - [wineasio](https://www.wineasio.org/) compiled for 32-bit (`wineasio32.dll`)
-  - The `wineasio-rsasio` named instance is recommended — see the [Linux guide](../linux/)
+  - The `wineasio-rsasio` named instance is recommended — see the [Linux guide section](../linux/README.md)
 - The **Real Tone Cable** (Ubisoft USB guitar adapter) physically connected
 - `Rocksmith.ini` set to `ExclusiveMode=1` (do **not** set `Win32UltraLowLatencyMode=1` — RS2011 does not support it)
 
