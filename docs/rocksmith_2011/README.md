@@ -10,30 +10,25 @@ with the assistance of GitHub Copilot (Claude Sonnet 4.6 and Claude Haiku 4.5).
 
 ## Requirements
 
-- Steam with Proton (tested with Proton 9+)
-- [wineasio](https://www.wineasio.org/) compiled for 32-bit (`wineasio32.dll`)
-  - The `wineasio-rsasio` named instance is recommended — see the [Linux guide section](../linux/README.md)
 - The **Real Tone Cable** (Ubisoft USB guitar adapter) physically connected
 - `Rocksmith.ini` set to `ExclusiveMode=1` (do **not** set `Win32UltraLowLatencyMode=1` — RS2011 does not support it)
+- Follow the [Linux guide section](../linux/README.md) to set up RS ASIO and WineASIO for Rocksmith (these instructions apply to both 2014 and 2011)
 
 ---
 
 ## RS_ASIO.ini configuration
 
-The default `RS_ASIO.ini` distributed with this build is pre-configured for RS2011 on Linux
-with WineASIO. The key settings are:
+The default `dist/RS_ASIO.ini` file requires the following additional configuration for Rocksmith 2011:
 
 ```ini
 [Config]
 EnableWasapiInputs=1   ; required — enables WASAPI capture device enumeration
-EnableAsio=1
 
 [Asio.Output]
 Driver=wineasio-rsasio
 
 [Asio.Input.0]
 Driver=wineasio-rsasio
-Channel=0
 WasapiDevice=Rocksmith  ; matches the Real Tone Cable's friendly name on Wine/Proton
 ```
 
@@ -94,8 +89,9 @@ the `RS_ASIO-log.txt` under `AsioHelpers::FindDrivers`.
 
 **Crackling or dropouts**
 
-WineASIO's buffer size is fixed at 256 frames (5ms at 48kHz) by default. If you experience
-dropouts, check your PipeWire quantum setting — it should match (256 frames recommended).
+If you experience dropouts, adjust your PipeWire quantum and buffer settings. The typical setup
+uses 256 frames at 48kHz (5ms latency), set via `PIPEWIRE_LATENCY="256/48000"` — but these are
+recommendations, not hard constraints. You may need to increase buffer size if dropouts persist.
 
 ---
 
