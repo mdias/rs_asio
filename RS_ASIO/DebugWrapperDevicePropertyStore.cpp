@@ -55,14 +55,34 @@ HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetAt(DWORD iProp, PR
 
 HRESULT STDMETHODCALLTYPE DebugWrapperDevicePropertyStore::GetValue(REFPROPERTYKEY key, PROPVARIANT *pv)
 {
+	//rslog::info_ts() << m_DeviceId << " " __FUNCTION__ " - key: " << key << std::endl;
+
 	HRESULT hr = m_RealPropertyStore.GetValue(key, pv);
-
-	// Log every property key the game reads so we can identify the cable-detection check
-	rslog::info_ts() << m_DeviceId << " GetValue key={" << key.fmtid.Data1 << "} pid=" << key.pid
-	                 << " vt=" << (pv ? pv->vt : 0xFFFF)
-	                 << ((!pv || pv->vt == VT_EMPTY) ? " (empty)" : "") << std::endl;
-
 	DEBUG_PRINT_HR(hr);
+	/*
+	if (hr == S_OK)
+	{
+		if (pv->vt == VT_EMPTY)
+		{
+			rslog::info_ts() << "  unhandled key" << std::endl;
+		}
+		else if (key == PKEY_AudioEngine_DeviceFormat && pv->vt == VT_BLOB)
+		{	
+			rslog::info_ts() << *(WAVEFORMATEX*)pv->blob.pBlobData;
+		}
+		else if (key == PKEY_AudioEndpoint_FormFactor && pv->vt == VT_UI4)
+		{
+			rslog::info_ts() << "  form factor: " << std::dec << pv->uintVal << std::endl;
+		}
+		else if (key == PKEY_Device_FriendlyName)
+		{
+			if (pv->vt == VT_LPWSTR)
+				rslog::info_ts() << "  friendly name: " << std::dec << pv->pwszVal << std::endl;
+			else if (pv->vt == VT_LPSTR)
+				rslog::info_ts() << "  friendly name: " << std::dec << pv->pszVal << std::endl;
+		}
+	}
+	*/
 
 	return hr;
 }
