@@ -350,12 +350,3 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-
-# Exception: include built DLLs for distribution
-# Must come after the bin/ ignore pattern to override it
-!bin/
-!bin/Win32/
-!bin/Win32/Release/
-!bin/Win32/Release/**
-
-misc/
