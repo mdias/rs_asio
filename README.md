@@ -159,6 +159,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [NUX Mighty Plug](https://github.com/mdias/rs_asio/issues/117)
 - [NUX Mighty Plug Pro](https://github.com/mdias/rs_asio/issues/117)
 - [PositiveGrid Spark 40](https://github.com/mdias/rs_asio/issues/218) (issue reported with limited sample rate support in 2024/07; see linked issue)
+- [Presonus AudioBox Go](https://github.com/mdias/rs_asio/issues/606)
 - [Presonus AudioBox iTwo](https://github.com/mdias/rs_asio/issues/140)
 - [Presonus AudioBox USB 96](https://github.com/mdias/rs_asio/issues/140)
 - [Presonus ioStation 24c](https://github.com/mdias/rs_asio/issues/542)
