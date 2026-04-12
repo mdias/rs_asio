@@ -5,8 +5,8 @@ It patches game code at runtime to allow intervening in the process of WASAPI de
 
 ## Looking for Rocksmith 2011 support?
 
-There is a new separate project named [RS2011-ASIO](https://github.com/ferabreu/rs2011-asio) aiming to provide similar functionality to Rocksmith 2011 on linux (it may also work on Windows).
-This project was created by a different person, and you should check it out if you want ASIO on Rocksmith 2011.
+There is a new separate work-in-progress project named [rocksmith-on-linux](https://github.com/ferabreu/rocksmith-on-linux) aiming to provide similar functionality to Rocksmith 2011 on linux. At the moment it will still require a RTC.
+This project was created by a different person, and you should check it out if you want WINEASIO on Rocksmith 2011 for linux.
 
 ## Other Languages
 [简体中文](README_CN.md) (Out of date)
