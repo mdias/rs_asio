@@ -62,7 +62,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Behringer U-Phoria UM2  [(see this for more details)](https://github.com/mdias/rs_asio/issues/7) **IMPORTANT: needs legacy ASIO driver**
 - [Behringer UMC22](https://github.com/mdias/rs_asio/issues/326)  **IMPORTANT: needs legacy ASIO driver**
 - Behringer UMC1820
-- Behringer UMC202HD
+- [Behringer UMC202HD](https://github.com/mdias/rs_asio/issues/610)
 - [Behringer UMC204](https://github.com/mdias/rs_asio/issues/156)
 - [Behringer UMC204HD](https://github.com/mdias/rs_asio/issues/161)
 - [Behringer UMC404HD](https://github.com/mdias/rs_asio/issues/13)
