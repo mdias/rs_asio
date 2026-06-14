@@ -1,4 +1,4 @@
-# Focusrite Scarlett Solo Gen 3
+# Focusrite Scarlett Solo
 
 Note: may also work on other Solo generations.
 
@@ -29,17 +29,17 @@ SoftwareMasterVolumePercent=100
 
 [Asio.Input.0]
 Driver=Focusrite USB ASIO
-Channel=1
+Channel=0
 EnableSoftwareEndpointVolumeControl=1
 EnableSoftwareMasterVolumeControl=1
 SoftwareMasterVolumePercent=100
 
-[Asio.Input.1]
+;[Asio.Input.1]
 ;Driver=Focusrite USB ASIO
-Channel=1
-EnableSoftwareEndpointVolumeControl=1
-EnableSoftwareMasterVolumeControl=1
-SoftwareMasterVolumePercent=100
+;Channel=1
+;EnableSoftwareEndpointVolumeControl=1
+;EnableSoftwareMasterVolumeControl=1
+;SoftwareMasterVolumePercent=100
 ```
 
 ## Troubleshooting

@@ -105,6 +105,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - Focusrite Scarlett 18i20 2nd Gen [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 2nd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - [Focusrite Scarlett Solo 3rd Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
+- [Focusrite Scarlett Solo 4th Gen](docs/focusrite_solo/README.md) [(Known issues)](#known-issues)
 - [Fractal Audio AXE FX III](https://github.com/mdias/rs_asio/issues/347)
 - [Hotone Ampero II Stage](https://github.com/mdias/rs_asio/issues/444)
 - [Hotone Ampero II Stomp](https://github.com/mdias/rs_asio/issues/444)
