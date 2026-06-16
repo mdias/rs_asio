@@ -1,4 +1,4 @@
-# Focusrite Scarlett Solo
+# Focusrite Scarlett Solo Gen 4
 
 Note: may also work on other Solo generations.
 
