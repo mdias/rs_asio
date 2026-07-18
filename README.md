@@ -3,11 +3,6 @@
 This project aims to add ASIO support to `Rocksmith 2014 Edition - Remastered` in order to avoid issues with some WASAPI drivers.
 It patches game code at runtime to allow intervening in the process of WASAPI device enumeration so that we can inject our own fake WASAPI devices which internally use ASIO audio API.
 
-## Looking for Rocksmith 2011 support?
-
-There is a new separate work-in-progress project named [rocksmith-on-linux](https://github.com/ferabreu/rocksmith-on-linux) aiming to provide similar functionality to Rocksmith 2011 on linux. At the moment it will still require a RTC.
-This project was created by a different person, and you should check it out if you want WINEASIO on Rocksmith 2011 for linux.
-
 ## Other Languages
 [简体中文](README_CN.md) (Out of date)
 
