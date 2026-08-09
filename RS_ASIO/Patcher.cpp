@@ -315,66 +315,91 @@ std::vector<unsigned char> GetUntouchedVirtualProtectBytes(unsigned numBytes)
 {
 	constexpr const char* fnName = "NtProtectVirtualMemory";
 
-	std::wstring tmpFilePath = GetGamePath() + L"RS_ASIO.ntdll.tmp";
-	HMODULE untouchedMod = LoadLibraryW(tmpFilePath.c_str());
-	HANDLE tmpFile = nullptr;
-
 	std::vector<char> ntDllFileContents;
-	
-	if (!untouchedMod)
+	if (!LoadNtDllFileContents(ntDllFileContents))
 	{
-		// load original
-		rslog::info_ts() << "Loading ntdll.dll to memory" << std::endl;
-		if (!LoadNtDllFileContents(ntDllFileContents))
-		{
-			return {};
-		}
-		else
-		{
-			rslog::info_ts() << "Loaded ntdll.dll to memory: " << (ntDllFileContents.size() / 1024) << " kB" << std::endl;
-		}
+		return {};
+	}
+	else
+	{
+		const DWORD crc32 = crc32buf(ntDllFileContents.data(), ntDllFileContents.size());
 
-		// create temporary copy
-		tmpFile = CreateFileW(tmpFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY | FILE_ATTRIBUTE_HIDDEN, nullptr);
-		if (tmpFile == nullptr)
-		{
-			rslog::error_ts() << "Failed to open temporary file for writing" << std::endl;
-			return {};
-		}
-		else
-		{
-			DWORD numBytesWritten = 0;
-			const BOOL writeResult = WriteFile(tmpFile, ntDllFileContents.data(), ntDllFileContents.size(), &numBytesWritten, nullptr);
-			if (!writeResult || numBytesWritten < ntDllFileContents.size())
-			{
-				rslog::error_ts() << "Error when writing to temporary file. Wrote " << numBytesWritten << " out of " << ntDllFileContents.size() << " bytes" << std::endl;
-			}
+		char crc32_str[16] = { 0 };
+		snprintf(crc32_str, 15, "0x%08x", crc32);
 
-			CloseHandle(tmpFile);
-			tmpFile = nullptr;
-		}
-
-		untouchedMod = LoadLibraryW(tmpFilePath.c_str());
+		rslog::info_ts() << "Loaded ntdll.dll to memory: " << (ntDllFileContents.size() / 1024) << " kB, crc32: " << crc32_str << std::endl;
 	}
 
-	std::vector<unsigned char> result;
-
-	if (untouchedMod)
+	// DOS header
+	auto* dos = reinterpret_cast<IMAGE_DOS_HEADER*>(ntDllFileContents.data());
+	if (dos->e_magic != IMAGE_DOS_SIGNATURE)
 	{
-		void* proc = (void*)GetProcAddress(untouchedMod, fnName);
-		if (!proc)
-		{
-			rslog::error_ts() << "Failed to get " << fnName << " proc" << std::endl;
-		}
-		else
-		{
-			result.resize(numBytes);
-			memcpy(result.data(), proc, numBytes);
-		}
-
-		FreeLibrary(untouchedMod);
+		rslog::error_ts() << "  invalid header magic" << std::endl;
+		return {};
 	}
-	DeleteFileW(tmpFilePath.c_str());
 
-	return result;
+	// PE32 header
+	auto* nt = reinterpret_cast<IMAGE_NT_HEADERS32*>(ntDllFileContents.data() + dos->e_lfanew);
+	if (nt->Signature != IMAGE_NT_SIGNATURE || nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR32_MAGIC)
+	{
+		rslog::error_ts() << "  invalid header signature" << std::endl;
+		return {};
+	}
+
+	// RVA -> file offset
+	auto rvaToOffset = [&](DWORD rva) -> size_t
+	{
+		auto* section = IMAGE_FIRST_SECTION(nt);
+
+		for (WORD i = 0; i < nt->FileHeader.NumberOfSections; ++i, ++section)
+		{
+			DWORD start = section->VirtualAddress;
+			DWORD size = section->SizeOfRawData;
+
+			if (rva >= start && rva < start + size)
+				return section->PointerToRawData + (rva - start);
+		}
+
+		return rva;
+	};
+
+	const auto& dir = nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
+	if (!dir.VirtualAddress)
+	{
+		rslog::error_ts() << "  invalid header directory virtual address" << std::endl;
+		return {};
+	}
+
+	auto* exp = reinterpret_cast<IMAGE_EXPORT_DIRECTORY*>(ntDllFileContents.data() + rvaToOffset(dir.VirtualAddress));
+	auto* names = reinterpret_cast<DWORD*>(ntDllFileContents.data() + rvaToOffset(exp->AddressOfNames));
+	auto* ordinals = reinterpret_cast<WORD*>(ntDllFileContents.data() + rvaToOffset(exp->AddressOfNameOrdinals));
+	auto* functions = reinterpret_cast<DWORD*>(ntDllFileContents.data() + rvaToOffset(exp->AddressOfFunctions));
+
+	for (DWORD i = 0; i < exp->NumberOfNames; ++i)
+	{
+		const char* name = reinterpret_cast<const char*>(ntDllFileContents.data() + rvaToOffset(names[i]));
+
+		if (std::strcmp(name, fnName) != 0)
+			continue;
+
+		rslog::info_ts() << "  found " << fnName << std::endl;
+
+		DWORD rva = functions[ordinals[i]];
+		size_t offset = rvaToOffset(rva);
+
+		if (offset + numBytes > ntDllFileContents.size())
+		{
+			rslog::error_ts() << "  invalid function offset; not enough bytes present" << std::endl;
+			return {};
+		}
+
+		std::vector<unsigned char> result;
+		result.resize(numBytes);
+		memcpy(result.data(), ntDllFileContents.data() + offset, numBytes);
+
+		return result;
+	}
+
+	rslog::error_ts() << "  could not find function " << fnName << std::endl;
+	return {};
 }
