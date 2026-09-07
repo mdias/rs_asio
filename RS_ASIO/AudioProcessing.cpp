@@ -241,11 +241,13 @@ bool AudioProcessing::DoSoftwareVolumeDsp(BYTE* data, ASIOSampleType inSampleTyp
 		const int scalarPercentPoints = (int)(fVolumeScalar * 100.f);
 		for (DWORD i = 0; i < numSamples; ++i, data += 3)
 		{
-			std::int64_t sample = *(std::int16_t*)data;
-			sample = (sample << 8) | data[2];
+			std::int64_t sample = data[0] | (data[1] << 8) | (data[2] << 16);
+			if (sample & 0x800000)
+				sample |= ~std::int64_t(0xffffff);
 			sample = (sample * scalarPercentPoints) / 100;
-			*(std::int16_t*)data = (std::int16_t)(sample >> 8);
-			data[2] = sample & 0xff;
+			data[0] = (std::uint8_t)(sample & 0xff);
+			data[1] = (std::uint8_t)((sample >> 8) & 0xff);
+			data[2] = (std::uint8_t)((sample >> 16) & 0xff);
 		}
 		return true;
 	}
@@ -266,6 +268,7 @@ bool AudioProcessing::DoSoftwareVolumeDsp(BYTE* data, ASIOSampleType inSampleTyp
 		{
 			(*(float*)data) *= fVolumeScalar;
 		}
+		return true;
 	}
 	else if (inSampleType == ASIOSTFloat64LSB)
 	{
@@ -302,7 +305,7 @@ static const TFuncConvertMatrix& GetFuncConvertMatrix()
 		s_FuncConvertMatrix[ASIOSTInt32LSB][ASIOSTInt24LSB] = &AudioCopyConvert<4, 3>;
 		s_FuncConvertMatrix[ASIOSTInt32LSB][ASIOSTInt32LSB] = &AudioCopyConvert<4, 4>;
 		s_FuncConvertMatrix[ASIOSTInt32LSB][ASIOSTFloat32LSB] = &AudioCopyConvertI2F<4, float>;
-		s_FuncConvertMatrix[ASIOSTInt32LSB][ASIOSTFloat64LSB] = &AudioCopyConvertI2F<5, double>;
+		s_FuncConvertMatrix[ASIOSTInt32LSB][ASIOSTFloat64LSB] = &AudioCopyConvertI2F<4, double>;
 
 		s_FuncConvertMatrix[ASIOSTFloat32LSB][ASIOSTInt16LSB] = &AudioCopyConvertF2I<float, 2>;
 		s_FuncConvertMatrix[ASIOSTFloat32LSB][ASIOSTInt24LSB] = &AudioCopyConvertF2I<float, 3>;
