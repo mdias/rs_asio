@@ -69,6 +69,10 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::ReleaseBuffer(UINT32 NumFram
 	if (!m_WaitingForBufferRelease)
 		return AUDCLNT_E_OUT_OF_ORDER;
 
+	const UINT32 expectedNumFrames = m_AsioAudioClient.GetBufferNumFrames();
+	if (NumFramesRead != 0 && NumFramesRead != expectedNumFrames)
+		return AUDCLNT_E_INVALID_SIZE;
+
 	m_WaitingForBufferRelease = false;
 
 	return S_OK;

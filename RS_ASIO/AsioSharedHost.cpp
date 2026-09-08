@@ -847,7 +847,7 @@ long __cdecl AsioSharedHost::AsioCalback_asioMessage(long selector, long value, 
 
 	rslog::info << ret << std::endl;
 
-	return 0;
+	return ret;
 }
 
 ASIOTime* __cdecl AsioSharedHost::AsioCalback_bufferSwitchTimeInfo(ASIOTime* params, long doubleBufferIndex, ASIOBool directProcess)
