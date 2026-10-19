@@ -336,6 +336,18 @@ static void LoadConfigIni(RSConfig& out)
 							rslog::error_ts() << __FUNCTION__ << " - invalid value for buffer size, value should be an integer starting at 1. line: " << line << std::endl;
 						}
 					}
+					else if (key == "samplerate" || key == "customsamplerate")
+					{
+						int sr = 0;
+						if (parseIntString(val, sr) && sr > 0)
+						{
+							out.asioConfig.customSampleRate = (unsigned)sr;
+						}
+						else
+						{
+							rslog::error_ts() << __FUNCTION__ << " - invalid value for sample rate, value should be a positive integer (e.g. 44100 or 48000). line: " << line << std::endl;
+						}
+					}
 				}
 				else if (currentSection == SectionAsioOut)
 				{

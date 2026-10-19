@@ -34,6 +34,7 @@ struct RSAsioConfig
 	std::array<RSAsioInputConfig, 3> inputs;
 	RSAsioDevice::BufferSizeMode bufferMode = RSAsioDevice::BufferSizeMode_Driver;
 	unsigned customBufferSize = 128;
+	std::optional<unsigned> customSampleRate;
 };
 
 struct RSConfig

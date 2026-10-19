@@ -83,11 +83,15 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetValue(REFPROPERTYKEY key
 			if (asioDriver->getChannels(&numInputChannels, &numOutputChannels) == ASE_OK
 				&& asioDriver->getSampleRate(&sampleRate) == ASE_OK)
 			{
+				DWORD reportedSampleRate = (DWORD)std::lround(sampleRate);
+				if (reportedSampleRate == 44100 || reportedSampleRate == 0)
+					reportedSampleRate = 48000;
+
 				WAVEFORMATEXTENSIBLE* wfe = (WAVEFORMATEXTENSIBLE*)CoTaskMemAlloc(sizeof(WAVEFORMATEXTENSIBLE));
 				wfe->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
 				wfe->Format.nChannels = m_AsioDevice.GetNumWasapiChannels();
 				wfe->Format.wBitsPerSample = 32;
-				wfe->Format.nSamplesPerSec = std::lround(sampleRate);
+				wfe->Format.nSamplesPerSec = reportedSampleRate;
 				wfe->Format.nBlockAlign = wfe->Format.nChannels * (wfe->Format.wBitsPerSample / 8);
 				wfe->Format.nAvgBytesPerSec = wfe->Format.nBlockAlign * wfe->Format.nSamplesPerSec;
 				wfe->Format.cbSize = 22;

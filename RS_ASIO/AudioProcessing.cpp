@@ -232,6 +232,10 @@ bool AudioProcessing::DoSoftwareVolumeDsp(BYTE* data, ASIOSampleType inSampleTyp
 		{
 			std::int64_t sample = *(std::int16_t*)data;
 			sample = (sample * scalarPercentPoints) / 100;
+			if (sample > 32767)
+				sample = 32767;
+			else if (sample < -32768)
+				sample = -32768;
 			*(std::int16_t*)data = (std::int16_t)sample;
 		}
 		return true;
@@ -245,6 +249,10 @@ bool AudioProcessing::DoSoftwareVolumeDsp(BYTE* data, ASIOSampleType inSampleTyp
 			if (sample & 0x800000)
 				sample |= ~std::int64_t(0xffffff);
 			sample = (sample * scalarPercentPoints) / 100;
+			if (sample > 8388607)
+				sample = 8388607;
+			else if (sample < -8388608)
+				sample = -8388608;
 			data[0] = (std::uint8_t)(sample & 0xff);
 			data[1] = (std::uint8_t)((sample >> 8) & 0xff);
 			data[2] = (std::uint8_t)((sample >> 16) & 0xff);
@@ -258,6 +266,10 @@ bool AudioProcessing::DoSoftwareVolumeDsp(BYTE* data, ASIOSampleType inSampleTyp
 		{
 			std::int64_t sample = *(std::int32_t*)data;
 			sample = (sample * scalarPercentPoints) / 100;
+			if (sample > 2147483647LL)
+				sample = 2147483647LL;
+			else if (sample < -2147483648LL)
+				sample = -2147483648LL;
 			*(std::int32_t*)data = (std::int32_t)sample;
 		}
 		return true;

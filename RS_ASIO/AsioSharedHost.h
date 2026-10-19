@@ -28,6 +28,8 @@ public:
 	const std::string GetAsioDllPath() const { return m_AsioDllPath; }
 
 	ASIOError SetSamplerate(const DWORD rate);
+	void SetCustomSampleRate(std::optional<DWORD> customRate) { m_CustomSampleRate = customRate; }
+	DWORD GetAsioSampleRate() const { return m_AsioSampleRate; }
 	ASIOError Setup(const WAVEFORMATEX& format, const DWORD bufferDurationFrames);
 	void Reset();
 
@@ -83,6 +85,8 @@ private:
 	std::set<IAsioBufferSwitchListener*> m_AsioBufferListeners;
 	std::mutex m_AsioMutex;
 	std::optional<ASIOSampleRate> m_SampleRateRestore;
+	std::optional<DWORD> m_CustomSampleRate;
+	DWORD m_AsioSampleRate = 0;
 
 	std::unique_ptr<std::thread> m_AsioEventsThread;
 

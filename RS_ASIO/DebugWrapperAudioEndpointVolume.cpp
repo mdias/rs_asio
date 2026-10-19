@@ -57,7 +57,26 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioEndpointVolume::SetMasterVolumeLevel(
 
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioEndpointVolume::SetMasterVolumeLevelScalar(float fLevel, LPCGUID pguidEventContext)
 {
-	rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " fLevel: " << fLevel << std::endl;
+	static float s_LastLevel = -1.0f;
+	static unsigned int s_RepeatCount = 0;
+	if (s_LastLevel < 0.0f || (fLevel - s_LastLevel > 0.0005f) || (s_LastLevel - fLevel > 0.0005f))
+	{
+		if (s_RepeatCount > 0)
+		{
+			rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " (repeated " << s_RepeatCount << " times at fLevel: " << s_LastLevel << ")" << std::endl;
+			s_RepeatCount = 0;
+		}
+		rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " fLevel: " << fLevel << std::endl;
+		s_LastLevel = fLevel;
+	}
+	else
+	{
+		++s_RepeatCount;
+		if (s_RepeatCount % 300 == 0)
+		{
+			rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " fLevel: " << fLevel << " (still repeating, count=" << s_RepeatCount << ")" << std::endl;
+		}
+	}
 
 	HRESULT hr = m_RealAudioEndpointVolume.SetMasterVolumeLevelScalar(fLevel, pguidEventContext);
 	DEBUG_PRINT_HR(hr);
