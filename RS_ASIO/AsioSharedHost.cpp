@@ -605,6 +605,11 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 	}
 
 	// check sample rate
+	if (format.nSamplesPerSec == 0)
+	{
+		rslog::error_ts() << "  invalid sample rate: 0" << std::endl;
+		return false;
+	}
 	const DWORD checkRate = m_CustomSampleRate.value_or(format.nSamplesPerSec);
 	if (m_Driver->canSampleRate((ASIOSampleRate)checkRate) != ASE_OK)
 	{

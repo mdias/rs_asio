@@ -57,24 +57,25 @@ HRESULT STDMETHODCALLTYPE DebugWrapperAudioEndpointVolume::SetMasterVolumeLevel(
 
 HRESULT STDMETHODCALLTYPE DebugWrapperAudioEndpointVolume::SetMasterVolumeLevelScalar(float fLevel, LPCGUID pguidEventContext)
 {
-	static float s_LastLevel = -1.0f;
-	static unsigned int s_RepeatCount = 0;
-	if (s_LastLevel < 0.0f || (fLevel - s_LastLevel > 0.0005f) || (s_LastLevel - fLevel > 0.0005f))
 	{
-		if (s_RepeatCount > 0)
+		std::lock_guard<std::mutex> lock(m_LogMutex);
+		if (m_LastLevel < 0.0f || (fLevel - m_LastLevel > 0.0005f) || (m_LastLevel - fLevel > 0.0005f))
 		{
-			rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " (repeated " << s_RepeatCount << " times at fLevel: " << s_LastLevel << ")" << std::endl;
-			s_RepeatCount = 0;
+			if (m_RepeatCount > 0)
+			{
+				rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " (repeated " << m_RepeatCount << " times at fLevel: " << m_LastLevel << ")" << std::endl;
+				m_RepeatCount = 0;
+			}
+			rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " fLevel: " << fLevel << std::endl;
+			m_LastLevel = fLevel;
 		}
-		rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " fLevel: " << fLevel << std::endl;
-		s_LastLevel = fLevel;
-	}
-	else
-	{
-		++s_RepeatCount;
-		if (s_RepeatCount % 300 == 0)
+		else
 		{
-			rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " fLevel: " << fLevel << " (still repeating, count=" << s_RepeatCount << ")" << std::endl;
+			++m_RepeatCount;
+			if (m_RepeatCount % 300 == 0)
+			{
+				rslog::info_ts() << m_DeviceId << " " << __FUNCTION__ << " fLevel: " << fLevel << " (still repeating, count=" << m_RepeatCount << ")" << std::endl;
+			}
 		}
 	}
 

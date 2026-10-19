@@ -173,14 +173,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	UINT32 numFrames = asioNumFrames;
 	if (m_ResamplingEnabled)
 	{
-		if (m_AsioDevice.GetConfig().isOutput)
-		{
-			numFrames = (UINT32)std::lround((double)asioNumFrames * (double)pFormat->nSamplesPerSec / (double)m_AsioSampleRate);
-		}
-		else
-		{
-			numFrames = (UINT32)(((std::uint64_t)asioNumFrames * pFormat->nSamplesPerSec + m_AsioSampleRate - 1) / m_AsioSampleRate);
-		}
+		numFrames = (UINT32)(((std::uint64_t)asioNumFrames * pFormat->nSamplesPerSec + m_AsioSampleRate - 1) / m_AsioSampleRate);
 		if (numFrames == 0)
 			numFrames = 1;
 		rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__
@@ -201,7 +194,7 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	{
 		const WORD nChannels = pFormat->nChannels;
 		m_ResampleHistory.resize(nChannels);
-		m_ResampleInputBuffer.resize((std::max<DWORD>)(asioNumFrames, allocFrames) * nChannels, 0.0f);
+		m_ResampleInputBuffer.resize((allocFrames * 3 + asioNumFrames) * nChannels, 0.0f);
 		m_ResampleOutputBuffer.resize((std::max<DWORD>)(asioNumFrames, allocFrames) * nChannels, 0.0f);
 		ResetResamplerState();
 	}
@@ -258,6 +251,8 @@ HRESULT RSAsioAudioClient::GetCurrentPadding(UINT32 *pNumPaddingFrames)
 
 	if (!m_IsInitialized)
 		return AUDCLNT_E_NOT_INITIALIZED;
+
+	std::lock_guard<std::mutex> g(m_bufferMutex);
 
 	bool isBufferWaiting = false;
 
@@ -648,6 +643,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 		if (isOutput)
 		{
+			const DWORD maxFifoFrames = (DWORD)(m_ResampleInputBuffer.size() / nChannels);
 			if (m_BuffersWereSwapped)
 			{
 				if (doSoftwareVolume)
@@ -656,25 +652,39 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 					AudioProcessing::DoSoftwareVolumeDsp(m_frontBuffer.data(), gameSampleType, totalSamples, fSoftwareVolumeScalar);
 				}
 
-				AudioProcessing::CopyConvertFormat(
-					m_frontBuffer.data(), gameSampleType, gameSampleTypeSize,
-					m_bufferNumFrames * nChannels,
-					(BYTE*)m_ResampleInputBuffer.data(), ASIOSTFloat32LSB, sizeof(float)
-				);
-			}
-			else
-			{
-				memset(m_ResampleInputBuffer.data(), 0, (size_t)m_bufferNumFrames * nChannels * sizeof(float));
+				const DWORD framesToAppend = (m_OutputFifoFrames + m_bufferNumFrames <= maxFifoFrames)
+					? m_bufferNumFrames
+					: (maxFifoFrames > m_OutputFifoFrames ? maxFifoFrames - m_OutputFifoFrames : 0);
+				if (framesToAppend > 0)
+				{
+					AudioProcessing::CopyConvertFormat(
+						m_frontBuffer.data(), gameSampleType, gameSampleTypeSize,
+						framesToAppend * nChannels,
+						(BYTE*)(m_ResampleInputBuffer.data() + (size_t)m_OutputFifoFrames * nChannels), ASIOSTFloat32LSB, sizeof(float)
+					);
+					m_OutputFifoFrames += framesToAppend;
+				}
+				m_PendingRenderNotify = true;
 			}
 
-			const double step = (double)m_bufferNumFrames / (double)asioNumFrames;
+			const double step = (double)m_WaveFormat.Format.nSamplesPerSec / (double)m_AsioSampleRate;
+			const DWORD requiredSrcFrames = (std::min<DWORD>)(maxFifoFrames, (DWORD)(m_ResamplePhase + (double)asioNumFrames * step) + 1);
+			if (m_OutputFifoFrames < requiredSrcFrames)
+			{
+				memset(
+					m_ResampleInputBuffer.data() + (size_t)m_OutputFifoFrames * nChannels,
+					0,
+					(size_t)(requiredSrcFrames - m_OutputFifoFrames) * nChannels * sizeof(float)
+				);
+				m_OutputFifoFrames = requiredSrcFrames;
+			}
+
 			for (DWORD j = 0; j < asioNumFrames; ++j)
 			{
-				const double pos = (double)j * step;
-				int n = (int)pos;
-				if ((DWORD)n >= m_bufferNumFrames)
-					n = (int)m_bufferNumFrames - 1;
-				const float t = (float)(pos - (double)n);
+				int n = (int)m_ResamplePhase;
+				if ((DWORD)n >= m_OutputFifoFrames)
+					n = (int)m_OutputFifoFrames - 1;
+				const float t = (float)(m_ResamplePhase - (double)n);
 
 				float* dstFrame = &m_ResampleOutputBuffer[(size_t)j * nChannels];
 				for (WORD ch = 0; ch < nChannels; ++ch)
@@ -685,8 +695,27 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 					const float y3 = getSrcSample(n, ch);
 					dstFrame[ch] = CubicHermiteInterpolate(y0, y1, y2, y3, t);
 				}
+
+				m_ResamplePhase += step;
 			}
-			updateHistory(m_bufferNumFrames);
+
+			const DWORD consumedFrames = (std::min<DWORD>)((DWORD)m_ResamplePhase, m_OutputFifoFrames);
+			m_ResamplePhase -= (double)consumedFrames;
+			if (m_ResamplePhase < 0.0)
+				m_ResamplePhase = 0.0;
+
+			updateHistory(consumedFrames);
+
+			const DWORD remainingFrames = m_OutputFifoFrames - consumedFrames;
+			if (remainingFrames > 0 && consumedFrames > 0)
+			{
+				memmove(
+					m_ResampleInputBuffer.data(),
+					m_ResampleInputBuffer.data() + (size_t)consumedFrames * nChannels,
+					(size_t)remainingFrames * nChannels * sizeof(float)
+				);
+			}
+			m_OutputFifoFrames = remainingFrames;
 
 			for (DWORD asioCh = 0; asioCh < m_ChannelMap.size(); ++asioCh)
 			{
@@ -782,20 +811,17 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 				m_ResamplePhase += step;
 			}
 
-			static unsigned int s_MeterCallbacks = 0;
-			static float s_MaxRawPeak = 0.0f;
-			static float s_MaxOutPeak = 0.0f;
-			if (batchRawPeak > s_MaxRawPeak)
-				s_MaxRawPeak = batchRawPeak;
-			if (batchOutPeak > s_MaxOutPeak)
-				s_MaxOutPeak = batchOutPeak;
-			if (++s_MeterCallbacks >= 1000)
+			if (batchRawPeak > m_MaxRawPeak)
+				m_MaxRawPeak = batchRawPeak;
+			if (batchOutPeak > m_MaxOutPeak)
+				m_MaxOutPeak = batchOutPeak;
+			if (++m_MeterCallbacks >= 1000)
 			{
-				rslog::info_ts() << m_AsioDevice.GetIdRef() << " [InputMeter] rawPeak=" << s_MaxRawPeak
-					<< " outPeak=" << s_MaxOutPeak << " gainScalar=" << fSoftwareVolumeScalar << std::endl;
-				s_MeterCallbacks = 0;
-				s_MaxRawPeak = 0.0f;
-				s_MaxOutPeak = 0.0f;
+				rslog::info_ts() << m_AsioDevice.GetIdRef() << " [InputMeter] rawPeak=" << m_MaxRawPeak
+					<< " outPeak=" << m_MaxOutPeak << " gainScalar=" << fSoftwareVolumeScalar << std::endl;
+				m_MeterCallbacks = 0;
+				m_MaxRawPeak = 0.0f;
+				m_MaxOutPeak = 0.0f;
 			}
 
 			m_ResamplePhase -= (double)asioNumFrames;
@@ -892,21 +918,37 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 		{
 			m_CaptureClient->NotifyNewBuffer();
 		}
-		if (m_RenderClient)
+
+		bool signalApplicationAboutNewBuffer = false;
+		if (isOutput && m_ResamplingEnabled)
 		{
-			m_RenderClient->NotifyNewBuffer();
+			if (m_PendingRenderNotify && m_OutputFifoFrames < m_bufferNumFrames)
+			{
+				m_PendingRenderNotify = false;
+				if (m_RenderClient)
+				{
+					m_RenderClient->NotifyNewBuffer();
+				}
+				signalApplicationAboutNewBuffer = true;
+			}
+		}
+		else
+		{
+			if (m_RenderClient)
+			{
+				m_RenderClient->NotifyNewBuffer();
+			}
+			// NOTE(1): we cannot notify the application multiple times otherwise it will ask for all those
+			// buffers and since we don't save old buffers, it will eventually error out. Some interfaces
+			// will trigger this behavior quickly.
+			// NOTE(2): for input we want to force signal the app for the first incoming buffer.
+			signalApplicationAboutNewBuffer = m_BuffersWereSwapped || (isInput && m_IsFirstBuffer);
 		}
 
 		if (m_dbgNumBufferSwitches < 3)
 		{
 			++m_dbgNumBufferSwitches;
 		}
-
-		// NOTE(1): we cannot notify the application multiple times otherwise it will ask for all those
-		// buffers and since we don't save old buffers, it will eventually error out. Some interfaces
-		// will trigger this behavior quickly.
-		// NOTE(2): for input we want to force signal the app for the first incoming buffer.
-		const bool signalApplicationAboutNewBuffer = m_BuffersWereSwapped || (isInput && m_IsFirstBuffer);
 
 		m_BuffersWereSwapped = false;
 		m_IsFirstBuffer = false;
@@ -973,6 +1015,11 @@ void RSAsioAudioClient::UpdateChannelMap()
 void RSAsioAudioClient::ResetResamplerState()
 {
 	m_ResamplePhase = 0.0;
+	m_OutputFifoFrames = 0;
+	m_PendingRenderNotify = false;
+	m_MeterCallbacks = 0;
+	m_MaxRawPeak = 0.0f;
+	m_MaxOutPeak = 0.0f;
 	for (auto& h : m_ResampleHistory)
 	{
 		h = { 0.0f, 0.0f, 0.0f, 0.0f };

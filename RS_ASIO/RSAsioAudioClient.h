@@ -82,9 +82,15 @@ private:
 	bool m_ResamplingEnabled = false;
 	DWORD m_AsioSampleRate = 0;
 	double m_ResamplePhase = 0.0;
+	DWORD m_OutputFifoFrames = 0;
+	bool m_PendingRenderNotify = false;
 	std::vector<std::array<float, 4>> m_ResampleHistory;
 	std::vector<float> m_ResampleInputBuffer;
 	std::vector<float> m_ResampleOutputBuffer;
+
+	unsigned int m_MeterCallbacks = 0;
+	float m_MaxRawPeak = 0.0f;
+	float m_MaxOutPeak = 0.0f;
 
 	unsigned m_dbgNumBufferSwitches;
 
