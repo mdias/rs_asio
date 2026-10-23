@@ -201,6 +201,7 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
 - [TC HELICON Blender](https://github.com/mdias/rs_asio/issues/407)
 - [Teyun Q22](https://github.com/mdias/rs_asio/issues/520), using ASIO4All
 - [Teyun Q24](https://github.com/mdias/rs_asio/issues/427), using ASIO4All
+- [TOPPING E2X2 OTG USB](https://github.com/mdias/rs_asio/issues/647)
 - [Universal Audio Apollo Twin USB](https://github.com/mdias/rs_asio/issues/307) (requires older driver)
 - [Universal Audio Volt 1](docs/universal_audio_volt1/README.md)
 - [Universal Audio Volt 2 USB](https://github.com/mdias/rs_asio/issues/462)
