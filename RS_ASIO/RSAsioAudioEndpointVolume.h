@@ -32,5 +32,7 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE GetVolumeRange(float *pflVolumeMindB, float *pflVolumeMaxdB, float *pflVolumeIncrementdB) override;
 
 private:
+	bool IsVolumeControlEnabled() const;
+
 	RSAsioDevice& m_AsioDevice;
 };

@@ -196,6 +196,7 @@
     <ClInclude Include="DebugDeviceEnum.h" />
     <ClInclude Include="TrampolineToMethod.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="VolumeTaper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AsioHelpers.cpp" />
