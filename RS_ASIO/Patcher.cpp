@@ -3,6 +3,7 @@
 #include "crc32.h"
 #include "Patcher.h"
 #include "Configurator.h"
+#include "CabinetIRFix.h"
 
 typedef ULONG NTSTATUS;
 
@@ -18,7 +19,7 @@ EXTERN_C ULONG NtProtectVirtualMemory(
 	OUT PULONG OldProtect
 );
 
-static bool RedirectedVirtualProtect(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect)
+bool RedirectedVirtualProtect(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect)
 {
 	if (pfnNtProtectVirtualMemory != nullptr)
 	{
@@ -238,11 +239,12 @@ bool Patch_VerifyAndReplaceAtRva(uintptr_t rva, const BYTE* expected, const BYTE
 	return true;
 }
 
-void Patch_GameSampleRate(const uintptr_t (&sites)[9])
+void Patch_GameSampleRate(const uintptr_t (&sites)[9], uintptr_t cabinetSiteRva)
 {
 	if (GetGameSampleRate() != 44100)
 	{
 		rslog::info_ts() << "GameSampleRate: SKIPPED (engine keeps 48000 Hz)" << std::endl;
+		InstallCabinetIRProbe(cabinetSiteRva);
 		return;
 	}
 
@@ -284,6 +286,7 @@ void Patch_GameSampleRate(const uintptr_t (&sites)[9])
 		}
 	}
 	rslog::info_ts() << "GameSampleRate: PATCHED 9 sites (48000 -> 44100 Hz)" << std::endl;
+	InstallCabinetIRProbe(cabinetSiteRva);
 }
 
 static bool LoadNtDllFileContents(std::vector<char>& outBuffer)

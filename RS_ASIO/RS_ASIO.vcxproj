@@ -177,6 +177,7 @@
     <ClInclude Include="function_traits.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MyUnknown.h" />
+    <ClInclude Include="CabinetIRFix.h" />
     <ClInclude Include="Patcher.h" />
     <ClInclude Include="RSAsioAudioCaptureClient.h" />
     <ClInclude Include="RSAsioAudioClient.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="DebugWrapperRenderClient.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="CabinetIRFix.cpp" />
     <ClCompile Include="Patcher.cpp" />
     <ClCompile Include="Patcher_6ea6d1ba.cpp" />
     <ClCompile Include="Patcher_d1b38fcb.cpp" />

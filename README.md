@@ -261,8 +261,8 @@ It supports the September 2022 and December 2024 Learn & Play builds.
 Blank, `0`, or `48000` keeps the default 48 kHz behavior; other values are
 unsupported and ignored. Configure your interface for the same sample rate.
 
-At 44.1 kHz the game's amp-cabinet impulse-response effect fails to initialise,
-so tones lack the cabinet colouring. A follow-up will address this limitation.
+When `GameSampleRate=44100`, the amp-cabinet impulse responses are automatically
+resampled to 44.1 kHz so tones retain their cabinet colouring.
 
 ### Known issues
 
