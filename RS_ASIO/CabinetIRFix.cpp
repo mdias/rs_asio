@@ -87,11 +87,10 @@ namespace
 	// the session is then free: a memcpy instead of partCount forward and
 	// inverse transforms.
 	//
-	// Keyed on the ENTIRE pre-conversion media plus the target rate, so a hit
-	// can only ever be the identical filter. Hashing ~40 KB costs microseconds
-	// against the milliseconds it saves, and it
-	// leaves no room for two cabinets that agree on their first kilobyte to be
-	// handed each other's impulse response.
+	// Keyed on a 64-bit hash of the ENTIRE pre-conversion media plus the target
+	// rate. Hashing ~40 KB costs microseconds against the milliseconds it saves,
+	// and hashing the whole media (not a prefix) keeps cabinets that share their
+	// first kilobyte apart. Equal hashes are not a proof of equal media.
 	std::mutex g_CabinetCacheMutex;
 	std::map<uint64_t, std::vector<unsigned char>> g_CabinetCache;
 	constexpr size_t kCabinetCacheMaxEntries = 128;
@@ -155,12 +154,11 @@ namespace
 	// reintroduces it - but it does NOT survive a rate change: 128 samples in
 	// becomes 128*ratio samples out, so ~10 samples of the IR's leading transient
 	// are cut off at 44.1 kHz. Measured up to 13.5 dB of magnitude-response error,
-	// worst on IRs with a hard normalised onset, and it is what the "sand"
-	// reported on AT-0112C / HG-2120C / ED-END D212XLT actually was.
+	// worst on IRs with a hard normalised onset, where it is audible as a
+	// gritty top end.
 
-	// In-place iterative radix-2 Cooley-Tukey. n must be a power of two - the
-	// only caller uses n=256 (the media's fixed FFT size), so no general
-	// input validation is needed here.
+	// In-place iterative radix-2 Cooley-Tukey, with a direct-DFT fallback for
+	// the non-power-of-two sizes that variable partitions need.
 	void ComplexFFT(std::complex<double>* a, size_t n, bool inverse)
 	{
 		// Variable-partition media needs non-power-of-two transforms (a 58-bin
@@ -384,11 +382,10 @@ namespace
 
 	// Takes the media the ENGINE already fetched, and the engine rate by value.
 	//
-	// It must NOT call GetPluginMedia itself. Doing so is the prime suspect for
-	// three heap-corruption crashes in tlsf_free on 2026-08-18: our extra fetch
-	// plus the engine's own meant the media was acquired twice and released once,
-	// and the damage surfaced later inside free. Exactly one call per Init is
-	// what the engine expects, so we read the pointer it already holds.
+	// It must NOT call GetPluginMedia itself: a second fetch acquires the media
+	// twice while the engine releases it once, which corrupts the heap. Exactly
+	// one call per Init is what the engine expects, so we read the pointer it
+	// already holds.
 	void ResampleCabinetIR(unsigned char* data, unsigned size, unsigned engineRate)
 	{
 		// Wall-clock cost of the whole hook. The game fades down across a
@@ -422,13 +419,27 @@ namespace
 		// sizes, zero-padded up to a 16-byte boundary. The engine computes this
 		// itself at RVA 0x00A84AF5:
 		//     lea edx,[ecx+ecx+0xf] ; and edx,0xfffffff0   with ecx = partCount
-		// It happens to equal 0x70 for 25..32 partitions, which is why a
-		// hardcoded 0x70 survived validation against a 31-partition cabinet -
-		// and then wrote 16 bytes past the media block on a 37-partition one,
-		// corrupting the neighbouring TLSF block header and crashing the game
-		// inside free (fault 0x00AA091C, four times on 2026-08-18). 331 of the
-		// 440 shipped IRs have 33+ partitions.
+		// It equals 0x70 only for 25..32 partitions; a hardcoded 0x70 writes
+		// past the media block on larger cabinets and corrupts the heap. 331 of
+		// the 440 shipped IRs have 33+ partitions.
+		// Bound everything the header claims against the media size before it
+		// sizes any allocation or read: a malformed header must not be able to
+		// request a huge table or read past the media.
+		const size_t maxPartCount = (size - 0x30) / sizeof(unsigned short);
+		if (partCount == 0 || partCount > maxPartCount || mediaRate < 8000 || mediaRate > 192000)
+		{
+			rslog::error_ts() << "CABINET_IR_RESAMPLE: header out of range (partCount="
+				<< partCount << " mediaRate=" << mediaRate << " size=" << size
+				<< "); not touching media" << std::endl;
+			return;
+		}
 		const size_t payloadOffset = 0x30 + ((2u * static_cast<size_t>(partCount) + 15u) & ~static_cast<size_t>(0xF));
+		if (payloadOffset > size)
+		{
+			rslog::error_ts() << "CABINET_IR_RESAMPLE: partition table does not fit the media; "
+				"not touching media" << std::endl;
+			return;
+		}
 		// Channel count. Multi-channel media stores one COMPLETE payload block
 		// per channel, laid end to end - the engine points channel 2 at
 		// payload + irLength*8 (== the whole partition payload) in the
@@ -472,6 +483,13 @@ namespace
 		size_t binTotal = 0;
 		for (unsigned k = 0; k < partCount; ++k)
 		{
+			// The transform supports at most 128 bins (a 256-point FFT).
+			if (partBins[k] == 0 || partBins[k] > 128)
+			{
+				rslog::error_ts() << "CABINET_IR_RESAMPLE: partition " << k << " has "
+					<< partBins[k] << " bins (supported 1..128); not touching media" << std::endl;
+				return;
+			}
 			partByteOff[k] = binTotal * 8;
 			partSampleOff[k] = binTotal;
 			binTotal += partBins[k];
@@ -479,11 +497,13 @@ namespace
 		partByteOff[partCount] = binTotal * 8;
 		partSampleOff[partCount] = binTotal;
 
+		// 64-bit so the total cannot wrap on x86.
 		const size_t channelBytes = binTotal * 8;
-		const size_t requiredSize = payloadOffset + channelBytes * channels;
+		const uint64_t requiredSize = static_cast<uint64_t>(payloadOffset)
+			+ static_cast<uint64_t>(channelBytes) * channels;
 		if (blockSize == 0 || fftSize == 0 || partCount == 0 || irLength == 0
 			|| binTotal != irLength
-			|| size < requiredSize)
+			|| static_cast<uint64_t>(size) < requiredSize)
 		{
 			rslog::error_ts() << "CABINET_IR_RESAMPLE: header does not look sane "
 				"(blockSize=" << blockSize << " fftSize=" << fftSize
@@ -735,7 +755,7 @@ namespace
 
 	// Hook sited AFTER the engine's own GetPluginMedia call, not at function
 	// entry, so that call happens exactly once per Init. Calling it ourselves a
-	// second time is the suspected cause of three tlsf_free crashes.
+	// second time corrupts the heap (see ResampleCabinetIR).
 	//
 	//   00A84AA2  ff d0     call eax          ; the engine's single fetch
 	//   00A84AA4  8b 45 fc  mov eax,[ebp-4]   ; 3 bytes  <-- stolen
@@ -780,8 +800,8 @@ namespace
 		// LP December 2024 0x00A83A80/0x00A83AA4. Both steal the same bytes.
 		// NOT the function entry. This is the instruction right after Init's own
 		// call to GetPluginMedia, so [ebp-4]/[ebp-8] already hold the media the
-		// engine fetched. Hooking the entry and fetching our own copy corrupted
-		// the TLSF heap and crashed the game three times on 2026-08-18.
+		// engine fetched. Hooking the entry and fetching our own copy corrupts
+		// the heap.
 		static const BYTE expected[]{ 0x8B, 0x45, 0xFC, 0x85, 0xC0 };  // mov eax,[ebp-4] / test eax,eax
 		constexpr size_t kStolen = sizeof(expected);
 

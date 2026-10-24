@@ -258,12 +258,14 @@ GameSampleRate=44100
 
 This runs the game's audio engine natively at 44.1 kHz, so a 44.1 kHz interface
 needs no external sample-rate conversion.
-It supports the September 2022 and December 2024 Learn & Play builds.
+It supports the September 2022 build (runtime-tested) and the December 2024
+Learn & Play build (patch sites byte-checked only, not yet runtime-tested).
 Blank, `0`, or `48000` keeps the default 48 kHz behavior; other values are
 unsupported and ignored. Configure your interface for the same sample rate.
 
-When `GameSampleRate=44100`, the amp-cabinet impulse responses are automatically
-resampled to 44.1 kHz so tones retain their cabinet colouring.
+When `GameSampleRate=44100` and the cabinet hook installs, the amp-cabinet
+impulse responses are resampled to 44.1 kHz as they load, so tones keep their
+cabinet colouring. `RS_ASIO-log.txt` reports the hook and each conversion.
 
 Only 44.1 kHz is offered as an alternative. The game's note detector uses an
 analysis window fixed in samples, so higher rates shorten it: at 96 kHz the lowest
