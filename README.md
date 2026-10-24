@@ -256,7 +256,8 @@ If your interface cannot run at 48 kHz (for example, it is hardware locked to
 GameSampleRate=44100
 ```
 
-This runs the game's audio engine natively at 44.1 kHz without resampling.
+This runs the game's audio engine natively at 44.1 kHz, so a 44.1 kHz interface
+needs no external sample-rate conversion.
 It supports the September 2022 and December 2024 Learn & Play builds.
 Blank, `0`, or `48000` keeps the default 48 kHz behavior; other values are
 unsupported and ignored. Configure your interface for the same sample rate.

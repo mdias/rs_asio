@@ -181,7 +181,8 @@ namespace
 						* static_cast<double>(k) * static_cast<double>(t) / static_cast<double>(n);
 					acc += a[t] * std::complex<double>(std::cos(ang), std::sin(ang));
 				}
-				out[k] = acc;
+				// Same 1/n inverse scaling as the radix-2 path below.
+				out[k] = inverse ? acc / static_cast<double>(n) : acc;
 			}
 			for (size_t i = 0; i < n; ++i)
 				a[i] = out[i];
