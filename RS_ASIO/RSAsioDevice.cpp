@@ -102,6 +102,7 @@ bool RSAsioDevice::SetEndpointVolumeLevelScalar(float fLevel)
 	if (!m_Config.enableSoftwareEndpointVolmeControl)
 		return false;
 	// Precompute the taper off the audio callback.
+	std::lock_guard<std::mutex> lock(m_EndpointVolumeSetMutex);
 	m_SoftwareEndpointVolumeAmplitude.store(VolumeTaper::ScalarToAmplitude(fLevel), std::memory_order_relaxed);
 	m_SoftwareEndpointVolumeScalar.store(fLevel, std::memory_order_release);
 	return true;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <mutex>
 
 #include "ComBaseUnknown.h"
 #include "AsioSharedHost.h"
@@ -70,6 +71,9 @@ private:
 	std::atomic<float> m_SoftwareEndpointVolumeScalar{ 1.0f };
 	std::atomic<float> m_SoftwareEndpointVolumeAmplitude{ 1.0f };
 	std::atomic<float> m_SoftwareMasterVolumeScalar{ 1.0f };
+	// Serializes setters so the scalar and its amplitude always form a pair.
+	// Never taken by the audio callback.
+	std::mutex m_EndpointVolumeSetMutex;
 };
 
 class RSAsioEndpoint : public ComBaseUnknown<IMMEndpoint>
