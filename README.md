@@ -264,6 +264,11 @@ unsupported and ignored. Configure your interface for the same sample rate.
 When `GameSampleRate=44100`, the amp-cabinet impulse responses are automatically
 resampled to 44.1 kHz so tones retain their cabinet colouring.
 
+Only 44.1 kHz is offered as an alternative. The game's note detector uses an
+analysis window fixed in samples, so higher rates shorten it: at 96 kHz the lowest
+detectable pitch rises to about 47 Hz and a bass low E (41.2 Hz) can no longer be
+detected.
+
 ### Known issues
 
 - Your interface must support 48 kHz playback unless using `GameSampleRate=44100` as described above.
