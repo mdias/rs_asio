@@ -20,6 +20,11 @@ static RSConfig& GetConfig()
 	return config;
 }
 
+unsigned GetGameSampleRate()
+{
+	return GetConfig().gameSampleRate;
+}
+
 static void AddWasapiDevices(RSAggregatorDeviceEnum& rsEnum, bool enableOutputs, bool enableInputs)
 {
 	if (!enableOutputs && !enableInputs)
@@ -265,7 +270,14 @@ static void LoadConfigIni(RSConfig& out)
 			{
 				if (currentSection == SectionConfig)
 				{
-					if (key == "enablewasapioutputs")
+					if (key == "gamesamplerate")
+					{
+						if (val == "0" || val == "48000" || val == "44100")
+							out.gameSampleRate = (val == "44100") ? 44100 : 0;
+						else
+							rslog::error_ts() << "GameSampleRate: SKIPPED (unsupported value: " << val << ")" << std::endl;
+					}
+					else if (key == "enablewasapioutputs")
 					{
 						isOldWasapiCfgMode = false;
 						bool v = false;

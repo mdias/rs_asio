@@ -246,9 +246,27 @@ Some people have had success using RS ASIO with [wineasio](https://www.wineasio.
     1. Run Rocksmith
     1. Look into `RS_ASIO-log.txt` if you experience any issues
 
+#### Native 44.1 kHz sample rate
+
+If your interface cannot run at 48 kHz (for example, it is hardware locked to
+44.1 kHz), add this to `RS_ASIO.ini`:
+
+```ini
+[Config]
+GameSampleRate=44100
+```
+
+This runs the game's audio engine natively at 44.1 kHz without resampling.
+It supports the September 2022 and December 2024 Learn & Play builds.
+Blank, `0`, or `48000` keeps the default 48 kHz behavior; other values are
+unsupported and ignored. Configure your interface for the same sample rate.
+
+At 44.1 kHz the game's amp-cabinet impulse-response effect fails to initialise,
+so tones lack the cabinet colouring. A follow-up will address this limitation.
+
 ### Known issues
 
-- Your interface MUST support 48kHz playback
+- Your interface must support 48 kHz playback unless using `GameSampleRate=44100` as described above.
 - Doesn't provide a way to open the ASIO control panel (please configure your interface elsewhere for now, if needed).
 - Will need a game reboot if ASIO settings are changed while the game is running (such as changing sample rate, sample type etc).
 - Some Focusrite devices have been reported to only output sound properly when using ASIO buffer sizes of 48, 96 or 192.
