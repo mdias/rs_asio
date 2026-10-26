@@ -1,12 +1,13 @@
 #include "stdafx.h"
 #include <limits>
+#include <cstdint>
+#include <cstring>
 
 #include "AudioProcessing.h"
 
 using TFuncConvert = void(const BYTE* inData, const WORD inStride, BYTE* outData, const WORD outStride, const DWORD numSamples);
 using TFuncConvertMatrix = std::array<std::array<TFuncConvert*, ASIOSTLastEntry>, ASIOSTLastEntry>;
 
-static TFuncConvertMatrix s_FuncConvertMatrix{};
 
 static const TFuncConvertMatrix& GetFuncConvertMatrix();
 
@@ -199,28 +200,32 @@ bool AudioProcessing::CopyConvertFormat(const BYTE* inData, ASIOSampleType inSam
 	const WORD inSampleSize = GetAsioSampleTypeNumBytes(inSampleType);
 	const WORD outSampleSize = GetAsioSampleTypeNumBytes(outSampleType);
 
-	if (!inSampleType || !outSampleType)
+	if (!inSampleSize || !outSampleSize)
 		return false;
 
 	// simple copy case; no conversion needed here
 	if (inSampleType == outSampleType)
 	{
-		AudioBlit(inData, inStride, outData, outStride, inSampleSize, numFrames);
-		return true;
+		return AudioBlit(inData, inStride, outData, outStride, inSampleSize, numFrames);
 	}
 	else
 	{
 		// get convert function to use
 		const auto& convFuncMatrix = GetFuncConvertMatrix();
 		auto convFunc = convFuncMatrix[inSampleType][outSampleType];
-		if (convFunc)
-		{
-			// call conversion function
-			convFunc(inData, inStride, outData, outStride, numFrames);
-		}
+		if (!convFunc)
+			return false;
+		convFunc(inData, inStride, outData, outStride, numFrames);
 
 		return true;
 	}
+}
+
+bool AudioProcessing::CanConvertFormat(ASIOSampleType inSampleType, ASIOSampleType outSampleType)
+{
+	if (!GetAsioSampleTypeNumBytes(inSampleType) || !GetAsioSampleTypeNumBytes(outSampleType))
+		return false;
+	return inSampleType == outSampleType || GetFuncConvertMatrix()[inSampleType][outSampleType] != nullptr;
 }
 
 bool AudioProcessing::DoSoftwareVolumeDsp(BYTE* data, ASIOSampleType inSampleType, DWORD numSamples, float fVolumeScalar)
@@ -282,43 +287,149 @@ bool AudioProcessing::DoSoftwareVolumeDsp(BYTE* data, ASIOSampleType inSampleTyp
 	return false;
 }
 
-static const TFuncConvertMatrix& GetFuncConvertMatrix()
+// PCM containers carry right-aligned valid bits; writes sign-extend the value.
+template <ASIOSampleType T, unsigned Bytes, bool IsFloat, bool BigEndian, unsigned Bits>
+struct SampleCodec
 {
-	static bool initialized = false;
-	if (!initialized)
+	static constexpr ASIOSampleType type = T;
+	static constexpr unsigned bytes = Bytes;
+
+	static std::uint64_t Load(const BYTE* p)
 	{
-		initialized = true;
-
-		s_FuncConvertMatrix[ASIOSTInt16LSB][ASIOSTInt16LSB] = &AudioCopyConvert<2, 2>;
-		s_FuncConvertMatrix[ASIOSTInt16LSB][ASIOSTInt24LSB] = &AudioCopyConvert<2, 3>;
-		s_FuncConvertMatrix[ASIOSTInt16LSB][ASIOSTInt32LSB] = &AudioCopyConvert<2, 4>;
-		s_FuncConvertMatrix[ASIOSTInt16LSB][ASIOSTFloat32LSB] = &AudioCopyConvertI2F<2, float>;
-		s_FuncConvertMatrix[ASIOSTInt16LSB][ASIOSTFloat64LSB] = &AudioCopyConvertI2F<2, double>;
-
-		s_FuncConvertMatrix[ASIOSTInt24LSB][ASIOSTInt16LSB] = &AudioCopyConvert<3, 2>;
-		s_FuncConvertMatrix[ASIOSTInt24LSB][ASIOSTInt24LSB] = &AudioCopyConvert<3, 3>;
-		s_FuncConvertMatrix[ASIOSTInt24LSB][ASIOSTInt32LSB] = &AudioCopyConvert<3, 4>;
-		s_FuncConvertMatrix[ASIOSTInt24LSB][ASIOSTFloat32LSB] = &AudioCopyConvertI2F<3, float>;
-		s_FuncConvertMatrix[ASIOSTInt24LSB][ASIOSTFloat64LSB] = &AudioCopyConvertI2F<3, double>;
-
-		s_FuncConvertMatrix[ASIOSTInt32LSB][ASIOSTInt16LSB] = &AudioCopyConvert<4, 2>;
-		s_FuncConvertMatrix[ASIOSTInt32LSB][ASIOSTInt24LSB] = &AudioCopyConvert<4, 3>;
-		s_FuncConvertMatrix[ASIOSTInt32LSB][ASIOSTInt32LSB] = &AudioCopyConvert<4, 4>;
-		s_FuncConvertMatrix[ASIOSTInt32LSB][ASIOSTFloat32LSB] = &AudioCopyConvertI2F<4, float>;
-		s_FuncConvertMatrix[ASIOSTInt32LSB][ASIOSTFloat64LSB] = &AudioCopyConvertI2F<4, double>;
-
-		s_FuncConvertMatrix[ASIOSTFloat32LSB][ASIOSTInt16LSB] = &AudioCopyConvertF2I<float, 2>;
-		s_FuncConvertMatrix[ASIOSTFloat32LSB][ASIOSTInt24LSB] = &AudioCopyConvertF2I<float, 3>;
-		s_FuncConvertMatrix[ASIOSTFloat32LSB][ASIOSTInt32LSB] = &AudioCopyConvertF2I<float, 4>;
-		s_FuncConvertMatrix[ASIOSTFloat32LSB][ASIOSTFloat32LSB] = &AudioCopyConvertF2F<float, float>;
-		s_FuncConvertMatrix[ASIOSTFloat32LSB][ASIOSTFloat64LSB] = &AudioCopyConvertF2F<float, double>;
-
-		s_FuncConvertMatrix[ASIOSTFloat64LSB][ASIOSTInt16LSB] = &AudioCopyConvertF2I<double, 2>;
-		s_FuncConvertMatrix[ASIOSTFloat64LSB][ASIOSTInt24LSB] = &AudioCopyConvertF2I<double, 3>;
-		s_FuncConvertMatrix[ASIOSTFloat64LSB][ASIOSTInt32LSB] = &AudioCopyConvertF2I<double, 4>;
-		s_FuncConvertMatrix[ASIOSTFloat64LSB][ASIOSTFloat32LSB] = &AudioCopyConvertF2F<double, float>;
-		s_FuncConvertMatrix[ASIOSTFloat64LSB][ASIOSTFloat64LSB] = &AudioCopyConvertF2F<double, double>;
+		std::uint64_t v = 0;
+		for (unsigned i = 0; i < Bytes; ++i)
+			v |= static_cast<std::uint64_t>(p[BigEndian ? i : Bytes - 1 - i]) << (8 * (Bytes - 1 - i));
+		return v;
+	}
+	static void Store(BYTE* p, std::uint64_t v)
+	{
+		for (unsigned i = 0; i < Bytes; ++i)
+			p[BigEndian ? i : Bytes - 1 - i] = static_cast<BYTE>(v >> (8 * (Bytes - 1 - i)));
 	}
 
-	return s_FuncConvertMatrix;
+	static double Read(const BYTE* p)
+	{
+		const std::uint64_t raw = Load(p);
+		if constexpr (IsFloat)
+		{
+			if (Bytes == 4) { std::uint32_t u = static_cast<std::uint32_t>(raw); float f; std::memcpy(&f, &u, 4); return f; }
+			double d; std::memcpy(&d, &raw, 8); return d;
+		}
+		else
+		{
+			// Sign-extend the low Bits of the container, then normalise.
+			const unsigned shift = 64 - Bits;
+			const std::int64_t value = static_cast<std::int64_t>(raw << shift) >> shift;
+			return static_cast<double>(value) / static_cast<double>(std::int64_t(1) << (Bits - 1));
+		}
+	}
+	static void Write(BYTE* p, double x)
+	{
+		if constexpr (IsFloat)
+		{
+			if (Bytes == 4) { const float f = static_cast<float>(x); std::uint32_t u; std::memcpy(&u, &f, 4); Store(p, u); return; }
+			std::uint64_t u; std::memcpy(&u, &x, 8); Store(p, u); return;
+		}
+		else
+		{
+			const double scale = static_cast<double>(std::int64_t(1) << (Bits - 1));
+			const double maxValue = scale - 1.0;
+			double scaled = x * scale;
+			std::uint64_t representation;
+			std::memcpy(&representation, &x, sizeof(representation));
+			if ((representation & 0x7fffffffffffffffull) > 0x7ff0000000000000ull)
+				scaled = 0.0; // NaN -> silence, including /fp:fast builds
+			scaled = scaled < -scale ? -scale : (scaled > maxValue ? maxValue : scaled);
+			const std::int64_t value = static_cast<std::int64_t>(scaled < 0.0 ? scaled - 0.5 : scaled + 0.5);
+			const std::int64_t clamped = value < -static_cast<std::int64_t>(scale) ? -static_cast<std::int64_t>(scale)
+				: (value > static_cast<std::int64_t>(maxValue) ? static_cast<std::int64_t>(maxValue) : value);
+			Store(p, static_cast<std::uint64_t>(clamped));
+		}
+	}
+};
+
+using CodecInt16MSB = SampleCodec<ASIOSTInt16MSB, 2, false, true, 16>;
+using CodecInt24MSB = SampleCodec<ASIOSTInt24MSB, 3, false, true, 24>;
+using CodecInt32MSB = SampleCodec<ASIOSTInt32MSB, 4, false, true, 32>;
+using CodecFloat32MSB = SampleCodec<ASIOSTFloat32MSB, 4, true, true, 32>;
+using CodecFloat64MSB = SampleCodec<ASIOSTFloat64MSB, 8, true, true, 64>;
+using CodecInt32MSB16 = SampleCodec<ASIOSTInt32MSB16, 4, false, true, 16>;
+using CodecInt32MSB18 = SampleCodec<ASIOSTInt32MSB18, 4, false, true, 18>;
+using CodecInt32MSB20 = SampleCodec<ASIOSTInt32MSB20, 4, false, true, 20>;
+using CodecInt32MSB24 = SampleCodec<ASIOSTInt32MSB24, 4, false, true, 24>;
+using CodecInt16LSB = SampleCodec<ASIOSTInt16LSB, 2, false, false, 16>;
+using CodecInt24LSB = SampleCodec<ASIOSTInt24LSB, 3, false, false, 24>;
+using CodecInt32LSB = SampleCodec<ASIOSTInt32LSB, 4, false, false, 32>;
+using CodecFloat32LSB = SampleCodec<ASIOSTFloat32LSB, 4, true, false, 32>;
+using CodecFloat64LSB = SampleCodec<ASIOSTFloat64LSB, 8, true, false, 64>;
+using CodecInt32LSB16 = SampleCodec<ASIOSTInt32LSB16, 4, false, false, 16>;
+using CodecInt32LSB18 = SampleCodec<ASIOSTInt32LSB18, 4, false, false, 18>;
+using CodecInt32LSB20 = SampleCodec<ASIOSTInt32LSB20, 4, false, false, 20>;
+using CodecInt32LSB24 = SampleCodec<ASIOSTInt32LSB24, 4, false, false, 24>;
+
+template <class... Codecs> struct CodecList {};
+using AllPcmCodecs = CodecList<
+	CodecInt16MSB, CodecInt24MSB, CodecInt32MSB, CodecFloat32MSB, CodecFloat64MSB,
+	CodecInt32MSB16, CodecInt32MSB18, CodecInt32MSB20, CodecInt32MSB24,
+	CodecInt16LSB, CodecInt24LSB, CodecInt32LSB, CodecFloat32LSB, CodecFloat64LSB,
+	CodecInt32LSB16, CodecInt32LSB18, CodecInt32LSB20, CodecInt32LSB24>;
+
+template <class In, class Out>
+static void AudioCopyConvertGeneric(const BYTE* inData, const WORD inStride, BYTE* outData, const WORD outStride, const DWORD numSamples)
+{
+	for (DWORD i = 0; i < numSamples; ++i, inData += inStride, outData += outStride)
+		Out::Write(outData, In::Read(inData));
+}
+
+template <class In, class... Outs>
+static void FillGenericRow(TFuncConvertMatrix& m, CodecList<Outs...>)
+{
+	((m[In::type][Outs::type] ? void() : void(m[In::type][Outs::type] = &AudioCopyConvertGeneric<In, Outs>)), ...);
+}
+
+template <class... Ins>
+static void FillGenericMatrix(TFuncConvertMatrix& m, CodecList<Ins...> all)
+{
+	(FillGenericRow<Ins>(m, all), ...);
+}
+
+static const TFuncConvertMatrix& GetFuncConvertMatrix()
+{
+	static const TFuncConvertMatrix matrix = [] {
+		TFuncConvertMatrix result{};
+
+		result[ASIOSTInt16LSB][ASIOSTInt16LSB] = &AudioCopyConvert<2, 2>;
+		result[ASIOSTInt16LSB][ASIOSTInt24LSB] = &AudioCopyConvert<2, 3>;
+		result[ASIOSTInt16LSB][ASIOSTInt32LSB] = &AudioCopyConvert<2, 4>;
+		result[ASIOSTInt16LSB][ASIOSTFloat32LSB] = &AudioCopyConvertI2F<2, float>;
+		result[ASIOSTInt16LSB][ASIOSTFloat64LSB] = &AudioCopyConvertI2F<2, double>;
+
+		result[ASIOSTInt24LSB][ASIOSTInt16LSB] = &AudioCopyConvert<3, 2>;
+		result[ASIOSTInt24LSB][ASIOSTInt24LSB] = &AudioCopyConvert<3, 3>;
+		result[ASIOSTInt24LSB][ASIOSTInt32LSB] = &AudioCopyConvert<3, 4>;
+		result[ASIOSTInt24LSB][ASIOSTFloat32LSB] = &AudioCopyConvertI2F<3, float>;
+		result[ASIOSTInt24LSB][ASIOSTFloat64LSB] = &AudioCopyConvertI2F<3, double>;
+
+		result[ASIOSTInt32LSB][ASIOSTInt16LSB] = &AudioCopyConvert<4, 2>;
+		result[ASIOSTInt32LSB][ASIOSTInt24LSB] = &AudioCopyConvert<4, 3>;
+		result[ASIOSTInt32LSB][ASIOSTInt32LSB] = &AudioCopyConvert<4, 4>;
+		result[ASIOSTInt32LSB][ASIOSTFloat32LSB] = &AudioCopyConvertI2F<4, float>;
+		result[ASIOSTInt32LSB][ASIOSTFloat64LSB] = &AudioCopyConvertI2F<4, double>;
+
+		result[ASIOSTFloat32LSB][ASIOSTInt16LSB] = &AudioCopyConvertF2I<float, 2>;
+		result[ASIOSTFloat32LSB][ASIOSTInt24LSB] = &AudioCopyConvertF2I<float, 3>;
+		result[ASIOSTFloat32LSB][ASIOSTInt32LSB] = &AudioCopyConvertF2I<float, 4>;
+		result[ASIOSTFloat32LSB][ASIOSTFloat32LSB] = &AudioCopyConvertF2F<float, float>;
+		result[ASIOSTFloat32LSB][ASIOSTFloat64LSB] = &AudioCopyConvertF2F<float, double>;
+
+		result[ASIOSTFloat64LSB][ASIOSTInt16LSB] = &AudioCopyConvertF2I<double, 2>;
+		result[ASIOSTFloat64LSB][ASIOSTInt24LSB] = &AudioCopyConvertF2I<double, 3>;
+		result[ASIOSTFloat64LSB][ASIOSTInt32LSB] = &AudioCopyConvertF2I<double, 4>;
+		result[ASIOSTFloat64LSB][ASIOSTFloat32LSB] = &AudioCopyConvertF2F<double, float>;
+		result[ASIOSTFloat64LSB][ASIOSTFloat64LSB] = &AudioCopyConvertF2F<double, double>;
+		FillGenericMatrix(result, AllPcmCodecs{});
+		return result;
+	}();
+
+	return matrix;
 }

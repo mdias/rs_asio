@@ -151,9 +151,25 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	else
 	{
 		m_WaveFormat.Format = *pFormat;
+		m_WaveFormatIsFloat = pFormat->wFormatTag == WAVE_FORMAT_IEEE_FLOAT;
 	}
 
 	UpdateChannelMap();
+	const bool isOutput = m_AsioDevice.GetConfig().isOutput;
+	const unsigned firstChannel = m_AsioDevice.GetConfig().baseAsioChannelNumber;
+	const ASIOChannelInfo* channelInfo = isOutput ? m_AsioSharedHost.GetOutputChannelInfo(firstChannel)
+		: m_AsioSharedHost.GetInputChannelInfo(firstChannel);
+	ASIOSampleType gameSampleType;
+	if (channelInfo && AsioSampleTypeFromFormat(&gameSampleType, pFormat->wBitsPerSample, m_WaveFormatIsFloat))
+	{
+		rslog::info_ts() << (isOutput ? "Render" : "Capture") << " conversion: game tag=" << pFormat->wFormatTag
+			<< " subformat=" << m_WaveFormat.SubFormat << " bits=" << pFormat->wBitsPerSample
+			<< " valid bits=" << (pFormat->wFormatTag == WAVE_FORMAT_EXTENSIBLE ? m_WaveFormat.Samples.wValidBitsPerSample : pFormat->wBitsPerSample)
+			<< " channels=" << pFormat->nChannels << " ASIO=" << channelInfo->type
+			<< " container bytes=" << GetAsioSampleTypeNumBytes(channelInfo->type)
+			<< " path=" << (gameSampleType == channelInfo->type ? "identical-type copy " : "scalar conversion ")
+			<< (isOutput ? gameSampleType : channelInfo->type) << " -> " << (isOutput ? channelInfo->type : gameSampleType) << std::endl;
+	}
 
 	if (m_AsioDevice.GetConfig().isOutput)
 	{
@@ -575,11 +591,12 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 				{
 					if (srcCh >= 0)
 					{
-						AudioProcessing::CopyConvertFormat(
+						if (!AudioProcessing::CopyConvertFormat(
 							m_frontBuffer.data() + srcCh * gameSampleTypeSize, gameSampleType, m_WaveFormat.Format.nBlockAlign,
 							m_bufferNumFrames,
 							(BYTE*)bufferInfo->buffers[buffIdx], asioChannelInfo->type, asioSampleTypeSize
-						);
+						))
+							memset(bufferInfo->buffers[buffIdx], 0, asioSampleTypeSize * m_bufferNumFrames);
 					}
 					else
 					{
@@ -605,11 +622,15 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 					if (asioSampleTypeSize)
 					{
-						AudioProcessing::CopyConvertFormat(
+						if (!AudioProcessing::CopyConvertFormat(
 							(BYTE*)bufferInfo->buffers[buffIdx], asioChannelInfo->type, asioSampleTypeSize,
 							m_bufferNumFrames,
 							m_frontBuffer.data() + ch * gameSampleTypeSize, gameSampleType, m_WaveFormat.Format.nBlockAlign
-						);
+						))
+						{
+							for (DWORD frame = 0; frame < m_bufferNumFrames; ++frame)
+								memset(m_frontBuffer.data() + frame * m_WaveFormat.Format.nBlockAlign + ch * gameSampleTypeSize, 0, gameSampleTypeSize);
+						}
 					}
 				}
 			}

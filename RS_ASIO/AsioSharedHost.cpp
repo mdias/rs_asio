@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "AsioSharedHost.h"
+#include "AudioProcessing.h"
 
 #define TEST_OUTPUT_NOISE 0
 #define TEST_INPUT_NOISE 0
@@ -590,18 +591,16 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		return false;
 	}
 
-	// reject unsupported ASIO sample formats
-	switch (sampleType)
+	ASIOSampleType gameSampleType;
+	const bool isExtensible = format.wFormatTag == WAVE_FORMAT_EXTENSIBLE && format.cbSize >= 22;
+	const bool isFloat = format.wFormatTag == WAVE_FORMAT_IEEE_FLOAT ||
+		(isExtensible && ((const WAVEFORMATEXTENSIBLE&)format).SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT);
+	if (!AsioSampleTypeFromFormat(&gameSampleType, format.wBitsPerSample, isFloat) ||
+		!AudioProcessing::CanConvertFormat(gameSampleType, sampleType) ||
+		!AudioProcessing::CanConvertFormat(sampleType, gameSampleType))
 	{
-		case ASIOSTInt16LSB:
-		case ASIOSTInt24LSB:
-		case ASIOSTInt32LSB:
-		case ASIOSTFloat32LSB:
-		case ASIOSTFloat64LSB:
-			break;
-		default:
-			rslog::error_ts() << "  ASIO sample type " << sampleType << " is not currently supported" << std::endl;
-			return false;
+		rslog::error_ts() << "  ASIO sample type " << sampleType << " is not currently supported" << std::endl;
+		return false;
 	}
 
 	// block align sanity check
@@ -634,7 +633,9 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 
 		if (wfe.SubFormat == KSDATAFORMAT_SUBTYPE_IEEE_FLOAT)
 		{
-			if (sampleType != ASIOSTFloat32LSB && sampleType != ASIOSTFloat64LSB)
+			// keep IEEE Float for float hardware only, so integer interfaces keep integer game formats
+			if (sampleType != ASIOSTFloat32LSB && sampleType != ASIOSTFloat64LSB &&
+				sampleType != ASIOSTFloat32MSB && sampleType != ASIOSTFloat64MSB)
 			{
 				rslog::info_ts() << "  rejecting IEEE Float as it's incompatible with current ASIO sample type " << sampleType << std::endl;
 				return false;
