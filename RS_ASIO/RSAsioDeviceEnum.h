@@ -38,7 +38,7 @@ struct RSAsioConfig
 
 struct RSConfig
 {
-	unsigned gameSampleRate = 0;
+	bool gameSampleRate44100 = false;
 	std::optional<bool> enableWasapiOutputs = false;
 	bool enableWasapiInputs = false;
 	bool enableAsioOutput = false;

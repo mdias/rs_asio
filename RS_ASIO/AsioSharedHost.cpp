@@ -184,8 +184,8 @@ static void LogGameSampleRateHint(IAsioDriver* driver, const DWORD rate)
 	if (logged || rate != 48000 || driver->canSampleRate(44100.0) != ASE_OK)
 		return;
 	logged = true;
-	rslog::error_ts() << "  could not use 48000 Hz, but the driver reports 44100 Hz support;"
-		" set GameSampleRate=44100 under [Config] in RS_ASIO.ini" << std::endl;
+		rslog::error_ts() << "  could not use 48000 Hz, but the driver reports 44100 Hz support;"
+		" set GameSampleRate44100=true under [Config] in RS_ASIO.ini" << std::endl;
 }
 
 ASIOError AsioSharedHost::SetSamplerate(const DWORD rate)
