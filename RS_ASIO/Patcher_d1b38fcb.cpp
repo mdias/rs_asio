@@ -84,6 +84,10 @@ void vector_append(std::vector<T>& inOut, const std::vector<T>& source)
 
 void PatchOriginalCode_d1b38fcb()
 {
+	const uintptr_t rateSites[]{ 0x00ac6508, 0x00e51a98, 0x00e24a40,
+		0x00845d3c, 0x0084607c, 0x00846221, 0x008465be, 0x00846838, 0x00847069 };
+	Patch_GameSampleRate(rateSites, 0x00A84AA4);
+
 	std::vector<void*> offsets_CoCreateInstanceAbs = FindBytesOffsets(originalBytes_call_CoCreateInstance, sizeof(originalBytes_call_CoCreateInstance));
 	vector_append(offsets_CoCreateInstanceAbs, FindBytesOffsets(originalBytes_call_CoCreateInstance2, sizeof(originalBytes_call_CoCreateInstance2)));
 

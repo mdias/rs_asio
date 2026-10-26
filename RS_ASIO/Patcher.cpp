@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "dllmain.h"
 #include "crc32.h"
+#include "Patcher.h"
+#include "Configurator.h"
+#include "CabinetIRFix.h"
 
 typedef ULONG NTSTATUS;
 
@@ -16,7 +19,7 @@ EXTERN_C ULONG NtProtectVirtualMemory(
 	OUT PULONG OldProtect
 );
 
-static bool RedirectedVirtualProtect(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect)
+bool RedirectedVirtualProtect(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect)
 {
 	if (pfnNtProtectVirtualMemory != nullptr)
 	{
@@ -180,12 +183,13 @@ void Patch_ReplaceWithNops(void* offset, size_t numBytes)
 	}
 }
 
-void Patch_ReplaceWithBytes(void* offset, size_t numBytes, const BYTE* replaceBytes)
+bool Patch_ReplaceWithBytes(void* offset, size_t numBytes, const BYTE* replaceBytes)
 {
 	DWORD oldProtectFlags = 0;
 	if (!RedirectedVirtualProtect(offset, numBytes, PAGE_WRITECOPY, &oldProtectFlags))
 	{
 		rslog::error_ts() << "Failed to change memory protection" << std::endl;
+		return false;
 	}
 	else
 	{
@@ -199,8 +203,90 @@ void Patch_ReplaceWithBytes(void* offset, size_t numBytes, const BYTE* replaceBy
 		if (!RedirectedVirtualProtect(offset, numBytes, oldProtectFlags, &oldProtectFlags))
 		{
 			rslog::error_ts() << "Failed to restore memory protection" << std::endl;
+			return false;
 		}
 	}
+	return true;
+}
+
+bool Patch_VerifyBytesAtRva(uintptr_t rva, const BYTE* expected, size_t numBytes, const char* description)
+{
+	const HMODULE base = GetModuleHandle(NULL);
+	std::vector<BYTE> actual(numBytes);
+	SIZE_T bytesRead = 0;
+	if (!base || !ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<BYTE*>(base) + rva,
+		actual.data(), numBytes, &bytesRead) || bytesRead != numBytes ||
+		memcmp(actual.data(), expected, numBytes) != 0)
+	{
+		rslog::error_ts() << "GameSampleRate: FAILED (" << description << " at RVA 0x"
+			<< std::hex << rva << std::dec << "; unreadable or unexpected bytes)" << std::endl;
+		return false;
+	}
+	return true;
+}
+
+bool Patch_VerifyAndReplaceAtRva(uintptr_t rva, const BYTE* expected, const BYTE* replacement,
+	size_t numBytes, const char* description)
+{
+	if (!Patch_VerifyBytesAtRva(rva, expected, numBytes, description))
+		return false;
+	if (!Patch_ReplaceWithBytes(reinterpret_cast<BYTE*>(GetModuleHandle(NULL)) + rva, numBytes, replacement))
+	{
+		rslog::error_ts() << "GameSampleRate: FAILED (write to " << description << " at RVA 0x"
+			<< std::hex << rva << std::dec << ")" << std::endl;
+		return false;
+	}
+	return true;
+}
+
+void Patch_GameSampleRate(const uintptr_t (&sites)[9], uintptr_t cabinetSiteRva)
+{
+	if (GetGameSampleRate() != 44100)
+	{
+		rslog::info_ts() << "GameSampleRate: SKIPPED (engine keeps 48000 Hz)" << std::endl;
+		InstallCabinetIRProbe(cabinetSiteRva);
+		return;
+	}
+
+	const BYTE expectedInteger[]{ 0x80, 0xbb, 0x00, 0x00 };
+	const BYTE replacementInteger[]{ 0x44, 0xac, 0x00, 0x00 };
+	const BYTE expectedApproval[]{ 0xb8, 0x80, 0xbb, 0x00, 0x00 };
+	const BYTE replacementApproval[]{ 0xb8, 0x44, 0xac, 0x00, 0x00 };
+	const double expectedDouble = 48000.0;
+	const double replacementDouble = 44100.0;
+	const char* descriptions[]{ "output approval", "output value", "capture double",
+		"input 1", "input 2", "input 3", "input 4", "input 5", "input 6" };
+	const BYTE* expected[]{ expectedApproval, expectedInteger,
+		reinterpret_cast<const BYTE*>(&expectedDouble) };
+	const BYTE* replacement[]{ replacementApproval, replacementInteger,
+		reinterpret_cast<const BYTE*>(&replacementDouble) };
+	const size_t sizes[]{ sizeof(expectedApproval), sizeof(expectedInteger), sizeof(expectedDouble) };
+
+	// Output approval alone does not change the requested format. Capture needs
+	// both its double rate and all six integer rates to keep input pitch correct.
+	// Verify the entire set before writing any site.
+	bool verified = true;
+	for (size_t i = 0; i < 9; ++i)
+	{
+		const size_t type = (i < 3) ? i : 1;
+		if (!Patch_VerifyBytesAtRva(sites[i], expected[type], sizes[type], descriptions[i]))
+			verified = false;
+	}
+	if (!verified)
+		return;
+
+	for (size_t i = 0; i < 9; ++i)
+	{
+		const size_t type = (i < 3) ? i : 1;
+		if (!Patch_VerifyAndReplaceAtRva(sites[i], expected[type], replacement[type], sizes[type], descriptions[i]))
+		{
+			if (i != 0)
+				rslog::error_ts() << "GameSampleRate: FAILED (partially applied: " << std::dec << i << " of 9 sites written)" << std::endl;
+			return;
+		}
+	}
+	rslog::info_ts() << "GameSampleRate: PATCHED 9 sites (48000 -> 44100 Hz)" << std::endl;
+	InstallCabinetIRProbe(cabinetSiteRva);
 }
 
 static bool LoadNtDllFileContents(std::vector<char>& outBuffer)
