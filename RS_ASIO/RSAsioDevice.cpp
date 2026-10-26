@@ -4,6 +4,7 @@
 #include "RSAsioDevicePropertyStore.h"
 #include "RSAsioAudioClient.h"
 #include "RSAsioAudioEndpointVolume.h"
+#include "VolumeTaper.h"
 
 RSAsioDevice::RSAsioDevice(AsioSharedHost& asioSharedHost, const std::wstring& id, const Config& config)
 	: m_AsioSharedHost(asioSharedHost)
@@ -100,26 +101,29 @@ bool RSAsioDevice::SetEndpointVolumeLevelScalar(float fLevel)
 {
 	if (!m_Config.enableSoftwareEndpointVolmeControl)
 		return false;
-	m_SoftwareEndpointVolumeScalar = fLevel;
+	// Precompute the taper off the audio callback.
+	std::lock_guard<std::mutex> lock(m_EndpointVolumeSetMutex);
+	m_SoftwareEndpointVolumeAmplitude.store(VolumeTaper::ScalarToAmplitude(fLevel), std::memory_order_relaxed);
+	m_SoftwareEndpointVolumeScalar.store(fLevel, std::memory_order_release);
 	return true;
 }
 
 float RSAsioDevice::GetEndpointVolumeLevelScalar() const
 {
-	return m_SoftwareEndpointVolumeScalar;
+	return m_SoftwareEndpointVolumeScalar.load(std::memory_order_acquire);
 }
 
 bool RSAsioDevice::SetMasterVolumeLevelScalar(float fLevel)
 {
 	if (!m_Config.enableSoftwareMasterVolumeControl)
 		return false;
-	m_SoftwareMasterVolumeScalar = fLevel;
+	m_SoftwareMasterVolumeScalar.store(fLevel, std::memory_order_relaxed);
 	return true;
 }
 
 float RSAsioDevice::GetMasterVolumeLevelScalar() const
 {
-	return m_SoftwareMasterVolumeScalar;
+	return m_SoftwareMasterVolumeScalar.load(std::memory_order_relaxed);
 }
 
 bool RSAsioDevice::GetSoftwareVolumeScalar(float* pOutScalar) const
@@ -132,10 +136,10 @@ bool RSAsioDevice::GetSoftwareVolumeScalar(float* pOutScalar) const
 		float volumeScalar = 1.0f;
 
 		if (m_Config.enableSoftwareEndpointVolmeControl)
-			volumeScalar *= m_SoftwareEndpointVolumeScalar;
+			volumeScalar *= m_SoftwareEndpointVolumeAmplitude.load(std::memory_order_relaxed);
 
 		if (m_Config.enableSoftwareMasterVolumeControl)
-			volumeScalar *= m_SoftwareMasterVolumeScalar;
+			volumeScalar *= m_SoftwareMasterVolumeScalar.load(std::memory_order_relaxed);
 
 		*pOutScalar = volumeScalar;
 	}
