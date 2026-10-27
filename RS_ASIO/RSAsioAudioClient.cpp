@@ -173,7 +173,14 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 	UINT32 numFrames = asioNumFrames;
 	if (m_ResamplingEnabled)
 	{
-		numFrames = (UINT32)(((std::uint64_t)asioNumFrames * pFormat->nSamplesPerSec + m_AsioSampleRate - 1) / m_AsioSampleRate);
+		if (m_AsioDevice.GetConfig().isOutput)
+		{
+			numFrames = (UINT32)(((std::uint64_t)asioNumFrames * pFormat->nSamplesPerSec + m_AsioSampleRate - 1) / m_AsioSampleRate);
+		}
+		else
+		{
+			numFrames = (UINT32)(((std::uint64_t)asioNumFrames * pFormat->nSamplesPerSec) / m_AsioSampleRate) + 1;
+		}
 		if (numFrames == 0)
 			numFrames = 1;
 		rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__
@@ -329,7 +336,7 @@ HRESULT RSAsioAudioClient::GetMixFormat(WAVEFORMATEX **ppDeviceFormat)
 		return E_FAIL;
 
 	DWORD reportedRate = (DWORD)std::lround(sampleRate);
-	if (reportedRate == 44100 || reportedRate == 0)
+	if (reportedRate != 48000)
 		reportedRate = 48000;
 
 	WAVEFORMATEX* fmt = (WAVEFORMATEX*)CoTaskMemAlloc(sizeof(WAVEFORMATEX));
@@ -584,6 +591,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 
 	if (!m_IsStarted)
 	{
+		memset(m_frontBuffer.data(), 0, m_frontBuffer.size());
 		return;
 	}
 
@@ -922,7 +930,7 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 		bool signalApplicationAboutNewBuffer = false;
 		if (isOutput && m_ResamplingEnabled)
 		{
-			if (m_PendingRenderNotify && m_OutputFifoFrames < m_bufferNumFrames)
+			if (m_PendingRenderNotify && m_OutputFifoFrames < m_bufferNumFrames + 2)
 			{
 				m_PendingRenderNotify = false;
 				if (m_RenderClient)

@@ -84,7 +84,7 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetValue(REFPROPERTYKEY key
 				&& asioDriver->getSampleRate(&sampleRate) == ASE_OK)
 			{
 				DWORD reportedSampleRate = (DWORD)std::lround(sampleRate);
-				if (reportedSampleRate == 44100 || reportedSampleRate == 0)
+				if (reportedSampleRate != 48000)
 					reportedSampleRate = 48000;
 
 				WAVEFORMATEXTENSIBLE* wfe = (WAVEFORMATEXTENSIBLE*)CoTaskMemAlloc(sizeof(WAVEFORMATEXTENSIBLE));
