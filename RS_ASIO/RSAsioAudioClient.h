@@ -88,10 +88,6 @@ private:
 	std::vector<float> m_ResampleInputBuffer;
 	std::vector<float> m_ResampleOutputBuffer;
 
-	unsigned int m_MeterCallbacks = 0;
-	float m_MaxRawPeak = 0.0f;
-	float m_MaxOutPeak = 0.0f;
-
 	unsigned m_dbgNumBufferSwitches;
 
 	std::mutex m_bufferMutex;

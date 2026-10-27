@@ -780,8 +780,6 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 			const double step = (double)m_AsioSampleRate / (double)m_WaveFormat.Format.nSamplesPerSec;
 			const UINT32 maxDstFrames = (UINT32)(m_ResampleOutputBuffer.size() / nChannels);
 			UINT32 producedFrames = 0;
-			float batchRawPeak = 0.0f;
-			float batchOutPeak = 0.0f;
 
 			while (m_ResamplePhase < (double)asioNumFrames && producedFrames < maxDstFrames)
 			{
@@ -798,9 +796,6 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 					const float y2 = getSrcSample(n - 1, ch);
 					const float y3 = getSrcSample(n, ch);
 					float s = CubicHermiteInterpolate(y0, y1, y2, y3, t);
-					const float absRaw = s >= 0.0f ? s : -s;
-					if (absRaw > batchRawPeak)
-						batchRawPeak = absRaw;
 					if (doSoftwareVolume)
 					{
 						s *= fSoftwareVolumeScalar;
@@ -809,27 +804,11 @@ void RSAsioAudioClient::OnAsioBufferSwitch(unsigned buffIdx)
 						else if (s < -1.0f)
 							s = -1.0f;
 					}
-					const float absOut = s >= 0.0f ? s : -s;
-					if (absOut > batchOutPeak)
-						batchOutPeak = absOut;
 					dstFrame[ch] = s;
 				}
 
 				++producedFrames;
 				m_ResamplePhase += step;
-			}
-
-			if (batchRawPeak > m_MaxRawPeak)
-				m_MaxRawPeak = batchRawPeak;
-			if (batchOutPeak > m_MaxOutPeak)
-				m_MaxOutPeak = batchOutPeak;
-			if (++m_MeterCallbacks >= 1000)
-			{
-				rslog::info_ts() << m_AsioDevice.GetIdRef() << " [InputMeter] rawPeak=" << m_MaxRawPeak
-					<< " outPeak=" << m_MaxOutPeak << " gainScalar=" << fSoftwareVolumeScalar << std::endl;
-				m_MeterCallbacks = 0;
-				m_MaxRawPeak = 0.0f;
-				m_MaxOutPeak = 0.0f;
 			}
 
 			m_ResamplePhase -= (double)asioNumFrames;
@@ -1025,9 +1004,6 @@ void RSAsioAudioClient::ResetResamplerState()
 	m_ResamplePhase = 0.0;
 	m_OutputFifoFrames = 0;
 	m_PendingRenderNotify = false;
-	m_MeterCallbacks = 0;
-	m_MaxRawPeak = 0.0f;
-	m_MaxOutPeak = 0.0f;
 	for (auto& h : m_ResampleHistory)
 	{
 		h = { 0.0f, 0.0f, 0.0f, 0.0f };
