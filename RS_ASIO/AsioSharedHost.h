@@ -27,8 +27,16 @@ public:
 
 	const std::string GetAsioDllPath() const { return m_AsioDllPath; }
 
+	enum ResamplingMode
+	{
+		ResamplingMode_Disabled,
+		ResamplingMode_Always,
+		ResamplingMode_Auto,
+	};
+
 	ASIOError SetSamplerate(const DWORD rate);
-	void SetCustomSampleRate(std::optional<DWORD> customRate) { m_CustomSampleRate = customRate; }
+	void SetResamplingMode(ResamplingMode mode) { m_ResamplingMode = mode; }
+	ResamplingMode GetResamplingMode() const { return m_ResamplingMode; }
 	DWORD GetAsioSampleRate() const { return m_AsioSampleRate; }
 	ASIOError Setup(const WAVEFORMATEX& format, const DWORD bufferDurationFrames);
 	void Reset();
@@ -85,7 +93,7 @@ private:
 	std::set<IAsioBufferSwitchListener*> m_AsioBufferListeners;
 	std::mutex m_AsioMutex;
 	std::optional<ASIOSampleRate> m_SampleRateRestore;
-	std::optional<DWORD> m_CustomSampleRate;
+	ResamplingMode m_ResamplingMode = ResamplingMode_Auto;
 	DWORD m_AsioSampleRate = 0;
 
 	std::unique_ptr<std::thread> m_AsioEventsThread;

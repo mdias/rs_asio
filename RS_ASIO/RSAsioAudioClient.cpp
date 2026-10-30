@@ -336,7 +336,7 @@ HRESULT RSAsioAudioClient::GetMixFormat(WAVEFORMATEX **ppDeviceFormat)
 		return E_FAIL;
 
 	DWORD reportedRate = (DWORD)std::lround(sampleRate);
-	if (reportedRate != 48000)
+	if (m_AsioSharedHost.GetResamplingMode() != AsioSharedHost::ResamplingMode_Disabled && reportedRate != 48000)
 		reportedRate = 48000;
 
 	WAVEFORMATEX* fmt = (WAVEFORMATEX*)CoTaskMemAlloc(sizeof(WAVEFORMATEX));
