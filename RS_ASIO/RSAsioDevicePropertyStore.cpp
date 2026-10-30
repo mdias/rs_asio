@@ -5,6 +5,7 @@
 #include "RSAsioDevicePropertyStore.h"
 #include "RSAsioDevice.h"
 #include "AsioSharedHost.h"
+#include "Configurator.h"
 
 
 RSAsioDevicePropertyStore::RSAsioDevicePropertyStore(RSAsioDevice& device)
@@ -84,8 +85,9 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetValue(REFPROPERTYKEY key
 				&& asioDriver->getSampleRate(&sampleRate) == ASE_OK)
 			{
 				DWORD reportedSampleRate = (DWORD)std::lround(sampleRate);
-				if (asioHost.GetResamplingMode() != AsioSharedHost::ResamplingMode_Disabled && reportedSampleRate != 48000)
-					reportedSampleRate = 48000;
+				const DWORD targetGameRate = GetGameSampleRate();
+				if (asioHost.GetResamplingMode() != AsioSharedHost::ResamplingMode_Disabled && reportedSampleRate != targetGameRate)
+					reportedSampleRate = targetGameRate;
 
 				WAVEFORMATEXTENSIBLE* wfe = (WAVEFORMATEXTENSIBLE*)CoTaskMemAlloc(sizeof(WAVEFORMATEXTENSIBLE));
 				wfe->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;

@@ -125,6 +125,11 @@ void PatchOriginalCode_6ea6d1ba()
 		SetVirtualProtectFnPtr(fnFixedProtectVirtualMemory);
 	}
 
+	// RVAs already account for this build's 0x001d0000 image base.
+	const uintptr_t rateSites[]{ 0x00ac5cb8, 0x00e52a98, 0x00e262d8,
+		0x00844e9c, 0x008451dc, 0x008468a1, 0x008456fe, 0x00845978, 0x00846249 };
+	Patch_GameSampleRate(rateSites, 0x00A83AA4);
+
 	std::vector<void*> offsets_CoCreateInstanceAbs = FindBytesOffsets(originalBytes_call_CoCreateInstance, sizeof(originalBytes_call_CoCreateInstance));
 
 	std::vector<void*> offsets_PaMarshalPointers = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));

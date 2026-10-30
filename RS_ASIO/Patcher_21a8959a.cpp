@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "dllmain.h"
 #include "Patcher.h"
+#include "Configurator.h"
 
 // this file contains the patch code for the game version released BEFORE 2022-09-11 (pre-patch)
 
@@ -61,6 +62,11 @@ static bool Patch_ReplaceAssembly(LPVOID location, LPVOID newAssembly, UINT leng
 
 void PatchOriginalCode_21a8959a()
 {
+	if (GetGameSampleRate() == 44100)
+		rslog::info_ts() << "GameSampleRate: SKIPPED (not supported for this game version)" << std::endl;
+	else
+		rslog::info_ts() << "GameSampleRate: SKIPPED (engine keeps 48000 Hz)" << std::endl;
+
 	std::vector<void*> offsets_CoCreateInstance = FindBytesOffsets(originalBytes_call_CoCreateInstance, sizeof(originalBytes_call_CoCreateInstance));
 	std::vector<void*> offsets_PaMarshalPointers = FindBytesOffsets(originalBytes_call_PortAudio_MarshalStreamComPointers, sizeof(originalBytes_call_PortAudio_MarshalStreamComPointers));
 	std::vector<void*> offsets_PaUnmarshalPointers = FindBytesOffsets(originalBytes_call_UnmarshalStreamComPointers, sizeof(originalBytes_call_UnmarshalStreamComPointers));

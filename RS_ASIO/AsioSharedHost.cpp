@@ -176,6 +176,18 @@ bool AsioSharedHost::IsValid() const
 	return m_Driver != nullptr;
 }
 
+// Interfaces that are locked to 44.1 kHz can still be used by running the game
+// natively at that rate, so point the user at the option instead of failing silently.
+static void LogGameSampleRateHint(IAsioDriver* driver, const DWORD rate)
+{
+	static bool logged = false;
+	if (logged || rate != 48000 || driver->canSampleRate(44100.0) != ASE_OK)
+		return;
+	logged = true;
+		rslog::error_ts() << "  could not use 48000 Hz, but the driver reports 44100 Hz support;"
+		" set GameSampleRate44100=true under [Config] in RS_ASIO.ini" << std::endl;
+}
+
 ASIOError AsioSharedHost::SetSamplerate(const DWORD rate)
 {
 	if (!IsValid())
@@ -234,6 +246,7 @@ ASIOError AsioSharedHost::SetSamplerate(const DWORD rate)
 				m_AsioSampleRate = currentRate;
 				return ASE_OK;
 			}
+			LogGameSampleRateHint(m_Driver, rate);
 			return ASE_HWMalfunction;
 		}
 		else
@@ -621,6 +634,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		else if (m_Driver->canSampleRate((ASIOSampleRate)format.nSamplesPerSec) != ASE_OK)
 		{
 			rslog::error_ts() << "  unsupported sample rate: " << format.nSamplesPerSec << std::endl;
+			LogGameSampleRateHint(m_Driver, format.nSamplesPerSec);
 			return false;
 		}
 	}
@@ -634,6 +648,7 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 		else
 		{
 			rslog::error_ts() << "  unsupported sample rate: " << format.nSamplesPerSec << std::endl;
+			LogGameSampleRateHint(m_Driver, format.nSamplesPerSec);
 			return false;
 		}
 	}

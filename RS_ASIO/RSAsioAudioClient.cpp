@@ -8,6 +8,7 @@
 #include "RSAsioAudioRenderClient.h"
 #include "RSAsioAudioCaptureClient.h"
 #include "AudioProcessing.h"
+#include "Configurator.h"
 
 RSAsioAudioClient::RSAsioAudioClient(RSAsioDevice& asioDevice)
 	: m_AsioDevice(asioDevice)
@@ -350,8 +351,9 @@ HRESULT RSAsioAudioClient::GetMixFormat(WAVEFORMATEX **ppDeviceFormat)
 		return E_FAIL;
 
 	DWORD reportedRate = (DWORD)std::lround(sampleRate);
-	if (m_AsioSharedHost.GetResamplingMode() != AsioSharedHost::ResamplingMode_Disabled && reportedRate != 48000)
-		reportedRate = 48000;
+	const DWORD targetGameRate = GetGameSampleRate();
+	if (m_AsioSharedHost.GetResamplingMode() != AsioSharedHost::ResamplingMode_Disabled && reportedRate != targetGameRate)
+		reportedRate = targetGameRate;
 
 	WAVEFORMATEX* fmt = (WAVEFORMATEX*)CoTaskMemAlloc(sizeof(WAVEFORMATEX));
 	fmt->wFormatTag = WAVE_FORMAT_PCM;
