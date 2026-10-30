@@ -138,7 +138,21 @@ HRESULT RSAsioAudioClient::Initialize(AUDCLNT_SHAREMODE ShareMode, DWORD StreamF
 		}
 	}
 
-	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - actual buffer duration: " << RefTimeToMilisecs(AudioFramesToDuration(bufferDurationFrames, asioSampleRate)) << "ms (" << std::dec << bufferDurationFrames << " ASIO frames)" << std::endl;
+	const REFERENCE_TIME actualBufferDuration = AudioFramesToDuration(bufferDurationFrames, asioSampleRate);
+	rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__ << " - actual buffer duration: " << RefTimeToMilisecs(actualBufferDuration) << "ms (" << std::dec << bufferDurationFrames << " ASIO frames)" << std::endl;
+	if (!m_AsioDevice.GetConfig().isOutput && actualBufferDuration > MilisecsToRefTime(4))
+	{
+		DWORD recommendedFrames = 64;
+		while (recommendedFrames * 2 <= (DWORD)std::lround((double)asioSampleRate * 0.0032))
+		{
+			recommendedFrames *= 2;
+		}
+		rslog::info_ts() << std::dec << m_AsioDevice.GetIdRef() << " " << __FUNCTION__
+			<< " - WARNING: ASIO input buffer size (" << bufferDurationFrames << " frames / "
+			<< RefTimeToMilisecs(actualBufferDuration) << "ms at " << asioSampleRate
+			<< "Hz) exceeds Rocksmith's ~3ms capture window and may cause pitch/fret tracking errors on low strings. "
+			<< "Recommended ASIO buffer size for " << asioSampleRate << "Hz is " << recommendedFrames << " samples." << std::endl;
+	}
 
 	// setup ASIO streaming
 	if (m_AsioSharedHost.Setup(*pFormat, bufferDurationFrames) != ASE_OK)
