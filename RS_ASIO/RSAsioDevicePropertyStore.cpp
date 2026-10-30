@@ -5,6 +5,7 @@
 #include "RSAsioDevicePropertyStore.h"
 #include "RSAsioDevice.h"
 #include "AsioSharedHost.h"
+#include "Configurator.h"
 
 
 RSAsioDevicePropertyStore::RSAsioDevicePropertyStore(RSAsioDevice& device)
@@ -83,11 +84,16 @@ HRESULT STDMETHODCALLTYPE RSAsioDevicePropertyStore::GetValue(REFPROPERTYKEY key
 			if (asioDriver->getChannels(&numInputChannels, &numOutputChannels) == ASE_OK
 				&& asioDriver->getSampleRate(&sampleRate) == ASE_OK)
 			{
+				DWORD reportedSampleRate = (DWORD)std::lround(sampleRate);
+				const DWORD targetGameRate = GetGameSampleRate();
+				if (asioHost.GetResamplingMode() != AsioSharedHost::ResamplingMode_Disabled && reportedSampleRate != targetGameRate)
+					reportedSampleRate = targetGameRate;
+
 				WAVEFORMATEXTENSIBLE* wfe = (WAVEFORMATEXTENSIBLE*)CoTaskMemAlloc(sizeof(WAVEFORMATEXTENSIBLE));
 				wfe->Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
 				wfe->Format.nChannels = m_AsioDevice.GetNumWasapiChannels();
 				wfe->Format.wBitsPerSample = 32;
-				wfe->Format.nSamplesPerSec = std::lround(sampleRate);
+				wfe->Format.nSamplesPerSec = reportedSampleRate;
 				wfe->Format.nBlockAlign = wfe->Format.nChannels * (wfe->Format.wBitsPerSample / 8);
 				wfe->Format.nAvgBytesPerSec = wfe->Format.nBlockAlign * wfe->Format.nSamplesPerSec;
 				wfe->Format.cbSize = 22;

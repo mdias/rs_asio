@@ -39,6 +39,7 @@ void RSAsioDeviceEnum::UpdateAvailableDevices()
 				AsioSharedHost* newHost = AsioHelpers::CreateAsioHost(info);
 				if (newHost)
 				{
+					newHost->SetResamplingMode(m_Config.resamplingMode);
 					createdAsioHosts.push_back(newHost);
 					newHost->AddRef();
 					return newHost;

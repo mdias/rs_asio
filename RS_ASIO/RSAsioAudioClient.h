@@ -47,6 +47,8 @@ public:
 
 	std::vector<BYTE>& GetBackBuffer() { return m_backBuffer; }
 	DWORD GetBufferNumFrames() const { return m_bufferNumFrames; }
+	DWORD GetFrontBufferNumFrames() const { return m_frontBufferFrames; }
+	DWORD GetBackBufferNumFrames() const { return m_backBufferFrames; }
 	void SwapBuffers();
 
 protected:
@@ -54,6 +56,7 @@ protected:
 
 private:
 	void UpdateChannelMap();
+	void ResetResamplerState();
 
 	RSAsioDevice& m_AsioDevice;
 	AsioSharedHost& m_AsioSharedHost;
@@ -71,8 +74,19 @@ private:
 
 	std::vector<BYTE> m_frontBuffer;
 	std::vector<BYTE> m_backBuffer;
+	DWORD m_frontBufferFrames = 0;
+	DWORD m_backBufferFrames = 0;
 	bool m_BuffersWereSwapped = false;
 	bool m_IsFirstBuffer = false;
+
+	bool m_ResamplingEnabled = false;
+	DWORD m_AsioSampleRate = 0;
+	double m_ResamplePhase = 0.0;
+	DWORD m_OutputFifoFrames = 0;
+	bool m_PendingRenderNotify = false;
+	std::vector<std::array<float, 4>> m_ResampleHistory;
+	std::vector<float> m_ResampleInputBuffer;
+	std::vector<float> m_ResampleOutputBuffer;
 
 	unsigned m_dbgNumBufferSwitches;
 

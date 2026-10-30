@@ -193,39 +193,79 @@ ASIOError AsioSharedHost::SetSamplerate(const DWORD rate)
 	if (!IsValid())
 		return ASE_NotPresent;
 
-	// Switch ASIO sample rate if needed
-	ASIOSampleRate asioSampleRate;
+	ASIOSampleRate asioSampleRate = 0.0;
 	if (m_Driver->getSampleRate(&asioSampleRate) != ASE_OK)
 	{
 		DisplayCurrentError();
 		return ASE_HWMalfunction;
 	}
-	if (std::lround(asioSampleRate) != rate)
+	const DWORD currentRate = (DWORD)std::lround(asioSampleRate);
+
+	DWORD targetRate = rate;
+	if (m_ResamplingMode == ResamplingMode_Always)
 	{
-		if (m_IsSetup)
+		if (currentRate > 0)
 		{
+			if (currentRate != rate)
+			{
+				rslog::info_ts() << std::dec << "  ResamplingMode=Always; keeping current driver rate " << currentRate << " Hz with resampling" << std::endl;
+			}
+			targetRate = currentRate;
+		}
+	}
+	else if (m_ResamplingMode == ResamplingMode_Auto && m_Driver->canSampleRate((ASIOSampleRate)rate) != ASE_OK)
+	{
+		if (currentRate > 0 && m_Driver->canSampleRate((ASIOSampleRate)currentRate) == ASE_OK)
+		{
+			rslog::info_ts() << std::dec << "  Driver does not support " << rate << " Hz; falling back to current driver rate " << currentRate << " Hz with resampling" << std::endl;
+			targetRate = currentRate;
+		}
+	}
+
+	if (m_IsSetup)
+	{
+		if (currentRate != targetRate && currentRate != m_AsioSampleRate)
+		{
+			return ASE_HWMalfunction;
+		}
+		m_AsioSampleRate = currentRate;
+		return ASE_OK;
+	}
+
+	if (currentRate != targetRate)
+	{
+		const ASIOSampleRate targetSampleRate = (ASIOSampleRate)targetRate;
+
+		rslog::info_ts() << std::dec << "  Switching sample rate from " << currentRate << " to " << targetRate << "..." << std::endl;
+		if (m_Driver->setSampleRate(targetSampleRate) != ASE_OK)
+		{
+			DisplayCurrentError();
+			if (m_ResamplingMode != ResamplingMode_Disabled && currentRate > 0)
+			{
+				rslog::info_ts() << "  Failed to set " << targetRate << " Hz; keeping current driver rate " << currentRate << " Hz with resampling..." << std::endl;
+				m_AsioSampleRate = currentRate;
+				return ASE_OK;
+			}
+			LogGameSampleRateHint(m_Driver, rate);
 			return ASE_HWMalfunction;
 		}
 		else
 		{
-			const ASIOSampleRate targetSampleRate = (ASIOSampleRate)rate;
-
-			rslog::info_ts() << std::dec << "  Switching sample rate from " << std::lround(asioSampleRate) << " to " << rate << "..." << std::endl;
-			if (m_Driver->setSampleRate(targetSampleRate) != ASE_OK)
-			{
-				DisplayCurrentError();
-				LogGameSampleRateHint(m_Driver, rate);
-				return ASE_HWMalfunction;
-			}
-			else
-			{
-				// save previously selected sample rate so that we can restore it later
-				m_SampleRateRestore = asioSampleRate;
-			}
-
-			rslog::info_ts() << " Waiting 5 seconds to give driver time to refresh" << std::endl;
-			Sleep(5000);
+			// save previously selected sample rate so that we can restore it later
+			m_SampleRateRestore = asioSampleRate;
 		}
+
+		rslog::info_ts() << " Waiting 5 seconds to give driver time to refresh" << std::endl;
+		Sleep(5000);
+	}
+
+	if (m_Driver->getSampleRate(&asioSampleRate) == ASE_OK && asioSampleRate > 0.0)
+	{
+		m_AsioSampleRate = (DWORD)std::lround(asioSampleRate);
+	}
+	else
+	{
+		m_AsioSampleRate = targetRate;
 	}
 
 	return ASE_OK;
@@ -280,10 +320,17 @@ ASIOError AsioSharedHost::Setup(const WAVEFORMATEX& format, const DWORD bufferDu
 			DisplayCurrentError();
 			return ASE_HWMalfunction;
 		}
-		if (std::lround(asioSampleRate) != format.nSamplesPerSec)
+		const DWORD actualAsioRate = (DWORD)std::lround(asioSampleRate);
+		const DWORD expectedAsioRate = m_AsioSampleRate ? m_AsioSampleRate : format.nSamplesPerSec;
+		if (actualAsioRate != expectedAsioRate && actualAsioRate != format.nSamplesPerSec)
 		{
-			rslog::error_ts() << std::dec << "  Current sample rate is " << std::lround(asioSampleRate) << " which is not the expected " << format.nSamplesPerSec << std::endl;
+			rslog::error_ts() << std::dec << "  Current sample rate is " << actualAsioRate << " which is not the expected " << expectedAsioRate << std::endl;
 			return ASE_InvalidMode;
+		}
+		m_AsioSampleRate = actualAsioRate;
+		if (m_AsioSampleRate != format.nSamplesPerSec)
+		{
+			rslog::info_ts() << std::dec << "  ASIO running at " << m_AsioSampleRate << " Hz (host format is " << format.nSamplesPerSec << " Hz - real-time resampling enabled)" << std::endl;
 		}
 
 		// check if driver wants to be notified about output being ready
@@ -374,6 +421,7 @@ void AsioSharedHost::Reset()
 		m_SampleRateRestore.reset();
 	}
 
+	m_AsioSampleRate = 0;
 	m_IsSetup = false;
 }
 
@@ -567,11 +615,42 @@ bool AsioSharedHost::IsWaveFormatSupported(const WAVEFORMATEX& format, bool outp
 	}
 
 	// check sample rate
-	if (m_Driver->canSampleRate((ASIOSampleRate)format.nSamplesPerSec) != ASE_OK)
+	if (format.nSamplesPerSec == 0)
 	{
-		rslog::error_ts() << "  unsupported sample rate: " << format.nSamplesPerSec << std::endl;
-		LogGameSampleRateHint(m_Driver, format.nSamplesPerSec);
+		rslog::error_ts() << "  invalid sample rate: 0" << std::endl;
 		return false;
+	}
+	if (m_ResamplingMode == ResamplingMode_Always)
+	{
+		ASIOSampleRate currentAsioRate = 0.0;
+		if (m_Driver->getSampleRate(&currentAsioRate) == ASE_OK && currentAsioRate > 0.0)
+		{
+			const DWORD currentRate = (DWORD)std::lround(currentAsioRate);
+			if (currentRate != format.nSamplesPerSec)
+			{
+				rslog::info_ts() << "  ResamplingMode=Always; " << currentRate << " Hz resampling will be used for requested " << format.nSamplesPerSec << " Hz" << std::endl;
+			}
+		}
+		else if (m_Driver->canSampleRate((ASIOSampleRate)format.nSamplesPerSec) != ASE_OK)
+		{
+			rslog::error_ts() << "  unsupported sample rate: " << format.nSamplesPerSec << std::endl;
+			LogGameSampleRateHint(m_Driver, format.nSamplesPerSec);
+			return false;
+		}
+	}
+	else if (m_Driver->canSampleRate((ASIOSampleRate)format.nSamplesPerSec) != ASE_OK)
+	{
+		ASIOSampleRate currentAsioRate = 0.0;
+		if (m_ResamplingMode == ResamplingMode_Auto && m_Driver->getSampleRate(&currentAsioRate) == ASE_OK && currentAsioRate > 0.0)
+		{
+			rslog::info_ts() << "  sample rate " << format.nSamplesPerSec << " Hz not natively supported by ASIO driver; " << (DWORD)std::lround(currentAsioRate) << " Hz resampling will be used" << std::endl;
+		}
+		else
+		{
+			rslog::error_ts() << "  unsupported sample rate: " << format.nSamplesPerSec << std::endl;
+			LogGameSampleRateHint(m_Driver, format.nSamplesPerSec);
+			return false;
+		}
 	}
 
 	// check bit depth
@@ -695,8 +774,9 @@ bool AsioSharedHost::GetLatencyTime(REFERENCE_TIME& in, REFERENCE_TIME& out)
 	if (m_Driver->getLatencies(&inputLatency, &outputLatency) != ASE_OK)
 		return false;
 
-	in = AudioFramesToDuration(inputLatency, m_CurrentWaveFormat.Format.nSamplesPerSec);
-	out = AudioFramesToDuration(outputLatency, m_CurrentWaveFormat.Format.nSamplesPerSec);
+	const DWORD asioRate = m_AsioSampleRate ? m_AsioSampleRate : m_CurrentWaveFormat.Format.nSamplesPerSec;
+	in = AudioFramesToDuration(inputLatency, asioRate);
+	out = AudioFramesToDuration(outputLatency, asioRate);
 
 	return true;
 }

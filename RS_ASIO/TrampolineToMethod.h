@@ -84,9 +84,18 @@ private:
 	}
 
 	template<typename TClass, typename TMemberFunc, typename... Args>
-	static typename function_traits<TFunc>::result_type __cdecl Redirector(void* savedReturnPointer, TClass* obj, TMemberFunc fn, Args ... args)
+#ifdef __GNUC__
+	__attribute__((optimize("no-optimize-sibling-calls"), noinline))
+#endif
+	static typename function_traits<TFunc>::result_type __cdecl Redirector(void* savedReturnPointer, TClass* obj, void* fnPtr, Args ... args)
 	{
+#ifdef __GNUC__
+		using TPlainFn = typename function_traits<TFunc>::result_type(__cdecl *)(TClass*, Args...);
+		return reinterpret_cast<TPlainFn>(fnPtr)(obj, args...);
+#else
+		TMemberFunc fn = *(TMemberFunc*)&fnPtr;
 		return (obj->*fn)(args...);
+#endif
 	}
 
 	BYTE* m_Blob;

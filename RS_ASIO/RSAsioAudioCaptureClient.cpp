@@ -29,7 +29,7 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::GetBuffer(BYTE **ppData, UIN
 	BYTE* backbuffer = GetBackbufferIfPending(true, &backbufferTimestamp, &isDiscontinuity);
 
 	*ppData = backbuffer;
-	*pNumFramesToRead = backbuffer ? m_AsioAudioClient.GetBufferNumFrames() : 0;
+	*pNumFramesToRead = backbuffer ? m_AsioAudioClient.GetBackBufferNumFrames() : 0;
 
 	DWORD dwOutFlags = 0;
 	if (backbufferTimestamp == 0)
@@ -69,8 +69,8 @@ HRESULT STDMETHODCALLTYPE RSAsioAudioCaptureClient::ReleaseBuffer(UINT32 NumFram
 	if (!m_WaitingForBufferRelease)
 		return AUDCLNT_E_OUT_OF_ORDER;
 
-	const UINT32 expectedNumFrames = m_AsioAudioClient.GetBufferNumFrames();
-	if (NumFramesRead != 0 && NumFramesRead != expectedNumFrames)
+	const UINT32 expectedNumFrames = m_AsioAudioClient.GetBackBufferNumFrames();
+	if (NumFramesRead != 0 && NumFramesRead != expectedNumFrames && NumFramesRead != m_AsioAudioClient.GetBufferNumFrames())
 		return AUDCLNT_E_INVALID_SIZE;
 
 	m_WaitingForBufferRelease = false;

@@ -2,6 +2,7 @@
 
 #include "RSBaseDeviceEnum.h"
 #include "RSAsioDevice.h"
+#include "AsioSharedHost.h"
 
 #include <optional>
 
@@ -34,6 +35,7 @@ struct RSAsioConfig
 	std::array<RSAsioInputConfig, 3> inputs;
 	RSAsioDevice::BufferSizeMode bufferMode = RSAsioDevice::BufferSizeMode_Driver;
 	unsigned customBufferSize = 128;
+	AsioSharedHost::ResamplingMode resamplingMode = AsioSharedHost::ResamplingMode_Auto;
 };
 
 struct RSConfig

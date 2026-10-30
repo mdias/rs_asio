@@ -124,7 +124,7 @@
 #endif
 
 // force 4 byte alignment
-#if defined(_MSC_VER) && !defined(__MWERKS__) 
+#if (defined(_MSC_VER) && !defined(__MWERKS__)) || defined(__GNUC__)
 #pragma pack(push,4)
 #elif PRAGMA_ALIGN_SUPPORTED
 #pragma options align = native
@@ -713,7 +713,7 @@ interface IAsioDriver : public IUnknown
 };
 
 // restore old alignment
-#if defined(_MSC_VER) && !defined(__MWERKS__) 
+#if (defined(_MSC_VER) && !defined(__MWERKS__)) || defined(__GNUC__)
 #pragma pack(pop)
 #elif PRAGMA_ALIGN_SUPPORTED
 #pragma options align = reset

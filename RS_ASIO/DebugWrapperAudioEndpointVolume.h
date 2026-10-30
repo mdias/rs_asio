@@ -32,4 +32,7 @@ public:
 private:
 	IAudioEndpointVolume& m_RealAudioEndpointVolume;
 	std::wstring m_DeviceId;
+	std::mutex m_LogMutex;
+	float m_LastLevel = -1.0f;
+	unsigned int m_RepeatCount = 0;
 };

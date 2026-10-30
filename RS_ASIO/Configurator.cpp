@@ -346,6 +346,26 @@ static void LoadConfigIni(RSConfig& out)
 							rslog::error_ts() << __FUNCTION__ << " - invalid value for buffer size, value should be an integer starting at 1. line: " << line << std::endl;
 						}
 					}
+					else if (key == "resamplingmode")
+					{
+						const std::string valLower = toLowerString(val);
+						if (valLower == "disabled" || valLower == "0" || valLower == "false")
+						{
+							out.asioConfig.resamplingMode = AsioSharedHost::ResamplingMode_Disabled;
+						}
+						else if (valLower == "always")
+						{
+							out.asioConfig.resamplingMode = AsioSharedHost::ResamplingMode_Always;
+						}
+						else if (valLower == "auto" || valLower == "1" || valLower == "true")
+						{
+							out.asioConfig.resamplingMode = AsioSharedHost::ResamplingMode_Auto;
+						}
+						else
+						{
+							rslog::error_ts() << __FUNCTION__ << " - invalid value for resampling mode. valid values are \"disabled\", \"always\", \"auto\". line: " << line << std::endl;
+						}
+					}
 				}
 				else if (currentSection == SectionAsioOut)
 				{
