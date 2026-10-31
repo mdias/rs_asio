@@ -11,14 +11,6 @@ typedef NTSTATUS(WINAPI* Type_NtProtectVirtualMemory)(HANDLE /*ProcessHandle*/, 
 
 static Type_NtProtectVirtualMemory pfnNtProtectVirtualMemory = nullptr;
 
-EXTERN_C ULONG NtProtectVirtualMemory(
-	IN HANDLE ProcessHandle,
-	IN OUT PVOID* BaseAddress,
-	IN OUT PSIZE_T RegionSize,
-	IN ULONG NewProtect,
-	OUT PULONG OldProtect
-);
-
 bool RedirectedVirtualProtect(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtect, PDWORD lpflOldProtect)
 {
 	if (pfnNtProtectVirtualMemory != nullptr)
@@ -28,7 +20,8 @@ bool RedirectedVirtualProtect(LPVOID lpAddress, SIZE_T dwSize, DWORD flNewProtec
 		return (pfnNtProtectVirtualMemory(ProcessHandle, &lpAddress, &NumberOfBytesToProtect, flNewProtect, lpflOldProtect) == 0);
 	}
 
-	return NtProtectVirtualMemory(GetCurrentProcess(), &lpAddress, &dwSize, flNewProtect, lpflOldProtect) == 0;
+	// InitPatcher failed to resolve NtProtectVirtualMemory
+	return false;
 }
 
 DWORD GetImageCrc32()
