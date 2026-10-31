@@ -28,31 +28,54 @@ struct REAL_FUNCTIONS
 };
 
 static HMODULE hModuleReal = NULL;
+#ifdef _MSC_VER
 static REAL_FUNCTIONS RealFunctions = {};
+#else
+extern "C" { REAL_FUNCTIONS RealFunctions = {}; }
+#endif
 
-#define IMPLEMENT_FORWARDER(x) void __declspec(naked) Wrapped_##x(){ _asm { jmp RealFunctions.##x }; }
-#define FILLREALPROCADDRESS(x) RealFunctions.##x = (decltype(RealFunctions.##x))GetProcAddress(hModuleReal, #x);
+#ifdef _MSC_VER
+#define IMPLEMENT_FORWARDER(x, idx) void __declspec(naked) Wrapped_##x(){ _asm { jmp RealFunctions.##x }; }
+#else
+// GCC/Clang (mingw): emit the tail-jump in a top-level asm block. "idx" is the
+// position of the function pointer inside REAL_FUNCTIONS.
+#define ASM_STR2(x) #x
+#define ASM_STR(x) ASM_STR2(x)
+#define ASM_SYM(name) ASM_STR(__USER_LABEL_PREFIX__) name
+#ifdef _WIN64
+#define ASM_JMP(idx) "jmp *(" ASM_SYM("RealFunctions") " + " ASM_STR(idx) "*8)(%rip)"
+#else
+#define ASM_JMP(idx) "jmp *(" ASM_SYM("RealFunctions") " + " ASM_STR(idx) "*4)"
+#endif
+#define IMPLEMENT_FORWARDER(x, idx) \
+	extern "C" void Wrapped_##x(); \
+	asm(".text\n" \
+		".globl " ASM_SYM("Wrapped_" #x) "\n" \
+		ASM_SYM("Wrapped_" #x) ":\n\t" \
+		ASM_JMP(idx) "\n");
+#endif
+#define FILLREALPROCADDRESS(x) RealFunctions.x = (decltype(RealFunctions.x))GetProcAddress(hModuleReal, #x);
 
-IMPLEMENT_FORWARDER(AvCreateTaskIndex);
-IMPLEMENT_FORWARDER(AvQuerySystemResponsiveness);
-IMPLEMENT_FORWARDER(AvQueryTaskIndexValue);
-IMPLEMENT_FORWARDER(AvRevertMmThreadCharacteristics);
-IMPLEMENT_FORWARDER(AvRtCreateThreadOrderingGroup);
-IMPLEMENT_FORWARDER(AvRtCreateThreadOrderingGroupExA);
-IMPLEMENT_FORWARDER(AvRtCreateThreadOrderingGroupExW);
-IMPLEMENT_FORWARDER(AvRtDeleteThreadOrderingGroup);
-IMPLEMENT_FORWARDER(AvRtJoinThreadOrderingGroup);
-IMPLEMENT_FORWARDER(AvRtLeaveThreadOrderingGroup);
-IMPLEMENT_FORWARDER(AvRtWaitOnThreadOrderingGroup);
-IMPLEMENT_FORWARDER(AvSetMmMaxThreadCharacteristicsA);
-IMPLEMENT_FORWARDER(AvSetMmMaxThreadCharacteristicsW);
-IMPLEMENT_FORWARDER(AvSetMmThreadCharacteristicsA);
-IMPLEMENT_FORWARDER(AvSetMmThreadCharacteristicsW);
-IMPLEMENT_FORWARDER(AvSetMmThreadPriority);
-IMPLEMENT_FORWARDER(AvSetMultimediaMode);
-IMPLEMENT_FORWARDER(AvTaskIndexYield);
-IMPLEMENT_FORWARDER(AvTaskIndexYieldCancel);
-IMPLEMENT_FORWARDER(AvThreadOpenTaskIndex);
+IMPLEMENT_FORWARDER(AvCreateTaskIndex, 0);
+IMPLEMENT_FORWARDER(AvQuerySystemResponsiveness, 1);
+IMPLEMENT_FORWARDER(AvQueryTaskIndexValue, 2);
+IMPLEMENT_FORWARDER(AvRevertMmThreadCharacteristics, 3);
+IMPLEMENT_FORWARDER(AvRtCreateThreadOrderingGroup, 4);
+IMPLEMENT_FORWARDER(AvRtCreateThreadOrderingGroupExA, 5);
+IMPLEMENT_FORWARDER(AvRtCreateThreadOrderingGroupExW, 6);
+IMPLEMENT_FORWARDER(AvRtDeleteThreadOrderingGroup, 7);
+IMPLEMENT_FORWARDER(AvRtJoinThreadOrderingGroup, 8);
+IMPLEMENT_FORWARDER(AvRtLeaveThreadOrderingGroup, 9);
+IMPLEMENT_FORWARDER(AvRtWaitOnThreadOrderingGroup, 10);
+IMPLEMENT_FORWARDER(AvSetMmMaxThreadCharacteristicsA, 11);
+IMPLEMENT_FORWARDER(AvSetMmMaxThreadCharacteristicsW, 12);
+IMPLEMENT_FORWARDER(AvSetMmThreadCharacteristicsA, 13);
+IMPLEMENT_FORWARDER(AvSetMmThreadCharacteristicsW, 14);
+IMPLEMENT_FORWARDER(AvSetMmThreadPriority, 15);
+IMPLEMENT_FORWARDER(AvSetMultimediaMode, 16);
+IMPLEMENT_FORWARDER(AvTaskIndexYield, 17);
+IMPLEMENT_FORWARDER(AvTaskIndexYieldCancel, 18);
+IMPLEMENT_FORWARDER(AvThreadOpenTaskIndex, 19);
 
 static void LoadOriginalDll()
 {

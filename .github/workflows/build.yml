@@ -11,3 +11,15 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
     - name: Build with MSBuild
       run: msbuild  '.\RS_ASIO.sln'
+
+  build-linux-mingw:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install mingw-w64
+      run: sudo apt-get update && sudo apt-get install -y cmake g++-mingw-w64-i686-posix
+    - name: Configure
+      run: cmake -S . -B build/x86 -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-i686.cmake -DCMAKE_BUILD_TYPE=Release
+    - name: Build
+      run: cmake --build build/x86 -j
+

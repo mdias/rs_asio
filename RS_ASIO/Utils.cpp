@@ -47,23 +47,21 @@ LONGLONG TimeStamp::GetPerformanceFreq() const
 
 std::string ConvertWStrToStr(const std::wstring& wstr)
 {
-	typedef std::codecvt<wchar_t, char, std::mbstate_t> converter_type;
+	// Convert using the ANSI code page. Not std::locale(""): with libstdc++ that
+	// reads LANG/LC_ALL, which is set under Wine/Proton, and throws when the
+	// name isn't one the mingw CRT accepts.
+	if (wstr.empty())
+		return std::string();
 
-	static const std::locale locale("");
-	const converter_type& converter = std::use_facet<converter_type>(locale);
+	const int size = WideCharToMultiByte(CP_ACP, 0, wstr.data(), (int)wstr.length(), nullptr, 0, nullptr, nullptr);
+	if (size <= 0)
+		return std::string();
 
-	std::vector<char> to(wstr.length() * converter.max_length());
-	std::mbstate_t state;
-	const wchar_t* from_next;
-	char* to_next;
-	const converter_type::result result = converter.out(state, wstr.data(), wstr.data() + wstr.length(), from_next, &to[0], &to[0] + to.size(), to_next);
+	std::string result(size, '\0');
+	if (WideCharToMultiByte(CP_ACP, 0, wstr.data(), (int)wstr.length(), &result[0], size, nullptr, nullptr) <= 0)
+		return std::string();
 
-	if (result == converter_type::ok or result == converter_type::noconv)
-	{
-		return std::string(&to[0], to_next);
-	}
-
-	return std::string();
+	return result;
 }
 
 

@@ -11,6 +11,16 @@
 #include <complex>
 #include <cmath>
 
+#ifndef _MSC_VER
+// GCC/Clang (mingw) have no __try/__except or MSVC inline asm: the thunk is
+// emitted as a top-level asm block below, and these C-linkage symbols are what
+// it references.
+extern "C" void rsasio_CabinetMediaThunk();
+extern "C" void* rsasio_CabinetHookResume;
+void* rsasio_CabinetHookResume = nullptr;
+extern "C" void rsasio_CabinetMediaHook(unsigned char* data, unsigned size, unsigned engineRate);
+#endif
+
 namespace
 {
 	struct ModuleImage
@@ -48,6 +58,7 @@ namespace
 	{
 		if (!p)
 			return false;
+#ifdef _MSC_VER
 		__try
 		{
 			memcpy(out, p, n);
@@ -57,6 +68,10 @@ namespace
 		{
 			return false;
 		}
+#else
+		SIZE_T done = 0;
+		return ReadProcessMemory(GetCurrentProcess(), p, out, n, &done) && done == n;
+#endif
 	}
 
 	// Guarded write counterpart to SafeRead. The media buffer is bank-owned;
@@ -65,6 +80,7 @@ namespace
 	{
 		if (!p)
 			return false;
+#ifdef _MSC_VER
 		__try
 		{
 			memcpy(p, in, n);
@@ -74,6 +90,10 @@ namespace
 		{
 			return false;
 		}
+#else
+		SIZE_T done = 0;
+		return WriteProcessMemory(GetCurrentProcess(), p, in, n, &done) && done == n;
+#endif
 	}
 
 	// Converted-payload cache.
@@ -751,7 +771,11 @@ namespace
 	}
 
 	// Where execution resumes: the instruction after the five bytes we steal.
+#ifdef _MSC_VER
 	static void* g_CabinetHookResume;
+#else
+	void*& g_CabinetHookResume = rsasio_CabinetHookResume;
+#endif
 
 	// Hook sited AFTER the engine's own GetPluginMedia call, not at function
 	// entry, so that call happens exactly once per Init. Calling it ourselves a
@@ -768,6 +792,7 @@ namespace
 	// The stolen `test` is re-executed LAST, immediately before returning, so the
 	// flags the following jne depends on are the ones it expects. Doing our work
 	// after the test would clobber them.
+#ifdef _MSC_VER
 	__declspec(naked) void CabinetMediaThunk()
 	{
 		__asm
@@ -793,6 +818,15 @@ namespace
 			jmp  dword ptr [g_CabinetHookResume]
 		}
 	}
+#else
+	void (*const CabinetMediaThunk)() = rsasio_CabinetMediaThunk;
+#endif
+
+#ifdef _MSC_VER
+	inline void* CabinetMediaThunkAddress() { return reinterpret_cast<void*>(&CabinetMediaThunk); }
+#else
+	inline void* CabinetMediaThunkAddress() { return reinterpret_cast<void*>(CabinetMediaThunk); }
+#endif
 
 	bool InstallCabinetIRProbeAt(const ModuleImage& img, uintptr_t siteRva)
 	{
@@ -824,7 +858,7 @@ namespace
 		BYTE patch[kStolen];
 		memset(patch, 0x90, sizeof(patch));
 		patch[0] = 0xE9;
-		const intptr_t fwd = reinterpret_cast<BYTE*>(&CabinetMediaThunk) - (target + 5);
+		const intptr_t fwd = reinterpret_cast<BYTE*>(CabinetMediaThunkAddress()) - (target + 5);
 		memcpy(patch + 1, &fwd, 4);
 
 		if (!Patch_ReplaceWithBytes(target, kStolen, patch))
@@ -837,6 +871,45 @@ namespace
 		return true;
 	}
 }
+
+#ifndef _MSC_VER
+extern "C" void rsasio_CabinetMediaHook(unsigned char* data, unsigned size, unsigned engineRate)
+{
+	CabinetMediaHook(data, size, engineRate);
+}
+
+#ifdef __i386__
+// Same thunk as the MSVC __asm version above (see the comment there).
+asm(
+	".text\n"
+	".globl _rsasio_CabinetMediaThunk\n"
+	"_rsasio_CabinetMediaThunk:\n"
+	".intel_syntax noprefix\n"
+	"	pushfd\n"
+	"	pushad\n"
+	"	mov  eax, [ebp + 0x10]\n"
+	"	test eax, eax\n"
+	"	jz   1f\n"
+	"	mov  eax, [eax]\n"
+	"	push eax\n"
+	"	mov  ecx, [ebp - 8]\n"
+	"	push ecx\n"
+	"	mov  edx, [ebp - 4]\n"
+	"	push edx\n"
+	"	call _rsasio_CabinetMediaHook\n"
+	"	add  esp, 12\n"
+	"1:\n"
+	"	popad\n"
+	"	popfd\n"
+	"	mov  eax, [ebp - 4]\n"
+	"	test eax, eax\n"
+	"	jmp  dword ptr [_rsasio_CabinetHookResume]\n"
+	".att_syntax prefix\n"
+);
+#else
+#error "The cabinet IR hook thunk is x86 (32-bit) only"
+#endif
+#endif
 
 void InstallCabinetIRProbe(uintptr_t siteRva)
 {
