@@ -14,11 +14,11 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "FileDescription", "RS ASIO"
-            VALUE "FileVersion", "0.7.5"
+            VALUE "FileVersion", "0.8.0"
             VALUE "InternalName", "RS_ASIO"
             VALUE "OriginalFilename", "RS_ASIO.dll"
             VALUE "ProductName", "RS ASIO"
-            VALUE "ProductVersion", "0.7.5"
+            VALUE "ProductVersion", "0.8.0"
         END
     END
     BLOCK "VarFileInfo"
