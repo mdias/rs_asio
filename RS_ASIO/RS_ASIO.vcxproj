@@ -179,6 +179,7 @@
     <ClInclude Include="MyUnknown.h" />
     <ClInclude Include="CabinetIRFix.h" />
     <ClInclude Include="Patcher.h" />
+    <ClInclude Include="Version.h" />
     <ClInclude Include="RSAsioAudioCaptureClient.h" />
     <ClInclude Include="RSAsioAudioClient.h" />
     <ClInclude Include="RSAsioAudioClientServiceBase.h" />
