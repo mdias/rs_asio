@@ -5,12 +5,15 @@
 #include "RSAggregatorDeviceEnum.h"
 #include "Configurator.h"
 #include "MyUnknown.h"
-#include "Version.h"
+#include <winver.h>
 
 #define USE_STRUCTURED_PA 1
 
+static HMODULE g_rsasioModule = nullptr;
 
 extern "C" {
+
+const char* __cdecl RSASIO_GetVersion();
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -20,10 +23,11 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
+		g_rsasioModule = hModule;
 		DisableThreadLibraryCalls(hModule);
 
 		rslog::InitLog();
-		rslog::info_ts() << " - Wrapper DLL loaded (v" RS_ASIO_VERSION_STRING ")" << std::endl;
+		rslog::info_ts() << " - Wrapper DLL loaded (v" << RSASIO_GetVersion() << ")" << std::endl;
 		InitPatcher();
 		PatchOriginalCode();
 		break;
@@ -40,11 +44,33 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 }
 
 // Lets other mods (e.g. RSMods) read the loaded RS ASIO version, for example to
-// compare it against the latest release. Returns a static string; the caller
-// must not free it.
+// compare it against the latest release. Reads the version embedded in this
+// DLL; the returned static string must not be freed by the caller.
 const char* __cdecl RSASIO_GetVersion()
 {
-	return RS_ASIO_VERSION_STRING;
+	static const std::string version = []() -> std::string {
+		wchar_t path[MAX_PATH];
+		const DWORD pathLength = GetModuleFileNameW(g_rsasioModule, path, MAX_PATH);
+		if (pathLength == 0 || pathLength >= MAX_PATH)
+			return {};
+
+		DWORD unused = 0;
+		const DWORD size = GetFileVersionInfoSizeW(path, &unused);
+		if (size == 0)
+			return {};
+
+		std::vector<BYTE> data(size);
+		if (!GetFileVersionInfoW(path, 0, size, data.data()))
+			return {};
+
+		LPVOID value = nullptr;
+		UINT length = 0;
+		if (!VerQueryValueA(data.data(), "\\StringFileInfo\\040904B0\\ProductVersion", &value, &length) || length == 0)
+			return {};
+
+		return static_cast<const char*>(value);
+	}();
+	return version.c_str();
 }
 
 HRESULT STDAPICALLTYPE Patched_CoCreateInstance(REFCLSID rclsid, IUnknown *pUnkOuter, DWORD dwClsContext, REFIID riid, void **ppOut)

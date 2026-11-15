@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(RS_ASIO CXX)
+project(RS_ASIO LANGUAGES CXX RC)
 
 # Cross-compile from Linux with mingw-w64:
 #   cmake -S . -B build/x86 -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-i686.cmake -DCMAKE_BUILD_TYPE=Release
@@ -42,7 +42,7 @@ set_target_properties(avrt PROPERTIES PREFIX "")
 
 # --- RS_ASIO.dll ---
 file(GLOB RSASIO_SOURCES CONFIGURE_DEPENDS RS_ASIO/*.cpp)
-add_library(RS_ASIO SHARED ${RSASIO_SOURCES} RS_ASIO/exports.def)
+add_library(RS_ASIO SHARED ${RSASIO_SOURCES} RS_ASIO/exports.def RS_ASIO/Version.rc)
 target_compile_definitions(RS_ASIO PRIVATE RSASIO_EXPORTS _CRT_SECURE_NO_WARNINGS)
-target_link_libraries(RS_ASIO PRIVATE ole32 uuid ksguid propsys psapi)
+target_link_libraries(RS_ASIO PRIVATE ole32 uuid ksguid propsys psapi version)
 set_target_properties(RS_ASIO PROPERTIES PREFIX "")

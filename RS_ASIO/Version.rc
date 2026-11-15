@@ -1,0 +1,28 @@
+#include <winver.h>
+
+1 VERSIONINFO
+FILEVERSION 0,7,5,0
+PRODUCTVERSION 0,7,5,0
+FILEFLAGSMASK 0x3fL
+FILEFLAGS 0x0L
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_DLL
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "RS ASIO"
+            VALUE "FileVersion", "0.7.5"
+            VALUE "InternalName", "RS_ASIO"
+            VALUE "OriginalFilename", "RS_ASIO.dll"
+            VALUE "ProductName", "RS ASIO"
+            VALUE "ProductVersion", "0.7.5"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END
