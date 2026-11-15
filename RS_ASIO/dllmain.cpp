@@ -5,6 +5,7 @@
 #include "RSAggregatorDeviceEnum.h"
 #include "Configurator.h"
 #include "MyUnknown.h"
+#include "Version.h"
 
 #define USE_STRUCTURED_PA 1
 
@@ -22,7 +23,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		DisableThreadLibraryCalls(hModule);
 
 		rslog::InitLog();
-		rslog::info_ts() << " - Wrapper DLL loaded (v0.7.5)" << std::endl;
+		rslog::info_ts() << " - Wrapper DLL loaded (v" RS_ASIO_VERSION_STRING ")" << std::endl;
 		InitPatcher();
 		PatchOriginalCode();
 		break;
@@ -36,6 +37,14 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		break;
     }
     return TRUE;
+}
+
+// Lets other mods (e.g. RSMods) read the loaded RS ASIO version, for example to
+// compare it against the latest release. Returns a static string; the caller
+// must not free it.
+const char* __cdecl RSASIO_GetVersion()
+{
+	return RS_ASIO_VERSION_STRING;
 }
 
 HRESULT STDAPICALLTYPE Patched_CoCreateInstance(REFCLSID rclsid, IUnknown *pUnkOuter, DWORD dwClsContext, REFIID riid, void **ppOut)
