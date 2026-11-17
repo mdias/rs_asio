@@ -437,13 +437,26 @@ WORD GetAsioSampleTypeNumBytes(ASIOSampleType sampleType)
 {
 	switch (sampleType)
 	{
+	case ASIOSTInt16MSB:
 	case ASIOSTInt16LSB:
 		return 2;
+	case ASIOSTInt24MSB:
 	case ASIOSTInt24LSB:
 		return 3;
+	case ASIOSTInt32MSB:
+	case ASIOSTFloat32MSB:
+	case ASIOSTInt32MSB16:
+	case ASIOSTInt32MSB18:
+	case ASIOSTInt32MSB20:
+	case ASIOSTInt32MSB24:
+	case ASIOSTInt32LSB16:
+	case ASIOSTInt32LSB18:
+	case ASIOSTInt32LSB20:
+	case ASIOSTInt32LSB24:
 	case ASIOSTInt32LSB:
 	case ASIOSTFloat32LSB:
 		return 4;
+	case ASIOSTFloat64MSB:
 	case ASIOSTFloat64LSB:
 		return 8;
 	}
